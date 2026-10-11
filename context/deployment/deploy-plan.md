@@ -1,6 +1,6 @@
 # First production deploy: PasujeMi on Cloudflare Workers
 
-**Status:** blocked at Phase 5 (2026-10-11). Phases 0–4 are done. `master` is pushed (0604ab2), and Workers Builds is connected but both builds **failed** (`442b0db0`, `94705c21`). Production is unaffected and still runs `b85cc2f0`.
+**Status:** blocked at Phase 5 (2026-10-11). Phases 0–4 are done. `master` is pushed (65be2af), and Workers Builds is connected but all three builds **failed** (`442b0db0`, `94705c21`, `8d2aa848`) because the Production tab had no build command; this is now fixed. Production is unaffected and still runs `b85cc2f0`.
 **Approved:** 2026-10-11
 **Inputs:** @context/foundation/infrastructure.md, @context/foundation/tech-stack.md
 
@@ -176,11 +176,13 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
   - GitHub Actions on the same commit: `ci` success, `smoke` success.
   - `wrangler deployments list` still shows `b85cc2f0` at 100%. Both secrets are present, and the curl checks pass.
   - The preview URLs are still public, because `preview_urls: false` only takes effect on the next successful deploy.
-  - **Cause (found by the user in the build log):** the build command in Workers Builds was empty (`None`), even though the setting is listed in the table above. The user set it to `npm run build` in Settings → Build and clicked **Retry build** (2026-10-11, about 16:19 UTC). The retry did not start a new build: no new deployment and no new check run appeared. The setting is now saved, and the next push (the commit recording this cause) triggers a fresh build.
-  - **Lesson:** after connecting Builds, reopen Settings → Build and confirm the build and deploy commands were saved. The connect flow can leave the build command empty.
+  - **Cause (found by the user in the build log):** the build command in Workers Builds was empty (`None`), even though the setting is listed in the table above. The user set it to `npm run build` and clicked **Retry build** (about 16:19 UTC). The retry did not start a new build, and the change was made in the wrong tab (see the root cause below).
+  - **Lesson:** the build settings are per tab. Edit them under Settings → Builds → **Production**, then confirm in a finished build's **Build settings** which commands it actually used.
   - **Second build, after the build-command fix:** push `8be0c5d..0604ab2` at 16:23 UTC. Build `94705c21-2d58-4e51-be4d-17ffb31dde98` ran 16:23:18Z → 16:24:14Z (about 1 minute) and **failed** again. `ci` and `smoke` passed. Production is unchanged: `b85cc2f0` is at 100%, both secrets are present, the curl checks pass, and both preview URLs still return 200. Build log: https://dash.cloudflare.com/b3303b56aea7018d5974a9989a2909e0/workers/services/view/pasuje-mi/production/builds/94705c21-2d58-4e51-be4d-17ffb31dde98
     - **Cause:** the build step still did not run. After `npm clean-install` (677 packages, 28 s), the log goes straight to `Executing user deploy command: npx wrangler deploy`, with no build-command line. Without `dist/`, wrangler used `wrangler.jsonc` and failed: `✘ [ERROR] The entry-point file at "@astrojs/cloudflare/entrypoints/server" was not found.` The build command saved at about 16:19 UTC was not applied to this build, which started at 16:23:16.
-    - **Fix (user, 2026-10-11):** the build command field is left empty, and the deploy command is now `npm run build && npx wrangler deploy`. It persisted after a page reload. The configuration table above is superseded for these two fields.
+    - **Root cause of all three failures (user, 2026-10-11):** the settings were changed in the wrong tab, not under Settings → Builds → **Production**. Build `8d2aa848`'s own Build settings show build command `None` and deploy command `npx wrangler deploy`, so none of the three builds ran `npm run build`.
+    - **Fix:** under Settings → Builds → **Production**, build command `npm run build` and deploy command `npx wrangler deploy`, as in the configuration table above. Saved, and still there after a page reload.
+  - **Third build, after the deploy-command fix:** push `0604ab2..65be2af` at 16:38:00 UTC. Build `8d2aa848-8dc1-4a6b-b445-7b10ab08163c` **failed** at 16:38:46Z, about 46 s after the push, which is roughly when the earlier builds finished `npm ci`. `ci` and `smoke` passed. Production is unchanged: `b85cc2f0` is at 100%, both secrets are present, the curl checks pass, and both preview URLs still return 200. Cause: same as above. The Production tab still had build command `None`.
     - **Side finding (not blocking):** Builds uses Node 22.14.0 from `.nvmrc`. `npm ci` warns `EBADENGINE` for `astro-eslint-parser@3.1.0` and `eslint-plugin-astro@3.1.0` (need `^22.22.3`) and for `undici@8.10.2` (needs `>=22.19.0`). The local build passes on 22.14.0. Consider bumping `.nvmrc` to the current 22.x in a separate change.
   - Original check list:
   - The build succeeds.
@@ -199,14 +201,14 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
 
 ## Deployment record
 
-| Field                                      | Value                                                                                                                           |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Production URL                             | https://pasuje-mi.przepisy-app.workers.dev                                                                                      |
-| Cloudflare account / workers.dev subdomain | `b3303b56aea7018d5974a9989a2909e0` / `przepisy-app`                                                                             |
-| Supabase project ref / region              | `zocbniggvvctublymudo` / `eu-central-1` (Frankfurt)                                                                             |
-| First version ID                           | `12f6f34f-0162-4f59-b870-e45a882b5bf9` (no secrets). With secrets, live: `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc`                 |
-| Workers Builds connected                   | Yes (check runs appear on GitHub). Builds `442b0db0` (8be0c5d) and `94705c21` (0604ab2) **failed**: the build command never ran |
-| Measured CPU time per request              | median 4 ms / p95 16 ms / max 21 ms (n=34, 2026-10-11). 7 of 34 at or above 10 ms → Workers Paid flagged                        |
+| Field                                      | Value                                                                                                                                                                                                             |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production URL                             | https://pasuje-mi.przepisy-app.workers.dev                                                                                                                                                                        |
+| Cloudflare account / workers.dev subdomain | `b3303b56aea7018d5974a9989a2909e0` / `przepisy-app`                                                                                                                                                               |
+| Supabase project ref / region              | `zocbniggvvctublymudo` / `eu-central-1` (Frankfurt)                                                                                                                                                               |
+| First version ID                           | `12f6f34f-0162-4f59-b870-e45a882b5bf9` (no secrets). With secrets, live: `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc`                                                                                                   |
+| Workers Builds connected                   | Yes (check runs appear on GitHub). Builds `442b0db0`, `94705c21` and `8d2aa848` **failed**: the Production tab had build command `None` (settings had been changed in the wrong tab). Fixed in the Production tab |
+| Measured CPU time per request              | median 4 ms / p95 16 ms / max 21 ms (n=34, 2026-10-11). 7 of 34 at or above 10 ms → Workers Paid flagged                                                                                                          |
 
 ## Out of scope
 
