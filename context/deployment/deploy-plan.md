@@ -1,6 +1,6 @@
 # First production deploy: PasujeMi on Cloudflare Workers
 
-**Status:** in progress. Phases 0–4 are done (2026-10-11). Phase 5: Builds is connected in the dashboard (per the user), preview URLs are still on, and the push to `master` awaits approval.
+**Status:** blocked at Phase 5 (2026-10-11). Phases 0–4 are done. `master` is pushed (8be0c5d), and Workers Builds is connected but its first build **failed**. Production is unaffected and still runs `b85cc2f0`.
 **Approved:** 2026-10-11
 **Inputs:** @context/foundation/infrastructure.md, @context/foundation/tech-stack.md
 
@@ -23,7 +23,7 @@
 
 **Verified state:**
 
-- Versions: wrangler 4.131.1, `@astrojs/cloudflare` 14.3.1, astro 7.3.2.
+- Versions: wrangler 4.131.1 (4.149.0 since commit a488adf), `@astrojs/cloudflare` 14.3.1, astro 7.3.2.
 - The build goes through `@cloudflare/vite-plugin` and emits `dist/server/wrangler.json`. `npx wrangler deploy` uses it as a redirected configuration.
 - `supabase/migrations/` does not exist, so there is no schema to push yet.
 - `.dev.vars`, `.env` and `.wrangler/` are gitignored.
@@ -36,16 +36,16 @@ Legend: 🤖 = agent runs it. 👤 = user does it (browser or dashboard). ✋ = 
 
 Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy needs are project devDependencies, so `npm ci` installs them and nothing has to be installed globally. Always call them with `npx`, so the version pinned in `package-lock.json` runs, not some global copy.
 
-| Tool                      | Required                         | How to get it                                              | Check                    | State on 2026-10-11                                                                  |
-| ------------------------- | -------------------------------- | ---------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------ |
-| Node.js                   | `22.14.0` (`.nvmrc`; CI uses 22) | nvm-windows: `nvm install 22.14.0`, then `nvm use 22.14.0` | `node -v`                | ✅ v22.14.0                                                                          |
-| npm                       | ships with Node                  | —                                                          | `npm -v`                 | ✅ 10.9.2                                                                            |
-| Project dependencies      | `package-lock.json`              | `npm ci`                                                   | `npx astro --version`    | ✅ installed                                                                         |
-| wrangler (Cloudflare CLI) | devDependency `^4.131.1`         | installed by `npm ci`; run as `npx wrangler …`             | `npx wrangler --version` | ✅ 4.131.1 (4.149.0 exists; upgrading is not part of this deploy)                    |
-| Supabase CLI              | devDependency `supabase`         | installed by `npm ci`; run as `npx supabase …`             | `npx supabase --version` | ✅ 2.117.0                                                                           |
-| Git                       | any recent version               | git-scm.com                                                | `git --version`          | ✅ 2.49.0                                                                            |
-| GitHub CLI (`gh`)         | **not needed**                   | —                                                          | —                        | ➖ not installed. Workers Builds connects to GitHub through the Cloudflare dashboard |
-| Docker                    | **not needed for deploy**        | Docker Desktop                                             | `docker --version`       | ➖ not installed. Only `npx supabase start` (local Supabase) needs it                |
+| Tool                      | Required                         | How to get it                                              | Check                    | State on 2026-10-11                                                                                                                                                               |
+| ------------------------- | -------------------------------- | ---------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js                   | `22.14.0` (`.nvmrc`; CI uses 22) | nvm-windows: `nvm install 22.14.0`, then `nvm use 22.14.0` | `node -v`                | ✅ v22.14.0                                                                                                                                                                       |
+| npm                       | ships with Node                  | —                                                          | `npm -v`                 | ✅ 10.9.2                                                                                                                                                                         |
+| Project dependencies      | `package-lock.json`              | `npm ci`                                                   | `npx astro --version`    | ✅ installed                                                                                                                                                                      |
+| wrangler (Cloudflare CLI) | devDependency `^4.149.0`         | installed by `npm ci`; run as `npx wrangler …`             | `npx wrangler --version` | ✅ 4.149.0 (upgraded from 4.131.1 in commit a488adf)                                                                                                                              |
+| Supabase CLI              | devDependency `supabase`         | installed by `npm ci`; run as `npx supabase …`             | `npx supabase --version` | ✅ 2.117.0                                                                                                                                                                        |
+| Git                       | any recent version               | git-scm.com                                                | `git --version`          | ✅ 2.49.0                                                                                                                                                                         |
+| GitHub CLI (`gh`)         | optional (verification only)     | cli.github.com, then `gh auth login`                       | `gh --version`           | ✅ 2.102.0, logged in as `aleksandraPecherz`. Workers Builds connects to GitHub through the Cloudflare dashboard, so `gh` is used only for read-only checks (check-runs, commits) |
+| Docker                    | **not needed for deploy**        | Docker Desktop                                             | `docker --version`       | ➖ not installed. Only `npx supabase start` (local Supabase) needs it                                                                                                             |
 
 - [x] 🤖 Check Node, npm, wrangler, Supabase CLI and Git against the table above.
 - [x] 🤖 Dependencies are installed (`npm ci` was already run, and `npm run build` passes).
@@ -168,14 +168,22 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
   - The branch-builds setting itself is not visible via wrangler or gh.
   - Separately, the user's first deploy (15:25 UTC) reformatted `wrangler.jsonc` with tabs and no final newline, leaving the settings unchanged. The user reverted it.
   - Fix: `"preview_urls": false` was added to `wrangler.jsonc` (commit `Disable Worker preview URLs`) and confirmed in the built `dist/server/wrangler.json`. It takes effect on the first Workers Builds deploy; until then, both preview URLs stay public. Preview URLs are public, invisible to logs, and missing from the Supabase redirect list.
-- [ ] 🤖 Check that the Worker name in the dashboard equals `name` in `wrangler.jsonc` (`pasuje-mi`).
-- [ ] ✋ Push `master`. This includes 516ed96, aa8c1a3 and 1ac376c, and triggers the first automatic build.
-- [ ] 🤖 Check the result:
+- [x] 🤖 Check that the Worker name in the dashboard equals `name` in `wrangler.jsonc` (`pasuje-mi`). The check run is named `Workers Builds: pasuje-mi`.
+- [x] ✋ Push `master` (user approved; `4fbafe9..8be0c5d` at 16:12 UTC). This includes 516ed96, aa8c1a3 and 1ac376c, and triggers the first automatic build.
+- [ ] 🤖 Check the result. **❌ Failed.**
+  - The `Workers Builds: pasuje-mi` check run on 8be0c5d ended in `failure`, and it started and completed in the same second (16:13:40Z), which suggests it failed during setup, before `npm run build`.
+  - Build ID: `442b0db0-5212-4baa-8901-da0f4c0fe3c8`. The log is only in the dashboard: https://dash.cloudflare.com/b3303b56aea7018d5974a9989a2909e0/workers/services/view/pasuje-mi/production/builds/442b0db0-5212-4baa-8901-da0f4c0fe3c8
+  - GitHub Actions on the same commit: `ci` success, `smoke` success.
+  - `wrangler deployments list` still shows `b85cc2f0` at 100%. Both secrets are present, and the curl checks pass.
+  - The preview URLs are still public, because `preview_urls: false` only takes effect on the next successful deploy.
+  - **Cause (found by the user in the build log):** the build command in Workers Builds was empty (`None`), even though the setting is listed in the table above. The user set it to `npm run build` in Settings → Build and clicked **Retry build** (2026-10-11, about 16:19 UTC). The retry did not start a new build: no new deployment and no new check run appeared. The setting is now saved, and the next push (the commit recording this cause) triggers a fresh build.
+  - **Lesson:** after connecting Builds, reopen Settings → Build and confirm the build and deploy commands were saved. The connect flow can leave the build command empty.
+  - Original check list:
   - The build succeeds.
   - `npx wrangler deployments list` shows a version deployed by Workers Builds.
   - The curl checks pass.
   - Both secrets are still present.
-- [ ] 🤖 Confirm `.github/workflows/ci.yml` is unchanged and still has no deploy step.
+- [x] 🤖 Confirm `.github/workflows/ci.yml` is unchanged and still has no deploy step. It was last changed in 0cd90ba, has jobs `ci` and `smoke`, and has no wrangler/deploy/`CLOUDFLARE` references.
 
 **Edge case:** Workers Builds does not wait for GitHub Actions, so a commit that fails CI is still deployed. That's accepted for the MVP; run `npm run lint` and `npx astro check` before pushing.
 
@@ -193,8 +201,8 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
 | Cloudflare account / workers.dev subdomain | `b3303b56aea7018d5974a9989a2909e0` / `przepisy-app`                                                             |
 | Supabase project ref / region              | `zocbniggvvctublymudo` / `eu-central-1` (Frankfurt)                                                             |
 | First version ID                           | `12f6f34f-0162-4f59-b870-e45a882b5bf9` (no secrets). With secrets, live: `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc` |
-| Workers Builds connected                   | _pending_                                                                                                       |
-| Measured CPU time per request              | median 6 ms / p95 16 ms / max 21 ms (n=24, 2026-10-11). 6 of 24 at or above 10 ms → Workers Paid flagged        |
+| Workers Builds connected                   | Yes (the check run appears on GitHub). First build `442b0db0` on 8be0c5d **failed**; cause pending              |
+| Measured CPU time per request              | median 4 ms / p95 16 ms / max 21 ms (n=34, 2026-10-11). 7 of 34 at or above 10 ms → Workers Paid flagged        |
 
 ## Out of scope
 
