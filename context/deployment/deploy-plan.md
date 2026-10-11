@@ -1,6 +1,6 @@
 # First production deploy: PasujeMi on Cloudflare Workers
 
-**Status:** done (2026-10-11). Production is live at https://pasuje-mi.przepisy-app.workers.dev, and pushes to `master` auto-deploy through Workers Builds (first successful build `9a58acf4` → version `8024c0e0`). Open follow-up: the CPU time flag (Workers Paid).
+**Status:** done (2026-10-11, final verification 16:53 UTC). Production is live at https://pasuje-mi.przepisy-app.workers.dev on version `8024c0e0`, and pushes to `master` auto-deploy through Workers Builds. Open items are listed under [Follow-ups](#follow-ups).
 **Approved:** 2026-10-11
 **Inputs:** @context/foundation/infrastructure.md, @context/foundation/tech-stack.md
 
@@ -64,8 +64,8 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
 
 ### 0.3 Logging in the CLIs
 
-- [x] 👤 **wrangler:** type `! npx wrangler login` in the Claude Code prompt. A browser opens; approve access, and the token is saved locally in the user profile, not in the repo. On 2026-10-11 the CLI was not logged in.
-- [x] 🤖 `npx wrangler whoami` shows your e-mail and Account ID, and the list of permissions includes `workers (write)`. (2026-10-11: OAuth login, account `b3303b56aea7018d5974a9989a2909e0`, `workers (write)` present. wrangler now resolves to 4.149.0, because `package.json` was bumped to `^4.149.0`, which isn't committed yet. The account has **no `workers.dev` subdomain yet**: API error 10007.)
+- [x] 👤 **wrangler:** type `! npx wrangler login` in the Claude Code prompt. A browser opens; approve access, and the token is saved locally in the user profile, not in the repo. (Done by the user on 2026-10-11.)
+- [x] 🤖 `npx wrangler whoami` shows your e-mail and Account ID, and the list of permissions includes `workers (write)`. (2026-10-11: OAuth login, account `b3303b56aea7018d5974a9989a2909e0`, `workers (write)` present, wrangler 4.149.0, committed in a488adf. At that point the account had no `workers.dev` subdomain (API error 10007); it got `przepisy-app` during Phase 3, see 0.2.)
 - [ ] 👤 (Optional) **Supabase CLI:** `! npx supabase login`. It isn't needed for this deploy; it will matter later for `supabase link` and `supabase db push` once the first migrations exist.
 
 ### 0.4 Agent access (optional)
@@ -120,8 +120,8 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
   - The user then deployed from PowerShell (wrangler 4.149.0, commit a488adf). This created version `12f6f34f-0162-4f59-b870-e45a882b5bf9` and KV namespace `pasuje-mi-session` (`c56765b72c7d44d1856289a39aa5ef04`).
 - [x] ✋ Run `npx wrangler versions secret put SUPABASE_URL` and `npx wrangler versions secret put SUPABASE_KEY`, then `npx wrangler versions deploy` to promote that version to 100% of traffic. (Values were piped from `.dev.vars` through stdin. This created versions `afc12a9e-142c-4698-a15c-c689fef1d9bd` (URL) and `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc` (URL + KEY). `b85cc2f0` was deployed at 100% with the message "Add Supabase secrets".)
 - [x] 🤖 `npx wrangler secret list` shows both names.
-- [x] 🤖 Run `npx wrangler deployments list` and record the version ID (the rollback target). Live: `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc`. Rollback target: `12f6f34f-0162-4f59-b870-e45a882b5bf9` (no secrets, so it isn't a useful target).
-- Note: the Worker's `previews_enabled` is `true` (account default). Turn it off along with non-production branch builds in Phase 5.
+- [x] 🤖 Run `npx wrangler deployments list` and record the version ID (the rollback target). After Phase 3: `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc` at 100%. (Since Phase 5, production runs `8024c0e0`; see the Deployment record.)
+- Note: after Phase 3 the Worker had `previews_enabled: true` (account default). This was resolved in Phase 5 with `preview_urls: false`.
 
 **If the deploy fails:**
 
@@ -145,14 +145,14 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
   - Tail captured 24 requests. All had `outcome: ok`, with **0 exceptions, 0 5xx responses, no error 1102, and no warn/error logs**.
   - CPU time: **median 6 ms, p95 16 ms, max 21 ms** (the first `GET /auth/signup`, a cold start). 6 of 24 requests were at or above 10 ms.
   - Anonymous `GET /` (warm) took 2–4 ms. Signed-in pages took 4–16 ms. `POST /api/auth/signin` took 8–9 ms of CPU, with 280–350 ms wall time (the Supabase round-trip). `POST /api/auth/signup` took 11 ms of CPU and 1.5 s wall time.
-  - ⚠️ **Flag: move to Workers Paid.** The p95 is above the Free 10 ms CPU limit. Nothing failed at this traffic level, but auth pages and cold starts run over the limit, so 1102 errors are likely under real use.
+  - ⚠️ The p95 is above the Free 10 ms CPU limit, mainly auth pages and first requests on a fresh isolate. Nothing failed. **Decision (user, 2026-10-11):** stay on Free, watch for error 1102, and move to Workers Paid only if it appears (see Follow-ups).
 
-**Rollback:** `npx wrangler rollback <version-id>` ✋. The first deploy has no earlier version, so fix forward or remove the secrets instead.
+**Rollback:** `npx wrangler rollback <version-id>` ✋. The current rollback target is `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc` (same code before `preview_urls: false`, with both secrets). Do not roll back to `12f6f34f`, which has no secrets.
 
 ## Phase 5: Auto-deploy from master with Workers Builds
 
 - [x] 👤 In the dashboard, go to Workers & Pages → `pasuje-mi` → Settings → Builds → Connect (GitHub). Authorize only `aleksandraPecherz/PasujeMi`. (The user reported this done on 2026-10-11. The agent could not verify the app's repo scope: `gh api user/installations` returns 403 for an OAuth token.)
-- [x] 👤 Set the build configuration (in Settings → Builds → **Production**; see the Phase 5 result below):
+- [x] 👤 Set the build configuration. Final, working settings are under Settings → Builds → **Production**:
 
   | Setting           | Value                 |
   | ----------------- | --------------------- |
@@ -162,36 +162,29 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
   | Root directory    | `/`                   |
   | Build variables   | none                  |
 
-- [x] 👤 Turn non-production branch builds OFF. Preview URLs are handled in config: **verified off.** The branch-builds toggle itself can't be checked with wrangler or gh.
-  - **2026-10-11 check:** `https://b85cc2f0-pasuje-mi.przepisy-app.workers.dev` and `https://12f6f34f-pasuje-mi.przepisy-app.workers.dev` both return 200. Preview URLs are still on, and the old secret-less version is public.
-  - Proposed durable fix: set `"preview_urls": false` in `wrangler.jsonc`, because `wrangler deploy` syncs that setting on every Workers Builds deploy.
-  - The branch-builds setting itself is not visible via wrangler or gh.
-  - Separately, the user's first deploy (15:25 UTC) reformatted `wrangler.jsonc` with tabs and no final newline, leaving the settings unchanged. The user reverted it.
-  - Fix: `"preview_urls": false` was added to `wrangler.jsonc` (commit `Disable Worker preview URLs`) and confirmed in the built `dist/server/wrangler.json`. It takes effect on the first Workers Builds deploy; until then, both preview URLs stay public.
-  - **Verified 2026-10-11 16:50 UTC**, after the first successful Builds deploy: `b85cc2f0-…`, `12f6f34f-…` and `8024c0e0-pasuje-mi.przepisy-app.workers.dev` all return **404**.
+- [x] Preview URLs are off. `"preview_urls": false` is in `wrangler.jsonc` (commit 03d4b83), so every `wrangler deploy` (including Workers Builds) re-applies it. Verified at 16:53 UTC: `b85cc2f0-…`, `12f6f34f-…` and `8024c0e0-pasuje-mi.przepisy-app.workers.dev` all return 404. (Until the first successful Builds deploy they returned 200.)
+- [ ] 👤 Turn non-production branch builds OFF. **Not verified:** this setting can't be read with wrangler or gh. The user should confirm it in the dashboard.
 - [x] 🤖 Check that the Worker name in the dashboard equals `name` in `wrangler.jsonc` (`pasuje-mi`). The check run is named `Workers Builds: pasuje-mi`.
-- [x] ✋ Push `master` (user approved; `4fbafe9..8be0c5d` at 16:12 UTC). This includes 516ed96, aa8c1a3 and 1ac376c, and triggers the first automatic build.
-- [x] 🤖 Check the result. The first three builds **failed**; the fourth **succeeded** (details at the end of this list).
-  - The `Workers Builds: pasuje-mi` check run on 8be0c5d ended in `failure` at 16:13:40Z. The build itself ran for about 1.5 minutes from 16:12:16Z. Workers Builds posts a separate `in_progress` check run at the start and a final one whose start and end times are both the completion time, so an identical start/end does not mean an instant failure.
-  - Build ID: `442b0db0-5212-4baa-8901-da0f4c0fe3c8`. The log is only in the dashboard: https://dash.cloudflare.com/b3303b56aea7018d5974a9989a2909e0/workers/services/view/pasuje-mi/production/builds/442b0db0-5212-4baa-8901-da0f4c0fe3c8
-  - GitHub Actions on the same commit: `ci` success, `smoke` success.
-  - `wrangler deployments list` still shows `b85cc2f0` at 100%. Both secrets are present, and the curl checks pass.
-  - The preview URLs are still public, because `preview_urls: false` only takes effect on the next successful deploy.
-  - **Cause (found by the user in the build log):** the build command in Workers Builds was empty (`None`), even though the setting is listed in the table above. The user set it to `npm run build` and clicked **Retry build** (about 16:19 UTC). The retry did not start a new build, and the change was made in the wrong tab (see the root cause below).
-  - **Lesson:** the build settings are per tab. Edit them under Settings → Builds → **Production**, then confirm in a finished build's **Build settings** which commands it actually used.
-  - **Second build, after the build-command fix:** push `8be0c5d..0604ab2` at 16:23 UTC. Build `94705c21-2d58-4e51-be4d-17ffb31dde98` ran 16:23:18Z → 16:24:14Z (about 1 minute) and **failed** again. `ci` and `smoke` passed. Production is unchanged: `b85cc2f0` is at 100%, both secrets are present, the curl checks pass, and both preview URLs still return 200. Build log: https://dash.cloudflare.com/b3303b56aea7018d5974a9989a2909e0/workers/services/view/pasuje-mi/production/builds/94705c21-2d58-4e51-be4d-17ffb31dde98
-    - **Cause:** the build step still did not run. After `npm clean-install` (677 packages, 28 s), the log goes straight to `Executing user deploy command: npx wrangler deploy`, with no build-command line. Without `dist/`, wrangler used `wrangler.jsonc` and failed: `✘ [ERROR] The entry-point file at "@astrojs/cloudflare/entrypoints/server" was not found.` The build command saved at about 16:19 UTC was not applied to this build, which started at 16:23:16.
-    - **Root cause of all three failures (user, 2026-10-11):** the settings were changed in the wrong tab, not under Settings → Builds → **Production**. Build `8d2aa848`'s own Build settings show build command `None` and deploy command `npx wrangler deploy`, so none of the three builds ran `npm run build`.
-    - **Fix:** under Settings → Builds → **Production**, build command `npm run build` and deploy command `npx wrangler deploy`, as in the configuration table above. Saved, and still there after a page reload.
-  - **Third build, after the deploy-command fix:** push `0604ab2..65be2af` at 16:38:00 UTC. Build `8d2aa848-8dc1-4a6b-b445-7b10ab08163c` **failed** at 16:38:46Z, about 46 s after the push, which is roughly when the earlier builds finished `npm ci`. `ci` and `smoke` passed. Production is unchanged: `b85cc2f0` is at 100%, both secrets are present, the curl checks pass, and both preview URLs still return 200. Cause: same as above. The Production tab still had build command `None`.
-    - **Side finding (not blocking):** Builds uses Node 22.14.0 from `.nvmrc`. `npm ci` warns `EBADENGINE` for `astro-eslint-parser@3.1.0` and `eslint-plugin-astro@3.1.0` (need `^22.22.3`) and for `undici@8.10.2` (needs `>=22.19.0`). The local build passes on 22.14.0. Consider bumping `.nvmrc` to the current 22.x in a separate change.
-  - **Fourth build, after the Production-tab fix: ✅ success.** Push `65be2af..9e5de95` at 16:47:16 UTC. Build `9a58acf4-f439-4584-953e-e05126a0e36b` completed at 16:48:33Z with `success`; `ci` and `smoke` also succeeded.
-    - [x] The build succeeds.
-    - [x] `npx wrangler deployments list` shows a version deployed by Workers Builds: `8024c0e0-f704-402a-abd4-782413764061` at 100%, created 16:48:28Z, during the build. wrangler labels its source `Unknown (version_upload)`, and the timing ties it to the build.
-    - [x] The curl checks pass: `/` 200, `/auth/signin` 200, `/dashboard` 302 → `/auth/signin`.
-    - [x] Both secrets are still present: `wrangler versions view 8024c0e0` lists `SUPABASE_KEY` and `SUPABASE_URL`.
-    - Tail on `8024c0e0` (16:48–16:51 UTC, 17 requests): 0 exceptions and 0 5xx. A signed-in session works (`POST /api/auth/signin` 302, then `/dashboard` 200).
-    - CPU: warm `GET /` 2–4 ms, but the first request on a fresh isolate is 13–23 ms for `/` and 28–49 ms for `/auth/signin`.
+- [x] ✋ Push `master`. The first push (`4fbafe9..8be0c5d`, 16:12 UTC) included 516ed96, aa8c1a3, 1ac376c, a488adf and 03d4b83. Three more pushes followed while builds were being fixed.
+- [x] 🤖 Check the result. The first three builds failed and the fourth succeeded:
+
+  | Build                                  | Commit  | Result | Cause                                                                                                                                                   |
+  | -------------------------------------- | ------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `442b0db0-5212-4baa-8901-da0f4c0fe3c8` | 8be0c5d | ❌     | Production tab had build command `None`                                                                                                                 |
+  | `94705c21-2d58-4e51-be4d-17ffb31dde98` | 0604ab2 | ❌     | Same; the log shows `npm ci`, then straight to `npx wrangler deploy`: `The entry-point file at "@astrojs/cloudflare/entrypoints/server" was not found.` |
+  | `8d2aa848-8dc1-4a6b-b445-7b10ab08163c` | 65be2af | ❌     | Same; its Build settings showed build `None`, deploy `npx wrangler deploy`                                                                              |
+  | `9a58acf4-f439-4584-953e-e05126a0e36b` | 9e5de95 | ✅     | —                                                                                                                                                       |
+  - **Root cause (user):** the build settings had been edited in the wrong tab, not under Settings → Builds → **Production**. "Retry build" (about 16:19 UTC) did not start a new build. Fixed by setting the Production tab as in the table above.
+  - **Lesson:** build settings are per tab. Edit them under **Production**, then confirm in a finished build's own **Build settings** which commands it actually used.
+  - **Check-run timing:** Workers Builds posts an `in_progress` run at the start and a final run whose start and end are both the completion time. An identical start/end does not mean an instant failure.
+  - During all three failures, production stayed on `b85cc2f0` with both secrets, and the curl checks passed. GitHub Actions `ci` and `smoke` passed on every commit.
+  - **Final verification (16:53 UTC):**
+    - `wrangler deployments list`: `8024c0e0-f704-402a-abd4-782413764061` at 100%, created 16:48:28Z. wrangler shows its source as `Unknown (version_upload)`; the link to Workers Builds is inferred, because it was created inside the window of build `9a58acf4` (push at 16:47:16, success at 16:48:33Z) and nothing else deployed then.
+    - `wrangler secret list` (and `versions view 8024c0e0`): `SUPABASE_URL`, `SUPABASE_KEY`.
+    - curl: `/` 200, `/auth/signin` 200 with no "not configured" message, `/dashboard` 302 → `/auth/signin`.
+    - Check runs on 9e5de95 (`origin/master`): `Workers Builds: pasuje-mi` success, `ci` success, `smoke` success.
+    - Tail on `8024c0e0` (16:48–16:51 UTC, 17 requests): 0 exceptions, 0 5xx. Signed-in session works (`POST /api/auth/signin` 302, then `/dashboard` 200).
+
 - [x] 🤖 Confirm `.github/workflows/ci.yml` is unchanged and still has no deploy step. It was last changed in 0cd90ba, has jobs `ci` and `smoke`, and has no wrangler/deploy/`CLOUDFLARE` references.
 
 **Edge case:** Workers Builds does not wait for GitHub Actions, so a commit that fails CI is still deployed. That's accepted for the MVP; run `npm run lint` and `npx astro check` before pushing.
@@ -200,19 +193,24 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
 
 - [x] 🤖 Save this plan to `context/deployment/deploy-plan.md`.
 - [x] 🤖 After each phase, update the checkboxes and record results: the URL, version IDs, Supabase region and CPU time.
-- [x] 🤖 Commit `Record first deployment plan`; push ✋. The plan was committed and pushed in several commits (8be0c5d, 0604ab2, 65be2af, 9e5de95); the final record is in the commit after 9e5de95.
+- [x] 🤖 Commit `Record first deployment plan` (8be0c5d), with updates in 0604ab2, 65be2af, 9e5de95, 32605c1 and the final close-out commit. Push ✋ pending user approval.
+- [x] 🤖 Stop `wrangler tail` and the local dev server (16:54 UTC; no node processes left).
 
 ## Deployment record
 
-| Field                                      | Value                                                                                                                                                                                                                                                                  |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Production URL                             | https://pasuje-mi.przepisy-app.workers.dev                                                                                                                                                                                                                             |
-| Cloudflare account / workers.dev subdomain | `b3303b56aea7018d5974a9989a2909e0` / `przepisy-app`                                                                                                                                                                                                                    |
-| Supabase project ref / region              | `zocbniggvvctublymudo` / `eu-central-1` (Frankfurt)                                                                                                                                                                                                                    |
-| First version ID                           | `12f6f34f-0162-4f59-b870-e45a882b5bf9` (manual, no secrets) → `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc` (with secrets) → **live: `8024c0e0-f704-402a-abd4-782413764061`** (Workers Builds, commit 9e5de95)                                                                |
-| Workers Builds connected                   | Yes. Builds `442b0db0`, `94705c21` and `8d2aa848` **failed** (the Production tab had build command `None`; settings had been changed in the wrong tab). Build `9a58acf4` on 9e5de95 **succeeded** after the Production-tab fix                                         |
-| Preview URLs                               | Off (`preview_urls: false` in `wrangler.jsonc`). All version preview hosts return 404                                                                                                                                                                                  |
-| Measured CPU time per request              | All 60 requests (2026-10-11): median 4 ms / p95 28 ms / max 49 ms, 17 of 60 at or above 10 ms. Warm requests take 1–8 ms; the first request on a fresh isolate takes 13–49 ms (`/auth/signin` is the heaviest). 0 errors and no 1102 so far → **Workers Paid flagged** |
+| Field                                      | Value                                                                                                                                                                                                                                                     |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production URL                             | https://pasuje-mi.przepisy-app.workers.dev                                                                                                                                                                                                                |
+| Cloudflare account / workers.dev subdomain | `b3303b56aea7018d5974a9989a2909e0` / `przepisy-app`                                                                                                                                                                                                       |
+| Supabase project ref / region              | `zocbniggvvctublymudo` / `eu-central-1` (Frankfurt)                                                                                                                                                                                                       |
+| Current production version                 | `8024c0e0-f704-402a-abd4-782413764061` at 100% (Workers Builds build `9a58acf4`, commit 9e5de95)                                                                                                                                                          |
+| Earlier versions                           | `12f6f34f-0162-4f59-b870-e45a882b5bf9` (manual first deploy, no secrets) → `afc12a9e-142c-4698-a15c-c689fef1d9bd` (URL secret) → `b85cc2f0-db8e-4ba1-8a8d-6cc18e7becbc` (both secrets; rollback target)                                                   |
+| KV namespace                               | `pasuje-mi-session` (`c56765b72c7d44d1856289a39aa5ef04`)                                                                                                                                                                                                  |
+| Secrets                                    | `SUPABASE_URL`, `SUPABASE_KEY`                                                                                                                                                                                                                            |
+| Workers Builds                             | **Working.** Push to `master` → build → deploy. First success: build `9a58acf4` on 9e5de95                                                                                                                                                                |
+| Final build settings                       | Settings → Builds → **Production**: branch `master`, build `npm run build`, deploy `npx wrangler deploy`, root `/`, no build variables                                                                                                                    |
+| Preview URLs                               | Off (`preview_urls: false` in `wrangler.jsonc`); all version preview hosts return 404                                                                                                                                                                     |
+| CPU time per request                       | 60 requests (2026-10-11): median 4 ms / p95 28 ms / max 49 ms; 17 of 60 at or above 10 ms. Warm 1–8 ms; first request on a fresh isolate 13–49 ms (`/auth/signin` heaviest). 0 errors, no 1102. Decision: stay on Free, move to Paid only if 1102 appears |
 
 ## Out of scope
 
@@ -223,9 +221,22 @@ Tool state was checked on this machine on 2026-10-11. All the CLIs this deploy n
 
 ## Done when
 
-1. ✅ On the `workers.dev` URL, `/` returns 200 and `/dashboard` returns 302 to `/auth/signin`. Verified 16:50 UTC on `8024c0e0`.
-2. ✅ The manual signup → confirm → signin → dashboard → signout flow works. Verified 15:42–16:05 UTC on `b85cc2f0`; signin → dashboard re-verified at 16:49 on `8024c0e0`. The confirmation-link click itself wasn't in the logs, but signin worked, so the e-mail is confirmed.
-3. ✅ `wrangler secret list` shows `SUPABASE_URL` and `SUPABASE_KEY`.
-4. ✅ A push to `master` produces a deployment through Workers Builds: 9e5de95 → build `9a58acf4` → version `8024c0e0` at 100%.
-5. ✅ CPU time per request is recorded; it is **not** under 10 ms (p95 28 ms, cold starts up to 49 ms), so the move to Workers Paid is flagged.
-6. ✅ This file is committed with the deployment record filled in, once the user approves the push of the final commit.
+Ticked only where verified directly with wrangler, gh, curl or tail.
+
+- [x] 1. On the `workers.dev` URL, `/` returns 200 and `/dashboard` returns 302 to `/auth/signin`. Verified by curl at 16:53 UTC on `8024c0e0`.
+- [x] 2. The manual signup → confirm → signin → dashboard → signout flow works. Verified via tail, 15:42–16:05 UTC on `b85cc2f0`; signin → dashboard was re-verified at 16:49 on `8024c0e0`. The confirmation-link click itself was not seen in tail. It is confirmed indirectly: Confirm email is ON, and signin succeeded.
+- [x] 3. `wrangler secret list` shows `SUPABASE_URL` and `SUPABASE_KEY`. Verified at 16:53 UTC.
+- [x] 4. A push to `master` produces a deployment through Workers Builds: 9e5de95 → build `9a58acf4` (check run success) → `8024c0e0` at 100%. The version-to-build link is by timing (wrangler reports the source as `Unknown`).
+- [x] 5. CPU time per request is recorded (p95 28 ms, so not under 10 ms). The decision about Workers Paid is recorded: move only if 1102 appears.
+- [x] 6. This file is committed with the deployment record filled in (final close-out commit). It is not yet pushed; the push awaits user approval.
+
+## Follow-ups
+
+Recorded only; none of these are fixed here.
+
+- **Delete the old London Supabase project (`eu-west-2`).** Production uses `zocbniggvvctublymudo` (Frankfurt), and Free orgs allow only 2 active projects. This is a destructive action for the user to do in the dashboard.
+- **Bump Node in `.nvmrc`** (currently 22.14.0). Workers Builds' `npm ci` warns `EBADENGINE`: `astro-eslint-parser@3.1.0` and `eslint-plugin-astro@3.1.0` need `^22.22.3`, and `undici@8.10.2` needs `>=22.19.0`.
+- **`tech-stack.md` says `cloudflare-pages`, but production runs Workers.** Fix it by re-running `/10x-tech-stack-selector`, not by hand.
+- **CRLF errors in local lint** (1086 × `Delete ␍`, Windows working copy only; CI and Builds are unaffected).
+- **Watch for error 1102** (CPU limit exceeded) in `wrangler tail` or Workers Logs. Move to Workers Paid ($5/mo) only if it appears.
+- **Confirm in the dashboard** that non-production branch builds are off; this couldn't be verified with wrangler or gh.
