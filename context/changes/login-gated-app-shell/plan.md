@@ -239,7 +239,7 @@ Brak danych do migracji. Stare zakładki na `/dashboard` po zalogowaniu dadzą 4
 - [x] 1.2 Type checking passes: `npx astro check` — 4480069
 - [x] 1.3 Production build succeeds: `npm run build` — 4480069
 - [x] 1.4 Starter files are gone and unreferenced — 4480069
-- [ ] 1.5 Smoke test passes against a running dev server: `npm run smoke`
+- [x] 1.5 Smoke test passes against a running dev server: `npm run smoke` — 5379e27
 
 #### Manual
 
@@ -252,16 +252,16 @@ Brak danych do migracji. Stare zakładki na `/dashboard` po zalogowaniu dadzą 4
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Type checking passes: `npx astro check`
-- [x] 2.3 Production build succeeds: `npm run build`
-- [x] 2.4 No English UI strings remain in auth screens
-- [ ] 2.5 Smoke test still passes: `npm run smoke`
+- [x] 2.1 Linting passes: `npm run lint` — 5379e27
+- [x] 2.2 Type checking passes: `npx astro check` — 5379e27
+- [x] 2.3 Production build succeeds: `npm run build` — 5379e27
+- [x] 2.4 No English UI strings remain in auth screens — 5379e27
+- [x] 2.5 Smoke test still passes: `npm run smoke` — 5379e27
 
 #### Manual
 
-- [x] 2.6 Sign-in, sign-up and confirm-email screens are fully Polish, including validation messages
-- [x] 2.7 Wrong password shows a Polish message
-- [x] 2.8 Signing up with an existing email shows a Polish message
-- [x] 2.9 Password hint reads correctly for 1, 2–4 and 5 missing characters
-- [x] 2.10 `/auth/signin?error=<dowolny tekst>` shows the generic Polish message, not the URL text
+- [x] 2.6 Sign-in, sign-up and confirm-email screens are fully Polish, including validation messages — 5379e27
+- [x] 2.7 Wrong password shows a Polish message — 5379e27
+- [x] 2.8 Signing up with an existing email shows a Polish message — 5379e27
+- [x] 2.9 Password hint reads correctly for 1, 2–4 and 5 missing characters — 5379e27
+- [x] 2.10 `/auth/signin?error=<dowolny tekst>` shows the generic Polish message, not the URL text — 5379e27

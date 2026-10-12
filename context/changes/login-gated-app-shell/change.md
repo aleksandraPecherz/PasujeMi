@@ -1,7 +1,7 @@
 ---
 change_id: login-gated-app-shell
 title: Logowanie jako brama do aplikacji (S-01)
-status: implementing
+status: implemented
 created: 2026-10-12
 updated: 2026-10-12
 archived_at: null
