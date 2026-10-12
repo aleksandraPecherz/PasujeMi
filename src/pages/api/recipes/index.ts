@@ -10,7 +10,11 @@ function parseIntParam(value: string | null, fallback: number): number | null {
   if (value === null) {
     return fallback;
   }
-  return /^\d+$/.test(value) ? Number(value) : null;
+  if (!/^\d+$/.test(value)) {
+    return null;
+  }
+  const n = Number(value);
+  return Number.isSafeInteger(n) ? n : null;
 }
 
 // Signed-out requests never reach this handler: the middleware answers /api/* with 401.
@@ -31,7 +35,9 @@ export const GET: APIRoute = async (context) => {
   try {
     const page = await listRecipes(supabase, { limit, offset });
     return Response.json(page);
-  } catch {
+  } catch (error) {
+    // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
+    console.error("listRecipes failed", error);
     return Response.json({ error: "database_error" }, { status: 500 });
   }
 };
