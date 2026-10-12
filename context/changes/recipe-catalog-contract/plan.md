@@ -324,12 +324,12 @@ Pierwsza migracja projektu; addytywna, bez danych. Wycofanie: `drop table public
 
 #### Automated
 
-- [x] 3.1 Linting passes: `npm run lint`
-- [x] 3.2 Type checking passes: `npx astro check`
-- [x] 3.3 Seed covers all five recipes
-- [ ] 3.4 CI `smoke` passes, including the new signed-in recipes step, after push
-- [ ] 3.5 CI RLS check passes: service role sees 5 seeded recipes, anon key gets no rows
+- [x] 3.1 Linting passes: `npm run lint` — d290873
+- [x] 3.2 Type checking passes: `npx astro check` — d290873
+- [x] 3.3 Seed covers all five recipes — d290873
+- [x] 3.4 CI `smoke` passes, including the new signed-in recipes step, after push — d290873
+- [x] 3.5 CI RLS check passes: service role sees 5 seeded recipes, anon key gets no rows — d290873
 
 #### Manual
 
-- [ ] 3.6 Author spot-checks the seeded recipes against the Excel
+- [x] 3.6 Author spot-checks the seeded recipes against the Excel — d290873
