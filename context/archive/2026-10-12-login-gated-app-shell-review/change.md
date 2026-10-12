@@ -1,9 +1,10 @@
 ---
 change_id: login-gated-app-shell-review
 title: Przegląd implementacji S-01 (Logowanie jako brama do aplikacji)
-status: impl_reviewed
+status: archived
 created: 2026-10-12
 updated: 2026-10-12
+archived_at: 2026-10-12T18:23:03Z
 ---
 
 ## Notes
