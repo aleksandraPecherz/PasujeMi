@@ -39,28 +39,28 @@ Osoba gotująca dla siebie i domowników chce szybko zobaczyć, co ugotuje z pro
 
 ## At a glance
 
-| ID   | Change ID                     | Outcome (user can …)                                                                   | Prerequisites                        | PRD refs                    | Status   |
-| ---- | ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------- | -------- |
-| F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                    | FR-004, FR-006, FR-007      | ready    |
-| F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel/JSON file in repo | FR-004, FR-005, NFR (< 1 s) | proposed |
-| S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                    | FR-001                      | done     |
-| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                           | FR-005, FR-006, US-01       | proposed |
-| S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                           | US-01, FR-002, FR-004       | proposed |
-| S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                 | FR-003                      | proposed |
-| S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                           | FR-007                      | proposed |
-| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                 | FR-009                      | proposed |
-| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                 | FR-010                      | proposed |
+| ID   | Change ID                     | Outcome (user can …)                                                                   | Prerequisites                              | PRD refs                    | Status      |
+| ---- | ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------- | ----------- |
+| F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                          | FR-004, FR-006, FR-007      | in-progress |
+| F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel file (author's machine) | FR-004, FR-005, NFR (< 1 s) | proposed    |
+| S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                          | FR-001                      | done        |
+| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | proposed    |
+| S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | proposed    |
+| S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | proposed    |
+| S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | proposed    |
+| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | proposed    |
+| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | proposed    |
 
 ## Streams
 
 Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the dependency graph below; this table is the proposed reading order across parallel tracks.
 
-| Stream | Theme                  | Chain                    | Note                                                                           |
-| ------ | ---------------------- | ------------------------ | ------------------------------------------------------------------------------ |
-| A      | Wejście i przeglądanie | `S-01` → `S-02`          | `S-02` potrzebuje też `F-01` ze strumienia B.                                  |
-| B      | Pętla dopasowania      | `F-01` → `S-03` → `S-04` | Gwiazda przewodnia; dołącza do strumienia A przy `S-01`. Ścieżka priorytetowa. |
-| C      | Zarządzanie przepisami | `S-05` → `S-06` → `S-07` | Dołącza do strumienia B przy `F-01`; może iść równolegle z `S-03`.             |
-| D      | Baza startowa          | `F-02`                   | Dołącza do strumienia B przy `F-01`; czeka na plik z przepisami w repo.        |
+| Stream | Theme                  | Chain                    | Note                                                                                  |
+| ------ | ---------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
+| A      | Wejście i przeglądanie | `S-01` → `S-02`          | `S-02` potrzebuje też `F-01` ze strumienia B.                                         |
+| B      | Pętla dopasowania      | `F-01` → `S-03` → `S-04` | Gwiazda przewodnia; dołącza do strumienia A przy `S-01`. Ścieżka priorytetowa.        |
+| C      | Zarządzanie przepisami | `S-05` → `S-06` → `S-07` | Dołącza do strumienia B przy `F-01`; może iść równolegle z `S-03`.                    |
+| D      | Baza startowa          | `F-02`                   | Dołącza do strumienia B przy `F-01`; czeka na plik z przepisami (lokalnie u autorki). |
 
 ## Baseline
 
@@ -88,7 +88,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Jaka struktura JSON-a jest optymalna na bazie kolumn Excela (zwłaszcza zapis składnika z gramaturą i zamiennikami)? — Owner: autorka. Block: no.
 - **Risk:** Tylko odczyt i dane testowe — zapis, edycja i role dochodzą w S-05…S-07, a pantry w S-03/S-04, więc foundation nie buduje całej warstwy danych z góry.
-- **Status:** ready
+- **Status:** in-progress
 
 ### F-02: Import bazowych przepisów
 
@@ -96,7 +96,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Change ID:** seed-recipe-import
 - **PRD refs:** FR-004, FR-005, NFR (< 1 s przy kilkuset przepisach), uwaga PRD o bazowych przepisach
 - **Unlocks:** ścieżka weryfikacji S-03 na realnej bazie (jakość dopasowania i NFR < 1 s); S-02 z pełną listą do doładowania
-- **Prerequisites:** F-01, recipe Excel/JSON file in repo
+- **Prerequisites:** F-01, recipe Excel file (author's machine)
 - **Parallel with:** S-01, S-02, S-03, S-04, S-05, S-06, S-07
 - **Blockers:** —
 - **Unknowns:**
@@ -194,17 +194,17 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                     | Suggested issue title                                 | Ready for `/10x-plan` | Notes                                    |
-| ---------- | ----------------------------- | ----------------------------------------------------- | --------------------- | ---------------------------------------- |
-| F-01       | recipe-catalog-contract       | Minimalny kontrakt danych przepisu + przepisy testowe | yes                   | Run `/10x-plan recipe-catalog-contract`  |
-| F-02       | seed-recipe-import            | Import bazowych 50–100 przepisów                      | no                    | Czeka na F-01 i plik z przepisami w repo |
-| S-01       | login-gated-app-shell         | Logowanie jako brama do aplikacji                     | yes                   | Run `/10x-plan login-gated-app-shell`    |
-| S-02       | browse-recipes-and-details    | Przeglądanie przepisów (10 + doładowanie) i szczegóły | no                    | Czeka na F-01, S-01                      |
-| S-03       | first-pantry-match            | Spiżarka w tagach i lista z % dopasowania             | no                    | Gwiazda przewodnia; czeka na F-01, S-01  |
-| S-04       | remembered-staples-exclusions | Zapamiętane produkty stałe i wykluczenia              | no                    | Czeka na S-03                            |
-| S-05       | add-recipe-manually           | Ręczne dodawanie przepisu z zamiennikami              | no                    | Czeka na F-01, S-01                      |
-| S-06       | author-edits-own-recipe       | Autor edytuje i usuwa swój przepis                    | no                    | Czeka na S-05                            |
-| S-07       | admin-manages-any-recipe      | Admin edytuje i usuwa dowolny przepis                 | no                    | Czeka na S-06                            |
+| Roadmap ID | Change ID                     | Suggested issue title                                 | Ready for `/10x-plan` | Notes                                                  |
+| ---------- | ----------------------------- | ----------------------------------------------------- | --------------------- | ------------------------------------------------------ |
+| F-01       | recipe-catalog-contract       | Minimalny kontrakt danych przepisu + przepisy testowe | yes                   | Run `/10x-plan recipe-catalog-contract`                |
+| F-02       | seed-recipe-import            | Import bazowych 50–100 przepisów                      | no                    | Czeka na F-01 i plik z przepisami (lokalnie u autorki) |
+| S-01       | login-gated-app-shell         | Logowanie jako brama do aplikacji                     | yes                   | Run `/10x-plan login-gated-app-shell`                  |
+| S-02       | browse-recipes-and-details    | Przeglądanie przepisów (10 + doładowanie) i szczegóły | no                    | Czeka na F-01, S-01                                    |
+| S-03       | first-pantry-match            | Spiżarka w tagach i lista z % dopasowania             | no                    | Gwiazda przewodnia; czeka na F-01, S-01                |
+| S-04       | remembered-staples-exclusions | Zapamiętane produkty stałe i wykluczenia              | no                    | Czeka na S-03                                          |
+| S-05       | add-recipe-manually           | Ręczne dodawanie przepisu z zamiennikami              | no                    | Czeka na F-01, S-01                                    |
+| S-06       | author-edits-own-recipe       | Autor edytuje i usuwa swój przepis                    | no                    | Czeka na S-05                                          |
+| S-07       | admin-manages-any-recipe      | Admin edytuje i usuwa dowolny przepis                 | no                    | Czeka na S-06                                          |
 
 ## Open Roadmap Questions
 

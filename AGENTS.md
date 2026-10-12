@@ -24,6 +24,7 @@ PasujeMi is a Polish-language recipe-matching web app built on the 10x Astro Sta
 - `src/components/` — shadcn/ui ("new-york") in `src/components/ui/`, added via `npx shadcn@latest add <name>`.
 - `src/lib/` — helpers and the Supabase client (@src/lib/supabase.ts); business logic in `src/lib/services/`, shared types in `src/types.ts`.
 - `supabase/migrations/YYYYMMDDHHmmss_short_description.sql` — schema changes.
+- `docs/reference/recipe-data-contract.md` — recipe shape and conversion rules from the local `data/recipes.xlsx` (gitignored, only on the author's machine); `supabase/seed.sql` — test data for local/CI only.
 
 ## Coding Style
 
