@@ -1,7 +1,7 @@
 ---
 change_id: recipe-catalog-contract
 title: Minimalny kontrakt danych przepisu z przepisami testowymi (F-01)
-status: implementing
+status: implemented
 created: 2026-10-12
 updated: 2026-10-12
 archived_at: null

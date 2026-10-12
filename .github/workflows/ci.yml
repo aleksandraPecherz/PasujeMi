@@ -39,7 +39,19 @@ jobs:
       - name: Start local Supabase
         run: |
           supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,realtime,storage-api,postgres-meta,supavisor
-          supabase status -o env | grep -E '^(API_URL|ANON_KEY)=' > supabase.env
+          supabase status -o env | grep -E '^(API_URL|ANON_KEY|SERVICE_ROLE_KEY)=' > supabase.env
+      - name: Check that recipes are hidden from the anon key
+        run: |
+          source supabase.env
+          # The service role bypasses RLS: the 5 seeded recipes must be there.
+          seeded=$(curl -s "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
+          echo "service role: $seeded"
+          test "$(echo "$seeded" | jq 'length')" -eq 5
+          # The anon key must get no rows: a permission error, not a list of recipes.
+          status=$(curl -s -o anon.json -w '%{http_code}' "$API_URL/rest/v1/recipes?select=id" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")
+          echo "anon: $status $(cat anon.json)"
+          [ "$status" = 401 ] || [ "$status" = 403 ]
+          jq -e '.code == "42501"' anon.json
       - name: Configure secrets for build and preview
         run: |
           source supabase.env
