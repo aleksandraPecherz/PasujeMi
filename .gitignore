@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# author's local source data (recipes.xlsx) - never committed
+data/

@@ -32,10 +32,13 @@ async function request(path, { method = "GET", form } = {}) {
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
   storeCookies(response);
-  return { status: response.status, location: response.headers.get("location") ?? "" };
+  const isJson = (response.headers.get("content-type") ?? "").includes("application/json");
+  const body = isJson ? await response.json() : undefined;
+  return { status: response.status, location: response.headers.get("location") ?? "", body };
 }
 
 // `location` must match exactly; use `locationPrefix` when only the start is fixed (e.g. an error query).
+// `check(body)` is an optional predicate on the parsed JSON body.
 const steps = [
   ["anonymous root redirects to signin", () => request("/"), { status: 302, location: "/auth/signin" }],
   ["signin page renders for anonymous user", () => request("/auth/signin"), { status: 200 }],
@@ -55,6 +58,11 @@ const steps = [
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
     { status: 302, location: "/" },
   ],
+  [
+    "signed-in user reads recipes",
+    () => request("/api/recipes"),
+    { status: 200, check: (body) => Array.isArray(body?.recipes) && typeof body?.hasMore === "boolean" },
+  ],
   ["app shell renders for signed-in user", () => request("/"), { status: 200 }],
   ["signed-in user is sent away from signin", () => request("/auth/signin"), { status: 302, location: "/" }],
   [
@@ -71,7 +79,8 @@ for (const [name, run, expected] of steps) {
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location === expected.location) &&
-    (expected.locationPrefix === undefined || actual.location.startsWith(expected.locationPrefix));
+    (expected.locationPrefix === undefined || actual.location.startsWith(expected.locationPrefix)) &&
+    (expected.check === undefined || expected.check(actual.body));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
