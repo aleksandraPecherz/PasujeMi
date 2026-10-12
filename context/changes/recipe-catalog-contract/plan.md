@@ -311,22 +311,22 @@ Pierwsza migracja projektu; addytywna, bez danych. Wycofanie: `drop table public
 
 #### Automated
 
-- [x] 2.1 Remote migration history includes the recipes migration
-- [x] 2.2 The `recipes` table exists on production and anon is blocked (REST permission error, not 404)
-- [ ] 2.3 CI and Workers Builds succeed for the merge commit on `master`
+- [x] 2.1 Remote migration history includes the recipes migration — 2d54b3f
+- [x] 2.2 The `recipes` table exists on production and anon is blocked (REST permission error, not 404) — 2d54b3f
+- [x] 2.3 CI and Workers Builds succeed for the merge commit on `master` — 2d54b3f
 
 #### Manual
 
-- [x] 2.4 Author approved `db push` after seeing the dry-run output
-- [ ] 2.5 Signed in on the dev server, `GET /api/recipes` returns an empty list
+- [x] 2.4 Author approved `db push` after seeing the dry-run output — 2d54b3f
+- [x] 2.5 Signed in on the dev server, `GET /api/recipes` returns an empty list — 2d54b3f
 
 ### Phase 3: Przepisy testowe i smoke w CI
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Type checking passes: `npx astro check`
-- [ ] 3.3 Seed covers all five recipes
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Type checking passes: `npx astro check`
+- [x] 3.3 Seed covers all five recipes
 - [ ] 3.4 CI `smoke` passes, including the new signed-in recipes step, after push
 - [ ] 3.5 CI RLS check passes: service role sees 5 seeded recipes, anon key gets no rows
 

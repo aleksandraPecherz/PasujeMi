@@ -61,7 +61,15 @@ const steps = [
   [
     "signed-in user reads recipes",
     () => request("/api/recipes"),
-    { status: 200, check: (body) => Array.isArray(body?.recipes) && typeof body?.hasMore === "boolean" },
+    {
+      status: 200,
+      // supabase/seed.sql loads 5 test recipes in CI.
+      check: (body) =>
+        Array.isArray(body?.recipes) &&
+        typeof body?.hasMore === "boolean" &&
+        body.recipes.length >= 5 &&
+        body.recipes.every((recipe) => recipe.steps.length > 0 && recipe.ingredients.length > 0),
+    },
   ],
   ["app shell renders for signed-in user", () => request("/"), { status: 200 }],
   ["signed-in user is sent away from signin", () => request("/auth/signin"), { status: 302, location: "/" }],
