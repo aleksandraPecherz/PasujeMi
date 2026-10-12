@@ -86,7 +86,7 @@ Formaty spotykane w pliku:
 
 - **PRODUKTY**: 74× `Nazwa (40g) [zamienniki: a (40g), b (20g)] ; …`; 2× `Nazwa - 120 g [zamienniki: x – 125 g], …` rozdzielane przecinkami (przecinek bywa też w nazwie: „Borówki amerykańskie, świeże lub mrożone - 100 g”). Etykieta `zamiennik:` (28×) i `zamienniki:`. Ilości: `5g`, `0,3 g`, `0.3g`, `25 g`, `1szczypta`.
 - **Jak zrobić?**: 42× numerowane (`1.` lub `1)`), 26× rozdzielane `;`, 8× nowymi liniami (z `;` w środku linii).
-- **rodzaj**: tylko `na słodko` / `na wytrawnie` + `na ciepło` / `na zimno`, rozdzielane `;` lub `;`.
+- **rodzaj**: tylko `na słodko` / `na wytrawnie` + `na ciepło` / `na zimno`, rozdzielane średnikiem ze spacją przed lub bez (`na słodko ; na zimno`, `na słodko; na zimno`).
 - **Kcal i makro**: zwykle ~400 kcal na porcję, ale część przepisów wielu porcji ma wartość na całość (pizza 4 porcje = 1704 kcal, spaghetti 2 porcje = 844 kcal), a część na porcję (babeczki 2 porcje = 406 kcal).
 - **waga (g)**: wypełniona 16×, pusta 36×, `BRAK` 24× — pomijana.
 
@@ -119,7 +119,7 @@ Usuwane z `product`, zostają w `name`. Występują prawie zawsze w zamiennikach
 - **Duplikaty składników** — ten sam składnik dwa razy w przepisie („Sól (0,5g)” i „Sól (0,3g)”); nie scalać, zostają dwie pozycje.
 - **Nawiasy w nazwach, które nie są ilością** — „(biała)”, „(z łopatki)”; ilością jest tylko ostatni nawias na końcu pozycji w postaci `(liczba jednostka)`.
 - **`;` wewnątrz `[...]`** — średnik w bloku zamienników nie dzieli składników; dlatego bloki `[zamiennik(i): …]` wydziela się przed podziałem.
-- **Separator `;` bez spacji przed** — dzielić po samym `;`, nie po `;`.
+- **Separator `;` bez spacji przed** — obok `składnik ; składnik` występuje `składnik; składnik`; dzielić po samym `;` i przycinać części, nie po „spacja + `;`”.
 - **Przecinek w nazwie** — w układzie „- 120 g” przecinek dzieli pozycje tylko po ilości lub po `]`.
 - **Różne zapisy ilości** — `5g`, `0,3 g`, `0.3g`, `1szczypta` (bez spacji, przecinek lub kropka dziesiętna).
 - **Kcal na całość vs na porcję** — patrz reguła autorki wyżej.

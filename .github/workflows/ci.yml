@@ -34,7 +34,7 @@ jobs:
           cache: npm
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.120.0
       - run: npm ci
       - name: Start local Supabase
         run: |
@@ -44,9 +44,9 @@ jobs:
         run: |
           source supabase.env
           # The service role bypasses RLS: the 5 seeded recipes must be there.
-          seeded=$(curl -s "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
+          seeded=$(curl -sf "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
           echo "service role: $seeded"
-          test "$(echo "$seeded" | jq 'length')" -eq 5
+          echo "$seeded" | jq -e 'type == "array" and length == 5'
           # The anon key must get no rows: a permission error, not a list of recipes.
           status=$(curl -s -o anon.json -w '%{http_code}' "$API_URL/rest/v1/recipes?select=id" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")
           echo "anon: $status $(cat anon.json)"
