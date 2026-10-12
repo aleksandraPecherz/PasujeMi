@@ -33,16 +33,20 @@ async function request(path, { method = "GET", form } = {}) {
   });
   storeCookies(response);
   const isJson = (response.headers.get("content-type") ?? "").includes("application/json");
-  const body = isJson ? await response.json() : undefined;
+  const body = isJson ? await response.json() : await response.text();
   return { status: response.status, location: response.headers.get("location") ?? "", body };
 }
 
-// `location` must match exactly; use `locationPrefix` when only the start is fixed (e.g. an error query).
-// `check(body)` is an optional predicate on the parsed JSON body.
+// `location` must match exactly.
+// `check(body)` is an optional predicate on the body (parsed JSON, otherwise text).
 const steps = [
   ["anonymous root redirects to signin", () => request("/"), { status: 302, location: "/auth/signin" }],
   ["signin page renders for anonymous user", () => request("/auth/signin"), { status: 200 }],
-  ["anonymous api request gets 401", () => request("/api/recipes"), { status: 401 }],
+  [
+    "anonymous api request gets 401",
+    () => request("/api/recipes"),
+    { status: 401, check: (body) => body?.error === "unauthorized" },
+  ],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
@@ -51,7 +55,7 @@ const steps = [
   [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
-    { status: 302, locationPrefix: "/auth/signin?error=" },
+    { status: 302, location: "/auth/signin?error=invalid_credentials" },
   ],
   [
     "signin accepts correct password",
@@ -71,7 +75,11 @@ const steps = [
         body.recipes.every((recipe) => recipe.steps.length > 0 && recipe.ingredients.length > 0),
     },
   ],
-  ["app shell renders for signed-in user", () => request("/"), { status: 200 }],
+  [
+    "app shell renders for signed-in user",
+    () => request("/"),
+    { status: 200, check: (body) => typeof body === "string" && body.includes("Wyloguj") },
+  ],
   ["signed-in user is sent away from signin", () => request("/auth/signin"), { status: 302, location: "/" }],
   [
     "signout clears session",
@@ -87,12 +95,11 @@ for (const [name, run, expected] of steps) {
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location === expected.location) &&
-    (expected.locationPrefix === undefined || actual.location.startsWith(expected.locationPrefix)) &&
     (expected.check === undefined || expected.check(actual.body));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? expected.locationPrefix ?? ""}`);
+    console.log(`      expected ${expected.status} ${expected.location ?? ""}`);
   }
 }
 
