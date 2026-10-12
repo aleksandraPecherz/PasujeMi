@@ -296,28 +296,28 @@ Pierwsza migracja projektu; addytywna, bez danych. Wycofanie: `drop table public
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Type checking passes: `npx astro check`
-- [x] 1.3 Production build succeeds: `npm run build`
-- [x] 1.4 Source data stays out of git
-- [x] 1.5 Migration enables RLS and defines only a select policy
-- [ ] 1.6 CI passes on the PR, including the signed-in `GET /api/recipes` step
+- [x] 1.1 Linting passes: `npm run lint` — 43a774c
+- [x] 1.2 Type checking passes: `npx astro check` — 43a774c
+- [x] 1.3 Production build succeeds: `npm run build` — 43a774c
+- [x] 1.4 Source data stays out of git — 43a774c
+- [x] 1.5 Migration enables RLS and defines only a select policy — 43a774c
+- [x] 1.6 CI passes on the PR, including the signed-in `GET /api/recipes` step — 43a774c
 
 #### Manual
 
-- [ ] 1.7 Author confirms the conversion rules in `docs/reference/recipe-data-contract.md` match the Excel
+- [x] 1.7 Author confirms the conversion rules in `docs/reference/recipe-data-contract.md` match the Excel — 43a774c
 
 ### Phase 2: Migracja na produkcję
 
 #### Automated
 
-- [ ] 2.1 Remote migration history includes the recipes migration
-- [ ] 2.2 The `recipes` table exists on production and anon is blocked (REST permission error, not 404)
+- [x] 2.1 Remote migration history includes the recipes migration
+- [x] 2.2 The `recipes` table exists on production and anon is blocked (REST permission error, not 404)
 - [ ] 2.3 CI and Workers Builds succeed for the merge commit on `master`
 
 #### Manual
 
-- [ ] 2.4 Author approved `db push` after seeing the dry-run output
+- [x] 2.4 Author approved `db push` after seeing the dry-run output
 - [ ] 2.5 Signed in on the dev server, `GET /api/recipes` returns an empty list
 
 ### Phase 3: Przepisy testowe i smoke w CI
