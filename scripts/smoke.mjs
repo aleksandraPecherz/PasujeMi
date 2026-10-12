@@ -35,9 +35,11 @@ async function request(path, { method = "GET", form } = {}) {
   return { status: response.status, location: response.headers.get("location") ?? "" };
 }
 
+// `location` must match exactly; use `locationPrefix` when only the start is fixed (e.g. an error query).
 const steps = [
-  ["home renders", () => request("/"), { status: 200 }],
-  ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  ["anonymous root redirects to signin", () => request("/"), { status: 302, location: "/auth/signin" }],
+  ["signin page renders for anonymous user", () => request("/auth/signin"), { status: 200 }],
+  ["anonymous api request gets 401", () => request("/api/recipes"), { status: 401 }],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
@@ -46,16 +48,21 @@ const steps = [
   [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
-    { status: 302, location: "/auth/signin?error=" },
+    { status: 302, locationPrefix: "/auth/signin?error=" },
   ],
   [
     "signin accepts correct password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
     { status: 302, location: "/" },
   ],
-  ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
-  ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
-  ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  ["app shell renders for signed-in user", () => request("/"), { status: 200 }],
+  ["signed-in user is sent away from signin", () => request("/auth/signin"), { status: 302, location: "/" }],
+  [
+    "signout clears session",
+    () => request("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  ["root redirects after signout", () => request("/"), { status: 302, location: "/auth/signin" }],
 ];
 
 let failed = 0;
@@ -63,11 +70,12 @@ for (const [name, run, expected] of steps) {
   const actual = await run();
   const ok =
     actual.status === expected.status &&
-    (expected.location === undefined || actual.location.startsWith(expected.location));
+    (expected.location === undefined || actual.location === expected.location) &&
+    (expected.locationPrefix === undefined || actual.location.startsWith(expected.locationPrefix));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? ""}`);
+    console.log(`      expected ${expected.status} ${expected.location ?? expected.locationPrefix ?? ""}`);
   }
 }
 

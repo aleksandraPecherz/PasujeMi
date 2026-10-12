@@ -1,8 +1,10 @@
 ---
-import Welcome from "@/components/Welcome.astro";
-import Layout from "@/layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
-<Layout>
-  <Welcome />
-</Layout>
+<AppLayout>
+  <section class="rounded-2xl border border-white/10 bg-white/10 p-6 text-center backdrop-blur-xl sm:p-8">
+    <h1 class="mb-2 text-xl font-semibold sm:text-2xl">Wypełnij spiżarkę, żeby zobaczyć dopasowanie</h1>
+    <p class="text-blue-100/70">Tu pojawią się Twoje produkty i przepisy dopasowane do tego, co masz.</p>
+  </section>
+</AppLayout>

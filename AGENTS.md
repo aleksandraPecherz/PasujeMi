@@ -19,7 +19,8 @@ PasujeMi is a Polish-language recipe-matching web app built on the 10x Astro Sta
 ## Project Structure
 
 - `src/pages/` — routes; API endpoints in `src/pages/api/`.
-- `src/middleware.ts` — sets `locals.user`; add guarded paths to `PROTECTED_ROUTES`.
+- `src/middleware.ts` — sets `locals.user`; every route requires sign-in except `PUBLIC_PREFIXES` (`/auth/`, `/api/auth/`). Signed-out `/api/*` gets 401, pages redirect to `/auth/signin`.
+- `src/layouts/AppLayout.astro` — shell (header + content) for signed-in pages.
 - `src/components/` — shadcn/ui ("new-york") in `src/components/ui/`, added via `npx shadcn@latest add <name>`.
 - `src/lib/` — helpers and the Supabase client (@src/lib/supabase.ts); business logic in `src/lib/services/`, shared types in `src/types.ts`.
 - `supabase/migrations/YYYYMMDDHHmmss_short_description.sql` — schema changes.
