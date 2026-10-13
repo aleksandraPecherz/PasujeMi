@@ -453,7 +453,7 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Automated
 
-- [x] 3.1 Lint, typy, testy i build: `npm run lint`, `npx astro check`, `npm test`, `npm run build`
+- [x] 3.1 Lint, typy, testy i build: `npm run lint`, `npx astro check`, `npm test`, `npm run build` — e9cca8e
 - [ ] 3.2 Smoke w CI nadal przechodzi: `npm run smoke`
 
 #### Manual
