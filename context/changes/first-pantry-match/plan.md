@@ -439,11 +439,11 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Automated
 
-- [ ] 2.1 Migracja nakłada się czysto: `npx supabase db reset`
-- [x] 2.2 Testy przechodzą, w tym testy `matchRecipes` na sztucznym kliencie: `npm test`
-- [x] 2.3 Lint i typy: `npm run lint`, `npx astro check`
-- [x] 2.4 Build: `npm run build`
-- [ ] 2.5 CI: krok `npm run match-keys` wypisuje `updated 5`, potem `updated 0`; sprawdzenia endpointu przechodzą w `npm run smoke`
+- [x] 2.1 Migracja nakłada się czysto: `npx supabase db reset` — d17c5c1
+- [x] 2.2 Testy przechodzą, w tym testy `matchRecipes` na sztucznym kliencie: `npm test` — d17c5c1
+- [x] 2.3 Lint i typy: `npm run lint`, `npx astro check` — d17c5c1
+- [x] 2.4 Build: `npm run build` — d17c5c1
+- [x] 2.5 CI: krok `npm run match-keys` wypisuje `updated 5`, potem `updated 0`; sprawdzenia endpointu przechodzą w `npm run smoke` — d17c5c1
 
 #### Manual
 
@@ -453,7 +453,7 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Automated
 
-- [ ] 3.1 Lint, typy, testy i build: `npm run lint`, `npx astro check`, `npm test`, `npm run build`
+- [x] 3.1 Lint, typy, testy i build: `npm run lint`, `npx astro check`, `npm test`, `npm run build`
 - [ ] 3.2 Smoke w CI nadal przechodzi: `npm run smoke`
 
 #### Manual
