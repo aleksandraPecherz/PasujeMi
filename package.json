@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
     "test": "vitest run",
-    "bench:match": "tsx scripts/bench-match.ts"
+    "bench:match": "tsx scripts/bench-match.ts",
+    "match-keys": "tsx scripts/match-keys.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

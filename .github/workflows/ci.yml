@@ -53,6 +53,16 @@ jobs:
           echo "anon: $status $(cat anon.json)"
           [ "$status" = 401 ] || [ "$status" = 403 ]
           jq -e '.code == "42501"' anon.json
+      - name: Compute recipe match keys (idempotent)
+        run: |
+          source supabase.env
+          export SUPABASE_URL="$API_URL" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          first=$(npm run --silent match-keys)
+          echo "first run: $first"
+          [ "$first" = "updated 5" ]
+          second=$(npm run --silent match-keys)
+          echo "second run: $second"
+          [ "$second" = "updated 0" ]
       - name: Configure secrets for build and preview
         run: |
           source supabase.env

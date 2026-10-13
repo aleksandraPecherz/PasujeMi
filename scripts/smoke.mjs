@@ -76,6 +76,32 @@ const steps = [
     },
   ],
   [
+    "signed-in user matches recipes to the pantry",
+    () => request("/api/recipes/match?have=pomidor&have=chleb&exclude=jogurt"),
+    {
+      status: 200,
+      // Shape first, then content (context/foundation/lessons.md). Every yogurt option in the seed contains "jogurt",
+      // so the muffins are hidden; the other 4 seeded recipes stay, sorted by a non-increasing %.
+      check: (body) => {
+        if (!Array.isArray(body?.recipes) || typeof body?.hasMore !== "boolean") return false;
+        const names = body.recipes.map((recipe) => recipe.name);
+        const percents = body.recipes.map((recipe) => recipe.match?.percent);
+        return (
+          !names.includes("Babeczki z jogurtem naturalnym") &&
+          [
+            "Kanapka z serem, szynką i ogórkiem",
+            "Twarożek z makrelą, porem, szpinakiem oraz ogórkiem kiszonym i pieczywem",
+            "Danie jednogarnkowe z mięsem",
+            "Domowe spaghetti",
+          ].every((name) => names.includes(name)) &&
+          percents.every((percent) => typeof percent === "number") &&
+          percents.some((percent) => percent > 0) &&
+          percents.every((percent, i) => i === 0 || percent <= percents[i - 1])
+        );
+      },
+    },
+  ],
+  [
     "app shell renders for signed-in user",
     () => request("/"),
     { status: 200, check: (body) => typeof body === "string" && body.includes("Wyloguj") },
