@@ -425,15 +425,15 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Automated
 
-- [x] 1.1 Testy reguły przechodzą: `npm test`
-- [x] 1.2 Lint przechodzi z wyłączonym katalogiem `vendor`: `npm run lint`
-- [x] 1.3 Typy przechodzą: `npx astro check`
-- [x] 1.4 Build przechodzi z zaimportowanym stemmerem: `npm run build`
+- [x] 1.1 Testy reguły przechodzą: `npm test` — f5b7c22
+- [x] 1.2 Lint przechodzi z wyłączonym katalogiem `vendor`: `npm run lint` — f5b7c22
+- [x] 1.3 Typy przechodzą: `npx astro check` — f5b7c22
+- [x] 1.4 Build przechodzi z zaimportowanym stemmerem: `npm run build` — f5b7c22
 
 #### Manual
 
-- [x] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 8 ms lokalnie, < 10 ms w Workers Logs
-- [x] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd i w `npm run build`, a potem jest usunięte
+- [x] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 8 ms lokalnie, < 10 ms w Workers Logs — f5b7c22
+- [x] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd i w `npm run build`, a potem jest usunięte — f5b7c22
 
 ### Phase 2: Klucze w bazie, serwis i API
 
