@@ -1,21 +1,10 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { parseIntParam } from "@/lib/query-params";
 import { listRecipes } from "@/lib/services/recipes";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
-
-// Missing parameter -> fallback; anything but a plain non-negative integer -> null.
-function parseIntParam(value: string | null, fallback: number): number | null {
-  if (value === null) {
-    return fallback;
-  }
-  if (!/^\d+$/.test(value)) {
-    return null;
-  }
-  const n = Number(value);
-  return Number.isSafeInteger(n) ? n : null;
-}
 
 // Signed-out requests never reach this handler: the middleware answers /api/* with 401.
 export const GET: APIRoute = async (context) => {

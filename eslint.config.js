@@ -77,15 +77,24 @@ const scriptsConfig = defineConfig({
   rules: { "no-console": "off" },
 });
 
+// TypeScript scripts (benchmarks, maintenance) keep type-checked rules but may print to the console.
+const tsScriptsConfig = defineConfig({
+  files: ["scripts/**/*.ts"],
+  rules: { "no-console": "off" },
+});
+
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
   // Course tooling (skills, prompts) downloaded by 10x-cli is not app code.
   globalIgnores([".claude/"]),
+  // Generated Snowball stemmer copied unchanged from snowball-stemmers-js (see its LICENSE).
+  globalIgnores(["src/lib/matching/vendor/"]),
   baseConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
   eslintPluginAstro.configs["flat/jsx-a11y-recommended"],
   astroConfig,
   scriptsConfig,
+  tsScriptsConfig,
   eslintPluginPrettier,
 );
