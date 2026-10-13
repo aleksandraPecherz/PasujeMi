@@ -103,6 +103,14 @@ async function fetchAllPages<Row>(
   }
 }
 
+// Keys are parallel to the ingredients: one entry per ingredient, the main option plus one per substitute.
+function keysFitIngredients(keys: MatchKeys, ingredients: RecipeIngredient[]): boolean {
+  return (
+    keys.length === ingredients.length &&
+    keys.every((options, index) => options.length === ingredients[index].substitutes.length + 1)
+  );
+}
+
 export async function matchRecipes(
   supabase: SupabaseClient,
   pantry: { have: string[]; staple: string[]; exclude: string[] },
@@ -127,7 +135,7 @@ export async function matchRecipes(
       supabase
         .from("recipes")
         .select("id, ingredients")
-        .or(`match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`)
+        .or(`match_keys.is.null,match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`)
         .order("id", { ascending: true })
         .range(from, to)
         .overrideTypes<IngredientsRow[], { merge: false }>(),
@@ -149,10 +157,11 @@ export async function matchRecipes(
   }
 
   // 3. Staples count exactly like owned products; one exclusion may expand to several tags ("maka" → mak, mąka).
-  const ranked = rankRecipes(candidates, {
+  const pantryKeys = {
     have: [...pantry.have, ...pantry.staple].map(normalizeTag),
     exclude: pantry.exclude.flatMap(normalizeExclusion),
-  });
+  };
+  const ranked = rankRecipes(candidates, pantryKeys);
   const page = ranked.slice(offset, offset + limit);
   const hasMore = ranked.length > offset + limit;
   if (page.length === 0) {
@@ -174,12 +183,21 @@ export async function matchRecipes(
   }
 
   const rowsById = new Map(data.map((row) => [row.id, row]));
+  const keysById = new Map(candidates.map((candidate) => [candidate.id, candidate.keys]));
   const recipes: MatchedRecipe[] = [];
   for (const { id, match } of page) {
     const row = rowsById.get(id);
     // A recipe deleted between the queries is simply left out.
-    if (row !== undefined) {
-      recipes.push({ ...toRecipe(row), match: resolveMatch(match, row.ingredients) });
+    if (row === undefined) {
+      continue;
+    }
+    // Stored keys that no longer fit the ingredients (edited without recomputing them) are recomputed for this
+    // recipe; if it is now excluded, it is left out.
+    const current = keysFitIngredients(keysById.get(id) ?? [], row.ingredients)
+      ? match
+      : rankRecipes([{ id, name: row.name, keys: computeMatchKeys(row.ingredients) }], pantryKeys).at(0)?.match;
+    if (current !== undefined) {
+      recipes.push({ ...toRecipe(row), match: resolveMatch(current, row.ingredients) });
     }
   }
   return { recipes, hasMore };

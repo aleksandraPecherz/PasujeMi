@@ -30,7 +30,7 @@ async function main(): Promise<number> {
     let query = supabase
       .from("recipes")
       .select("id, ingredients")
-      .or(`match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`)
+      .or(`match_keys.is.null,match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`)
       .order("id", { ascending: true })
       .limit(PAGE_SIZE);
     if (lastId !== null) {

@@ -1,12 +1,11 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { MAX_TAG_LENGTH, MAX_TAGS, MAX_TOKENS, countTokens } from "@/lib/matching/limits";
 import { parseIntParam } from "@/lib/query-params";
 import { matchRecipes } from "@/lib/services/recipes";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
-const MAX_TAG_LENGTH = 60;
-const MAX_TAGS = 30;
 
 // Repeated parameter (`?have=a&have=b`) -> trimmed tags; an empty or too long tag, or too many tags -> null.
 function parseTagList(params: URLSearchParams, name: string): string[] | null {
@@ -36,7 +35,8 @@ export const GET: APIRoute = async (context) => {
     staple === null ||
     exclude === null ||
     // With no tags at all the list is plain FR-005: /api/recipes.
-    have.length + staple.length + exclude.length === 0
+    have.length + staple.length + exclude.length === 0 ||
+    countTokens([...have, ...staple, ...exclude]) > MAX_TOKENS
   ) {
     return Response.json({ error: "invalid_query" }, { status: 400 });
   }

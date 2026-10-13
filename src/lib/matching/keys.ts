@@ -7,7 +7,7 @@ import type { MatchKeys, MatchOptionKeys, RecipeIngredient } from "@/types";
  * Version of the keys stored with recipes. Bump it on every change to normalization, the stemmer or the
  * dictionary; rows with another version get their keys recomputed per request.
  */
-export const MATCH_KEYS_VERSION = 1;
+export const MATCH_KEYS_VERSION = 2;
 
 /** Keys of a pantry tag (owned, staple or excluded). */
 export type TagKeys = string[];
@@ -37,8 +37,16 @@ function withinOneEdit(a: string, b: string): boolean {
   return lengthDiff > 0 ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1);
 }
 
+/**
+ * Keys of a recipe product. An ambiguous word keeps its plain key, and its exception reading counts for exclusions
+ * only: "maka pszenna" stays mak, but an exclusion of "mąka" still hides it.
+ */
 function textToOptionKeys(text: string): MatchOptionKeys {
-  return wordsToOptionKeys(tokenize(text).map(wordKey));
+  const readings = tokenize(text).map(wordKeyReadings);
+  const option = wordsToOptionKeys(readings.map(([key]) => key));
+  const exceptions = readings.filter((keys) => keys.length > 1).map((keys) => keys[1]);
+  if (exceptions.length > 0) option.p = unique([...(option.p ?? []), ...exceptions]);
+  return option;
 }
 
 function wordsToOptionKeys(words: string[]): MatchOptionKeys {
@@ -54,7 +62,8 @@ function wordsToOptionKeys(words: string[]): MatchOptionKeys {
     );
     if (product) {
       keys.push(product.key);
-      parents.push(...product.parents);
+      // The phrase's own words also count for exclusions ("kokosowe" hides "mleko kokosowe"), never for owning.
+      parents.push(...product.parents, ...product.words);
       i += product.words.length;
     } else {
       keys.push(words[i]);
@@ -77,15 +86,20 @@ export function normalizeTag(text: string): TagKeys {
 
 /**
  * Keys of an excluded tag: one tag per reading of its ambiguous words ("maka" → mak and mąka), so an exclusion
- * hides too much rather than too little.
+ * hides too much rather than too little. One choice per ambiguous key, not per token: mixing readings of the same
+ * word only adds keys, so it hides less than either pure reading ("maka maka" → 2 tags, not 4).
  */
 export function normalizeExclusion(text: string): TagKeys[] {
-  let readings: string[][] = [[]];
-  for (const token of tokenize(text)) {
-    const keys = wordKeyReadings(token);
-    readings = readings.flatMap((words) => keys.map((key) => [...words, key]));
+  const readings = tokenize(text).map(wordKeyReadings);
+  const ambiguous = unique(readings.filter((keys) => keys.length > 1).map(([key]) => key));
+  const tags: TagKeys[] = [];
+  for (let mask = 0; mask < 2 ** ambiguous.length; mask++) {
+    const words = readings.map((keys) =>
+      keys.length > 1 && mask & (1 << ambiguous.indexOf(keys[0])) ? keys[1] : keys[0],
+    );
+    tags.push(wordsToOptionKeys(words).k);
   }
-  return readings.map((words) => wordsToOptionKeys(words).k);
+  return tags;
 }
 
 /** The only way to compute a recipe's keys (sync script, service fallback, future recipe writes). */

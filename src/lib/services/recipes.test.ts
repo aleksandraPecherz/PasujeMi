@@ -186,7 +186,7 @@ describe("matchRecipes", () => {
     const fallback = calls.find((call) => call.filters.some((filter) => filter.startsWith("or:")));
     expect(fallback).toMatchObject({
       select: "id, ingredients",
-      filters: [`or:match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`],
+      filters: [`or:match_keys.is.null,match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`],
       range: [0, 999],
     });
 
@@ -214,6 +214,24 @@ describe("matchRecipes", () => {
 
     expect(result.recipes.map((recipe) => recipe.id)).toEqual(["b"]);
     expect(result.hasMore).toBe(false);
+  });
+
+  it("recomputes current-version keys that no longer fit the ingredients", async () => {
+    // Ingredients edited without recomputing the keys: the stored keys still describe one ingredient.
+    const rows = [
+      recipeRow("a", ["sól", "jogurt naturalny"], { keys: computeMatchKeys(ingredients(["sól"])) }),
+      recipeRow("b", ["sól", "pieprz"]),
+      recipeRow("c", ["sól"], { keys: null }),
+    ];
+    const { supabase } = fakeClient(rows);
+
+    const result = await matchRecipes(supabase, { have: ["sól"], staple: [], exclude: [] }, page);
+    expect(result.recipes.find((recipe) => recipe.id === "a")?.match.ingredients).toHaveLength(2);
+    // Missing keys with the current version are computed, not skipped.
+    expect(result.recipes.map((recipe) => recipe.id)).toContain("c");
+
+    const excluded = await matchRecipes(supabase, { have: ["sól"], staple: [], exclude: ["jogurt"] }, page);
+    expect(excluded.recipes.map((recipe) => recipe.id)).not.toContain("a");
   });
 
   it("returns the page in ranking order with full recipes and resolved matches", async () => {

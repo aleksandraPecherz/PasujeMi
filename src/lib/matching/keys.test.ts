@@ -49,6 +49,10 @@ describe("normalizeExclusion", () => {
     expect(normalizeExclusion("Maka pszenna")).toEqual([normalizeTag("mak pszenna"), normalizeTag("mąka pszenna")]);
   });
 
+  it("does not multiply readings of a repeated ambiguous word", () => {
+    expect(normalizeExclusion("maka ".repeat(12))).toEqual([normalizeTag("mak"), normalizeTag("mąka")]);
+  });
+
   it("keeps unambiguous words as one tag", () => {
     expect(normalizeExclusion("mąka")).toEqual([normalizeTag("mąka")]);
     expect(normalizeExclusion("mak")).toEqual([normalizeTag("mak")]);
@@ -99,7 +103,10 @@ describe("computeMatchKeys", () => {
       { name: "Sól", product: "sól", amount: 1, unit: "szczypta", substitutes: [] },
     ]);
     expect(keys).toEqual([
-      [{ k: normalizeTag("mleko kokosowe"), p: normalizeTag("mleko") }, { k: normalizeTag("mleko") }],
+      [
+        { k: normalizeTag("mleko kokosowe"), p: [...normalizeTag("mleko"), ...normalizeTag("kokosowe")] },
+        { k: normalizeTag("mleko") },
+      ],
       [{ k: normalizeTag("sól") }],
     ]);
   });
@@ -109,6 +116,7 @@ describe("computeMatchKeys", () => {
 // When it fails on purpose: bump MATCH_KEYS_VERSION in keys.ts and ADD a new entry below (never edit old ones).
 const FINGERPRINTS: Record<number, string> = {
   1: "641f0a0df3219183be8e10181b232fa0e2b1dcbe1ed8cec246ef286fbe6efa0a",
+  2: "66021d2273cdc011cd6f6396f1c89c3032996e1210b71e860b111de12a4f8e50",
 };
 
 const FINGERPRINT_WORDS = [
@@ -127,6 +135,7 @@ const FINGERPRINT_WORDS = [
   "kartofel",
   "ziemniaki",
   "mąka",
+  "maka pszenna",
   "mak",
   "ryż",
   "ryby",
@@ -142,6 +151,9 @@ describe("MATCH_KEYS_VERSION", () => {
   it("matches the fingerprint of keys and dictionary", () => {
     const snapshot = {
       words: FINGERPRINT_WORDS.map((word) => [word, normalizeTag(word)]),
+      recipeKeys: computeMatchKeys(
+        FINGERPRINT_WORDS.map((product) => ({ name: product, product, amount: 1, unit: "g", substitutes: [] })),
+      ),
       dictionary: {
         synonyms: SYNONYMS.map(([form, canonical]) => [form, normalizeTag(form), canonical]),
         separateProducts: [SEPARATE_PRODUCTS, SEPARATE_PRODUCT_KEYS],

@@ -27,7 +27,8 @@ const SECTIONS: { section: PantrySection; label: string; placeholder: string; ta
 ];
 
 export default function PantryMatch() {
-  const { lists, addTag, removeTag, apply, loadMore, recipes, hasMore, loading, error, filtered } = usePantryMatch();
+  const { lists, limitNotice, addTag, removeTag, apply, loadMore, recipes, hasMore, loading, error, filtered } =
+    usePantryMatch();
   const showEmptyFiltered = filtered && !loading && error === null && recipes.length === 0;
 
   return (
@@ -62,9 +63,13 @@ export default function PantryMatch() {
             />
           ))}
         </div>
+        <p role="status" className="mt-3 text-sm text-amber-200 empty:hidden">
+          {limitNotice}
+        </p>
         <Button
           type="button"
           onClick={apply}
+          disabled={loading}
           className="mt-5 w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500 sm:w-auto"
         >
           <SlidersHorizontal aria-hidden="true" />

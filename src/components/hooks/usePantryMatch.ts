@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MAX_TAG_LENGTH, MAX_TAGS, MAX_TOKENS, MAX_URL_LENGTH, countTokens } from "@/lib/matching/limits";
 import type { Recipe, RecipeMatch } from "@/types";
 
 const PAGE_SIZE = 10;
-// Limits of GET /api/recipes/match (src/pages/api/recipes/match.ts); a request above them would get 400.
-export const MAX_TAG_LENGTH = 60;
-export const MAX_TAGS = 30;
+const LIMIT_MESSAGE = `Za dużo produktów naraz (limit ${MAX_TOKENS} słów we wszystkich listach). Usuń któryś produkt.`;
 
 export type PantrySection = "have" | "staple" | "exclude";
 export type PantryLists = Record<PantrySection, string[]>;
@@ -81,9 +80,20 @@ function parsePage(body: unknown, withMatch: boolean): { items: ListedRecipe[]; 
 
 type PageResult = { ok: true; items: ListedRecipe[]; hasMore: boolean } | { ok: false; message: string };
 
-async function requestPage(filters: PantryLists, offset: number): Promise<PageResult> {
+// The same check as addTag, so a request above the endpoint's limits never leaves the browser.
+function exceedsLimits(filters: PantryLists): boolean {
+  return (
+    countTokens([...filters.have, ...filters.staple, ...filters.exclude]) > MAX_TOKENS ||
+    buildUrl(filters, 0).length > MAX_URL_LENGTH
+  );
+}
+
+async function requestPage(filters: PantryLists, offset: number, signal: AbortSignal): Promise<PageResult> {
+  if (exceedsLimits(filters)) {
+    return { ok: false, message: LIMIT_MESSAGE };
+  }
   try {
-    const res = await fetch(buildUrl(filters, offset), { headers: { Accept: "application/json" } });
+    const res = await fetch(buildUrl(filters, offset), { headers: { Accept: "application/json" }, signal });
     if (!res.ok) {
       return {
         ok: false,
@@ -99,6 +109,7 @@ async function requestPage(filters: PantryLists, offset: number): Promise<PageRe
     }
     return { ok: true, ...page };
   } catch {
+    // An aborted request lands here too; `commit` drops it, because a newer request has taken its id.
     return { ok: false, message: "Brak połączenia z serwerem. Spróbuj ponownie." };
   }
 }
@@ -112,8 +123,12 @@ export function usePantryMatch() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Why the last tag was not added because of the request limits; cleared by the next successful edit.
+  const [limitNotice, setLimitNotice] = useState<string | null>(null);
   // Only the latest request may update the list; an older response (e.g. "Pokaż więcej" before a new apply) is dropped.
   const requestId = useRef(0);
+  // A superseded request is aborted, so the Worker does not finish a full-catalog match nobody will see.
+  const inFlight = useRef<AbortController | null>(null);
 
   const commit = useCallback((id: number, filters: PantryLists, pageOffset: number, result: PageResult) => {
     if (id !== requestId.current) {
@@ -135,23 +150,34 @@ export function usePantryMatch() {
   const load = useCallback(
     (filters: PantryLists, pageOffset: number) => {
       const id = ++requestId.current;
+      inFlight.current?.abort();
+      const controller = new AbortController();
+      inFlight.current = controller;
       setLoading(true);
-      void requestPage(filters, pageOffset).then((result) => {
+      void requestPage(filters, pageOffset, controller.signal).then((result) => {
         commit(id, filters, pageOffset, result);
       });
     },
     [commit],
   );
 
-  // Initial view: the plain FR-005 list (no filters); `loading` starts as true.
+  // Initial view: the plain FR-005 list (no filters); `loading` starts as true, so no state is set here.
   useEffect(() => {
     const id = ++requestId.current;
-    void requestPage(EMPTY_LISTS, 0).then((result) => {
+    const controller = new AbortController();
+    inFlight.current = controller;
+    void requestPage(EMPTY_LISTS, 0, controller.signal).then((result) => {
       commit(id, EMPTY_LISTS, 0, result);
     });
+    return () => {
+      controller.abort();
+    };
   }, [commit]);
 
-  /** Returns false when the tag was skipped: empty, too long, a case-insensitive duplicate or the section is full. */
+  /**
+   * Returns false when the tag was skipped: empty, too long, a case-insensitive duplicate, the section is full, or the
+   * request would exceed the word or URL limit (then `limitNotice` says why).
+   */
   const addTag = useCallback(
     (section: PantrySection, tag: string): boolean => {
       const value = tag.trim();
@@ -165,6 +191,11 @@ export function usePantryMatch() {
       ) {
         return false;
       }
+      if (exceedsLimits({ ...lists, [section]: [...current, value] })) {
+        setLimitNotice(LIMIT_MESSAGE);
+        return false;
+      }
+      setLimitNotice(null);
       setLists((prev) => ({ ...prev, [section]: [...prev[section], value] }));
       return true;
     },
@@ -172,6 +203,7 @@ export function usePantryMatch() {
   );
 
   const removeTag = useCallback((section: PantrySection, tag: string) => {
+    setLimitNotice(null);
     setLists((prev) => ({ ...prev, [section]: prev[section].filter((t) => t !== tag) }));
   }, []);
 
@@ -185,6 +217,7 @@ export function usePantryMatch() {
 
   return {
     lists,
+    limitNotice,
     addTag,
     removeTag,
     apply,

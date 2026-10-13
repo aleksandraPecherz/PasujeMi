@@ -11,7 +11,7 @@ export const SYNONYMS: readonly (readonly [form: string, canonical: string])[] =
   ["pomidorki", "pomidor"],
 ];
 
-/** Separate products: the phrase becomes one key; the parent still counts for exclusions, never for owning. */
+/** Separate products: the phrase becomes one key; the parent and the phrase's words still count for exclusions, never for owning. */
 export const SEPARATE_PRODUCTS: readonly { phrase: string; parent: string }[] = [
   { phrase: "mleko kokosowe", parent: "mleko" },
   { phrase: "mleko owsiane", parent: "mleko" },

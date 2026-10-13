@@ -2,7 +2,7 @@ import { useState, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { MAX_TAG_LENGTH, MAX_TAGS } from "@/components/hooks/usePantryMatch";
+import { MAX_TAG_LENGTH, MAX_TAGS } from "@/lib/matching/limits";
 import { cn } from "@/lib/utils";
 
 interface TagInputProps {
@@ -10,8 +10,8 @@ interface TagInputProps {
   label: string;
   placeholder: string;
   tags: string[];
-  /** Adds a tag; duplicates (ignoring case) are skipped by the caller. */
-  onAdd: (tag: string) => void;
+  /** Adds a tag; false when the caller skipped it (duplicate ignoring case, limits), so the text stays to edit. */
+  onAdd: (tag: string) => boolean;
   onRemove: (tag: string) => void;
   tagClassName?: string;
 }
@@ -28,8 +28,9 @@ export function TagInput({ id, label, placeholder, tags, onAdd, onRemove, tagCla
     if (value.trim() === "") {
       return;
     }
-    onAdd(value);
-    setValue("");
+    if (onAdd(value)) {
+      setValue("");
+    }
   }
 
   return (

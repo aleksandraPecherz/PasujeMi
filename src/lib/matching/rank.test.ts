@@ -67,6 +67,7 @@ describe("owned products", () => {
     ["jogurt naturalny", "jogurt", "have"],
     ["mleko", "mleko kokosowe", "unknown"],
     ["mleko kokosowe", "mleko", "unknown"],
+    ["kokosowe", "mleko kokosowe", "unknown"],
   ])("tag %s → %s: %s", (tag, product, status) => {
     expect(one([product], [tag])?.ingredients[0].status).toBe(status);
   });
@@ -87,6 +88,10 @@ describe("exclusions", () => {
     ["orzechy", "orzechy włoskie", true],
     ["mleko", "mleko kokosowe", true],
     ["mleko kokosowe", "mleko", false],
+    ["kokosowe", "mleko kokosowe", true],
+    ["sojowe", "mleko sojowe", true],
+    ["mąka", "maka pszenna", true],
+    ["mąka", "mak", false],
     ["orzechy włoskie", "orzechy", false],
   ])("exclusion %s hides %s: %s", (exclusion, product, hidden) => {
     expect(one([product, "sól"], ["sól"], [exclusion]) === undefined).toBe(hidden);

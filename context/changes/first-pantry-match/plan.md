@@ -68,6 +68,10 @@ Każdy punkt wskazuje źródło. „Plan” oznacza decyzję autorki podjętą w
    - „orzechy” ukrywa „orzechy włoskie”
    - „mleko” ukrywa „mleko kokosowe”
    - „mleko kokosowe” nie ukrywa „mleko”
+   - „kokosowe” ukrywa „mleko kokosowe”
+
+   **Addendum (2026-10-13, impl-review F2):** klucze rodziców osobnego produktu (`p`) zawierają także klucze słów samej frazy, a nie tylko rodzica. Bez tego wpis w słowniku osłabiał wykluczenie („kokosowe” nie ukrywało „mleko kokosowe”). Dla `product` przepisu słowo dwuznaczne bez polskich znaków („maka”) dostaje w `p` także odczyt wyjątku (mąk), więc wykluczenie „mąka” ukrywa „maka pszenna” (F7). `p` nadal nie liczy się do posiadania. `MATCH_KEYS_VERSION` = 2.
+
 7. **Składnik.**
    - Jest **zablokowany**, gdy wykluczone są wszystkie jego opcje (główna i zamienniki). Zablokowany składnik ukrywa przepis (PRD Business Logic).
    - Jest **dostępny („mam”)**, gdy któraś niewykluczona opcja jest pokryta przez tag. Wykluczona opcja nigdy nie daje „mam”, nawet jeśli jest też w posiadanych (PRD Guardrails, bezpieczeństwo).
@@ -432,7 +436,9 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Manual
 
-- [x] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 8 ms lokalnie, < 10 ms w Workers Logs — f5b7c22
+- [ ] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 8 ms lokalnie, < 10 ms w Workers Logs
+  - 2026-10-13 (impl-review F5): lokalnie 8,26–8,68 ms, czyli powyżej progu 8 ms (w plan-brief było ok. 7,8 ms). Po poprawkach F1 i F2 (`MATCH_KEYS_VERSION` 2): 8,71–8,88 ms (JSON.parse ok. 6,0–6,2 ms, rankRecipes ok. 2,7 ms).
+  - Ostateczna decyzja zapada w 3.8 (Workers Logs po wdrożeniu). Przy ≥ 10 ms albo błędzie 1102 planem awaryjnym jest Workers Paid (`infrastructure.md:170`).
 - [x] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd i w `npm run build`, a potem jest usunięte — f5b7c22
 
 ### Phase 2: Klucze w bazie, serwis i API
@@ -447,20 +453,20 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Manual
 
-- [ ] 2.6 `curl` na `/api/recipes/match` przy wyzerowanych `match_keys` zwraca te same wyniki co po przeliczeniu
+- [x] 2.6 `curl` na `/api/recipes/match` przy wyzerowanych `match_keys` zwraca te same wyniki co po przeliczeniu
 
 ### Phase 3: Widok spiżarki i lista
 
 #### Automated
 
 - [x] 3.1 Lint, typy, testy i build: `npm run lint`, `npx astro check`, `npm test`, `npm run build` — e9cca8e
-- [ ] 3.2 Smoke w CI nadal przechodzi: `npm run smoke`
+- [x] 3.2 Smoke w CI nadal przechodzi: `npm run smoke` — 3f3d9ad
 
 #### Manual
 
-- [ ] 3.3 Po zalogowaniu `/` pokazuje zachętę i 10 przepisów bez %; „Pokaż więcej” doczytuje kolejne
-- [ ] 3.4 Posiadane „banan, płatki owsiane, miód, sól” podnoszą „Babeczki z jogurtem naturalnym” na górę z zielonymi tagami
-- [ ] 3.5 Wykluczenie „jogurt” ukrywa Babeczki; „jogurt naturalny” ich nie ukrywa, a kafelek wskazuje zamiennik
-- [ ] 3.6 Tagi dodają się Enterem i usuwają ×; lista zmienia się dopiero po „Zastosuj filtry”
-- [ ] 3.7 Widok jest używalny na szerokości telefonu i na desktopie
+- [x] 3.3 Po zalogowaniu `/` pokazuje zachętę i 10 przepisów bez %; „Pokaż więcej” doczytuje kolejne
+- [x] 3.4 Posiadane „banan, płatki owsiane, miód, sól” podnoszą „Babeczki z jogurtem naturalnym” na górę z zielonymi tagami
+- [x] 3.5 Wykluczenie „jogurt” ukrywa Babeczki; „jogurt naturalny” ich nie ukrywa, a kafelek wskazuje zamiennik
+- [x] 3.6 Tagi dodają się Enterem i usuwają ×; lista zmienia się dopiero po „Zastosuj filtry”
+- [x] 3.7 Widok jest używalny na szerokości telefonu i na desktopie
 - [ ] 3.8 Po wdrożeniu Workers Logs pokazują CPU dla `/api/recipes/match` poniżej 10 ms
