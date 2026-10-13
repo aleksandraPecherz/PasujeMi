@@ -2,3 +2,6 @@
 .claude/
 .10x-cli.json
 CLAUDE.md
+
+# Generated Snowball stemmer, vendored unchanged
+src/lib/matching/vendor/

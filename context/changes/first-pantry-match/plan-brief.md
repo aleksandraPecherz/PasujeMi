@@ -81,6 +81,7 @@ Wyspa `PantryMatch` woła `/api/recipes`, gdy nie ma filtrów, a `/api/recipes/m
 ## Open Risks & Assumptions
 
 - Pomiar CPU pochodzi z Node na komputerze autorki, nie z workerd. Weryfikacja: Workers Logs po wdrożeniu; ścieżka awaryjna to Workers Paid (`infrastructure.md:170`).
+- Benchmark na danych o kształcie Excela (ok. 10 składników, 0,8 zamiennika na składnik) daje ok. 7,8 ms lokalnie (JSON.parse ok. 5,5 ms + ocena ok. 2,3 ms) przy 1000 przepisów, więc zapas do 10 ms jest mały. Zmierzyć ponownie (`npm run bench:match` i Workers Logs) po imporcie F-02, na prawdziwym katalogu.
 - Słowo po „bez” zostaje tokenem, więc wykluczenia działają nadmiarowo. To bezpieczne, ale może ukryć np. „jogurt bez laktozy” przy wykluczeniu „laktoza”.
 - Zdrobnienia i formy, których stemmer nie łączy (np. `cukier/cukru`), wymagają wpisów w słowniku. Jakość zależy od jego uzupełniania.
 

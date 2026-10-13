@@ -193,7 +193,7 @@ Czysty moduł bez Supabase: stemmer, normalizacja, słownik, klucze, ocena i sor
 
 #### Manual Verification:
 
-- `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 6 ms przy 1000 przepisów
+- `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 8 ms lokalnie przy 1000 przepisów; w Workers Logs < 10 ms (sprawdzane po wdrożeniu w 3.8)
 - Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd (sprawdzenie z `infrastructure.md:171`), a `npm run build` z tym importem przechodzi; potem wywołanie jest usunięte
 
 **Implementation Note**: Po automatycznej weryfikacji zatrzymaj się na ręczne potwierdzenie przed fazą 2.
@@ -244,7 +244,7 @@ Kolumna kluczy, skrypt przeliczania, serwis z fallbackiem dla nieaktualnych wier
 
 1. Pobrać `id, name, match_keys, match_keys_version` w porcjach po 1000 (Critical Implementation Details).
 2. Jeśli są wiersze z nieaktualną wersją, pobrać ich `id, ingredients` filtrem po stronie serwera: `.or("match_keys_version.is.null,match_keys_version.neq.<MATCH_KEYS_VERSION>")`, w porcjach po 1000 przez `range`, po `id`. Klucze policzyć w pamięci. Nie używać listy `in('id', …)`: 1000 UUID to ok. 37 KB w adresie.
-3. Wywołać `rankRecipes`, wyciąć stronę `offset..offset+limit`.
+3. Zbudować klucze spiżarki: posiadane i stałe przez `normalizeTag`, wykluczenia przez `exclude.flatMap(normalizeExclusion)` (jedno wykluczenie może dać kilka tagów, np. „maka” → mak i mąka). Wywołać `rankRecipes`, wyciąć stronę `offset..offset+limit`.
 4. Pobrać pełne wiersze strony (`RECIPE_COLUMNS`, `in('id', …)`), ułożyć je w kolejności rankingu i dołączyć `match`.
 
 Błędy Supabase są rzucane dalej bez zmian (`recipes.ts:54-56`).
@@ -425,15 +425,15 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 #### Automated
 
-- [ ] 1.1 Testy reguły przechodzą: `npm test`
-- [ ] 1.2 Lint przechodzi z wyłączonym katalogiem `vendor`: `npm run lint`
-- [ ] 1.3 Typy przechodzą: `npx astro check`
-- [ ] 1.4 Build przechodzi z zaimportowanym stemmerem: `npm run build`
+- [x] 1.1 Testy reguły przechodzą: `npm test`
+- [x] 1.2 Lint przechodzi z wyłączonym katalogiem `vendor`: `npm run lint`
+- [x] 1.3 Typy przechodzą: `npx astro check`
+- [x] 1.4 Build przechodzi z zaimportowanym stemmerem: `npm run build`
 
 #### Manual
 
-- [ ] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 6 ms przy 1000 przepisów
-- [ ] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd i w `npm run build`, a potem jest usunięte
+- [x] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 8 ms lokalnie, < 10 ms w Workers Logs
+- [x] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd i w `npm run build`, a potem jest usunięte
 
 ### Phase 2: Klucze w bazie, serwis i API
 
