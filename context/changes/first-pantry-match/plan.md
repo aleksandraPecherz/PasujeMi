@@ -95,7 +95,7 @@ Każdy punkt wskazuje źródło. „Plan” oznacza decyzję autorki podjętą w
 2. Potem trwałe klucze, skrypt przeliczania, serwis i endpoint.
 3. Na końcu UI, z kafelkiem napisanym tak, żeby S-02 mógł go przejąć (`roadmap.md:130`).
 
-Klucze są wersjonowane. Każda zmiana normalizacji, stemmera lub słownika podnosi `MATCH_KEYS_VERSION`, a serwis liczy na bieżąco klucze dla wierszy z inną wersją. Poprawność nigdy nie zależy od tego, czy przeliczenie zostało uruchomione.
+Klucze są wersjonowane. Każda zmiana normalizacji, stemmera lub słownika podnosi `MATCH_KEYS_VERSION`, a serwis liczy na bieżąco klucze dla wierszy z inną wersją. Wynik jest więc poprawny także bez przeliczenia, ale tylko przy kilku nieaktualnych wierszach. Gdy nieaktualny jest cały katalog (≈ 36 ms przy 1000 przepisów), plan Free może zwrócić błąd 1102, dopóki skrypt nie przeliczy kluczy.
 
 ## Critical Implementation Details
 
@@ -113,7 +113,7 @@ Czysty moduł bez Supabase: stemmer, normalizacja, słownik, klucze, ocena i sor
 
 #### 1. Kopia stemmera Snowball
 
-**File**: `src/lib/matching/vendor/snowball/polish-stemmer.js`, `base-stemmer.js`, `LICENSE`, `index.d.ts`
+**File**: `src/lib/matching/vendor/snowball/polish-stemmer.js`, `base-stemmer.js`, `LICENSE`, `polish-stemmer.d.ts`
 
 **Intent**: Skopiować wygenerowany kod z `snowball-stemmers-js@3.1.2` zamiast dodawać zależność. Powody: pakiet nie ma `"type": "module"`, a ten sam kod musi działać w workerd, Vite, Vitest i Node/tsx; pakiet jest też młody i ma jednego opiekuna (`research.md:144-152`, `external-research.md:36`).
 
@@ -121,7 +121,7 @@ Czysty moduł bez Supabase: stemmer, normalizacja, słownik, klucze, ocena i sor
 
 - Kod skopiowany bez zmian, z nagłówkiem wskazującym źródło i wersję.
 - `LICENSE` zawiera tekst BSD-3 Snowball (pakiet go nie ma, `research.md:148`).
-- `index.d.ts` deklaruje domyślny eksport klasy z `stemWord(word: string): string`.
+- `polish-stemmer.d.ts` (obok pliku `.js`, żeby TS go znalazł przy imporcie `./vendor/snowball/polish-stemmer.js`) deklaruje domyślny eksport klasy z `stemWord(word: string): string`.
 - Katalog jest dopisany do `globalIgnores` w `eslint.config.js` i do `.prettierignore`.
 
 #### 2. Moduł reguły
@@ -139,7 +139,7 @@ Czysty moduł bez Supabase: stemmer, normalizacja, słownik, klucze, ocena i sor
 - `rankRecipes(candidates: { id; name; keys: MatchKeys }[], pantry: { have: TagKeys[]; exclude: TagKeys[] }): RankedRecipe[]`. Zwraca tylko niewykluczone przepisy, posortowane według punktu 9, z `percent: number | null` i statusem każdej pozycji.
 - Typy w `src/types.ts`:
   - `MatchKeys`: tablica równoległa do `ingredients`; element to tablica opcji `{ k: string[]; p?: string[] }`, gdzie `p` to klucze rodziców osobnego produktu;
-  - `IngredientMatch`: `{ status: "have" | "unknown"; via: string | null }`, gdzie `via` to `product` zamiennika, który dał „mam”;
+  - `IngredientMatch`: `{ status: "have" | "unknown"; mainExcluded: boolean; via: string | null }`. `via` to `product` zamiennika, który dał „mam”. Gdy główna opcja jest wykluczona, a żaden zamiennik nie daje „mam”, `via` to pierwszy niewykluczony zamiennik. Użytkownik z alergią musi widzieć, czym zastąpić wykluczony składnik;
   - `MatchedRecipe`: `Recipe & { match: { percent: number | null; ingredients: IngredientMatch[] } }`.
 
 #### 3. Runner testów
@@ -167,6 +167,7 @@ Czysty moduł bez Supabase: stemmer, normalizacja, słownik, klucze, ocena i sor
 - krótkie słowa: `sól ≠ sok`, `ryż ≠ ryby`, `mąka ≠ mak`;
 - posiadanie i wykluczenia z przykładów w punktach 5 i 6;
 - zamienniki: zablokowany tylko przy wszystkich opcjach wykluczonych; wykluczony zamiennik nie daje „mam”;
+- wykluczona główna opcja z niewykluczonym zamiennikiem: `mainExcluded: true`, a `via` wskazuje zamiennik (np. wykluczenie „jogurt naturalny” → `via: "jogurt roślinny"`) także przy statusie „brak informacji”;
 - duplikaty, przepis 0% na końcu, remisy (5/5 przed 2/2, 3/6 przed 1/2), same wykluczenia → `percent: null`;
 - strażnik wersji: odcisk (hash) kluczy dla stałej listy słów i całego słownika jest zapisany w teście razem z `MATCH_KEYS_VERSION`. Zmiana słownika lub normalizacji bez podniesienia wersji wywraca test.
 
@@ -193,7 +194,7 @@ Czysty moduł bez Supabase: stemmer, normalizacja, słownik, klucze, ocena i sor
 #### Manual Verification:
 
 - `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 6 ms przy 1000 przepisów
-- Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd (sprawdzenie z `infrastructure.md:171`), a potem jest usunięte
+- Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd (sprawdzenie z `infrastructure.md:171`), a `npm run build` z tym importem przechodzi; potem wywołanie jest usunięte
 
 **Implementation Note**: Po automatycznej weryfikacji zatrzymaj się na ręczne potwierdzenie przed fazą 2.
 
@@ -242,7 +243,7 @@ Kolumna kluczy, skrypt przeliczania, serwis z fallbackiem dla nieaktualnych wier
 **Contract**: `matchRecipes(supabase, pantry: { have: string[]; staple: string[]; exclude: string[] }, { limit, offset }): Promise<{ recipes: MatchedRecipe[]; hasMore: boolean }>`. Kroki:
 
 1. Pobrać `id, name, match_keys, match_keys_version` w porcjach po 1000 (Critical Implementation Details).
-2. Dla wierszy z nieaktualną wersją pobrać `id, ingredients` (`in('id', …)`) i policzyć klucze w pamięci.
+2. Jeśli są wiersze z nieaktualną wersją, pobrać ich `id, ingredients` filtrem po stronie serwera: `.or("match_keys_version.is.null,match_keys_version.neq.<MATCH_KEYS_VERSION>")`, w porcjach po 1000 przez `range`, po `id`. Klucze policzyć w pamięci. Nie używać listy `in('id', …)`: 1000 UUID to ok. 37 KB w adresie.
 3. Wywołać `rankRecipes`, wyciąć stronę `offset..offset+limit`.
 4. Pobrać pełne wiersze strony (`RECIPE_COLUMNS`, `in('id', …)`), ułożyć je w kolejności rankingu i dołączyć `match`.
 
@@ -270,9 +271,10 @@ Błędy Supabase są rzucane dalej bez zmian (`recipes.ts:54-56`).
 **Contract**:
 
 - W jobie smoke po `supabase start` krok `npm run match-keys` z `SUPABASE_URL=$API_URL` i `SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY`, sprawdzający `updated 5`, a przy drugim uruchomieniu `updated 0`.
-- Smoke po zalogowaniu woła `/api/recipes/match?have=banan&exclude=jogurt`. Najpierw sprawdza status 200 i `Array.isArray(body.recipes)` (lessons.md), potem treść:
-  - żaden przepis nie zawiera składnika, którego wszystkie opcje to jogurt (dane seeda);
-  - wyniki są malejąco po `match.percent`.
+- Smoke po zalogowaniu woła `/api/recipes/match?have=pomidor&have=chleb&exclude=jogurt`. Najpierw sprawdza status 200 i `Array.isArray(body.recipes)` (lessons.md), potem treść:
+  - „Babeczki z jogurtem naturalnym” nie ma na liście (wszystkie opcje jogurtu w seedzie zawierają „jogurt”);
+  - pozostałe 4 przepisy z seeda są na liście;
+  - co najmniej jeden `match.percent` > 0, a wartości są nierosnące.
 
 ### Success Criteria:
 
@@ -282,7 +284,7 @@ Błędy Supabase są rzucane dalej bez zmian (`recipes.ts:54-56`).
 - Testy przechodzą, w tym testy `matchRecipes` na sztucznym kliencie: stronicowanie po 1000, fallback dla nieaktualnej wersji, kolejność strony: `npm test`
 - Lint i typy: `npm run lint`, `npx astro check`
 - Build: `npm run build`
-- CI smoke: przeliczenie (`updated 5`, potem `updated 0`) i sprawdzenia endpointu przechodzą: `npm run smoke`
+- CI: krok `npm run match-keys` wypisuje `updated 5`, potem `updated 0`; sprawdzenia endpointu przechodzą w `npm run smoke`
 
 #### Manual Verification:
 
@@ -320,6 +322,7 @@ Wyspa React na `/`: trzy sekcje tagów, przycisk zastosowania, lista kafelków z
 - Pokazuje nazwę, odznakę `NN%` tylko przy `percent !== null` i składniki jako tagi. Zielony = „mam”, szary = „brak informacji” (PRD FR-006).
 - Status jest podany także tekstem dostępnym dla czytników ekranu, a nie tylko kolorem.
 - Przy `via` tag pokazuje zamiennik, np. „Miód (zamiennik: syrop klonowy)”.
+- Przy `mainExcluded` tag pokazuje, że główna opcja jest wykluczona, i wskazuje zamiennik, np. „Jogurt naturalny 2% → użyj: jogurt roślinny”.
 - Klasy łączone przez `cn()`.
 
 #### 3. Wejście tagów i stan
@@ -360,7 +363,7 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 - Po zalogowaniu `/` pokazuje zachętę i 10 przepisów bez %; „Pokaż więcej” doczytuje kolejne
 - Posiadane „banan, płatki owsiane, miód, sól” podnoszą „Babeczki z jogurtem naturalnym” na górę z zielonymi tagami tych składników
-- Wykluczenie „jogurt” ukrywa przepisy, w których jogurt nie ma niewykluczonego zamiennika; wykluczenie „jogurt naturalny” nie ukrywa przepisu z samym „jogurt”
+- Wykluczenie „jogurt” ukrywa „Babeczki z jogurtem naturalnym”; wykluczenie „jogurt naturalny” ich nie ukrywa (zostaje „jogurt roślinny”), a kafelek wskazuje zamiennik
 - Tagi dodają się Enterem i usuwają ×; lista zmienia się dopiero po „Zastosuj filtry”
 - Widok jest używalny na szerokości telefonu (ok. 375 px) i na desktopie
 - Po wdrożeniu Workers Logs pokazują CPU dla `/api/recipes/match` poniżej 10 ms (`infrastructure.md:159`)
@@ -393,10 +396,11 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 ## Migration Notes
 
 - Migracja jest addytywna. Wdrożenie: najpierw migracja, potem kod (`infrastructure.md:175`). Migracja na produkcji wymaga zgody człowieka (`infrastructure.md:153`).
-- Do czasu przeliczenia kod działa poprawnie, bo dla wierszy bez kluczy liczy je na bieżąco, kosztem CPU.
+- **Pierwsze wdrożenie (v1):** migracja → `npm run match-keys` → wdrożenie kodu. Stary kod nie czyta kolumny, więc nie ma okna z nieaktualnymi kluczami.
+- Do czasu przeliczenia kod działa poprawnie, bo dla wierszy bez kluczy liczy je na bieżąco, kosztem CPU. Przy dużym katalogu cały katalog nieaktualny może przekroczyć 10 ms CPU, dlatego skrypt uruchamia się zaraz po wdrożeniu.
 - **Przeliczanie po zmianie słownika, normalizacji lub stemmera:**
   1. PR zmienia `dictionary.ts` i podnosi `MATCH_KEYS_VERSION`. Test odcisku wymusza podniesienie wersji.
-  2. Po wdrożeniu wiersze ze starą wersją są liczone w żądaniu, więc wyniki są poprawne od razu.
+  2. Po wdrożeniu wiersze ze starą wersją są liczone w żądaniu, więc wyniki są poprawne od razu. Przy katalogu bliskim 1000 przepisów może to przekroczyć 10 ms CPU, więc krok 3 następuje zaraz po wdrożeniu.
   3. `npm run match-keys` przelicza tylko wiersze z inną wersją i wypisuje `updated <n>`. Na produkcji uruchamia go człowiek z kluczem service role.
   4. Drugie uruchomienie musi wypisać `updated 0`.
 - **Nowe zapisy przepisów (S-05, F-02)** muszą wołać `computeMatchKeys` i zapisywać `match_keys_version = MATCH_KEYS_VERSION`. Do tego czasu brak kluczy obsługuje fallback.
@@ -429,7 +433,7 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 #### Manual
 
 - [ ] 1.5 `npm run bench:match` pokazuje medianę parsowania i oceny ≤ 6 ms przy 1000 przepisów
-- [ ] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd, a potem jest usunięte
+- [ ] 1.6 Tymczasowe wywołanie `stemWord` w endpoincie działa w `npm run dev` na workerd i w `npm run build`, a potem jest usunięte
 
 ### Phase 2: Klucze w bazie, serwis i API
 
@@ -439,7 +443,7 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 - [ ] 2.2 Testy przechodzą, w tym testy `matchRecipes` na sztucznym kliencie: `npm test`
 - [ ] 2.3 Lint i typy: `npm run lint`, `npx astro check`
 - [ ] 2.4 Build: `npm run build`
-- [ ] 2.5 CI smoke: przeliczenie (`updated 5`, potem `updated 0`) i sprawdzenia endpointu przechodzą: `npm run smoke`
+- [ ] 2.5 CI: krok `npm run match-keys` wypisuje `updated 5`, potem `updated 0`; sprawdzenia endpointu przechodzą w `npm run smoke`
 
 #### Manual
 
@@ -456,7 +460,7 @@ Najpierw sprawdza `res.ok` i kształt odpowiedzi, potem jej treść (lessons.md)
 
 - [ ] 3.3 Po zalogowaniu `/` pokazuje zachętę i 10 przepisów bez %; „Pokaż więcej” doczytuje kolejne
 - [ ] 3.4 Posiadane „banan, płatki owsiane, miód, sól” podnoszą „Babeczki z jogurtem naturalnym” na górę z zielonymi tagami
-- [ ] 3.5 Wykluczenia „jogurt” i „jogurt naturalny” działają według reguły ogólne/szczegółowe
+- [ ] 3.5 Wykluczenie „jogurt” ukrywa Babeczki; „jogurt naturalny” ich nie ukrywa, a kafelek wskazuje zamiennik
 - [ ] 3.6 Tagi dodają się Enterem i usuwają ×; lista zmienia się dopiero po „Zastosuj filtry”
 - [ ] 3.7 Widok jest używalny na szerokości telefonu i na desktopie
 - [ ] 3.8 Po wdrożeniu Workers Logs pokazują CPU dla `/api/recipes/match` poniżej 10 ms
