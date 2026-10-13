@@ -1,10 +1,10 @@
 ---
 change_id: first-pantry-match
 title: Pierwsze dopasowanie przepisów ze spiżarki (S-03)
-status: impl_reviewed
+status: archived
 created: 2026-10-12
 updated: 2026-10-13
-archived_at: null
+archived_at: 2026-10-13T20:53:43Z
 ---
 
 ## Notes
