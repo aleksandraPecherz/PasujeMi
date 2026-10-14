@@ -85,6 +85,11 @@ gamma sRGB, jak w przeglądarce).
 | `warning` na `background`                           | 15.45:1  | ≥ 4.5 |
 | `warning` na `background-glow`                      | 14.53:1  | ≥ 4.5 |
 | `warning` na `card` (nałożonej na tło)              | 12.10:1  | ≥ 4.5 |
+| `ring` (pełne krycie) na `background`               | 6.91:1   | ≥ 3   |
+| `ring` (pełne krycie) na `card` (nałożonej na tło)  | 5.41:1   | ≥ 3   |
+
+Fokus przycisków: dawniej `ring-ring/50` = 2.55:1 na `background` (poniżej 3:1); od F2 z przeglądu
+implementacji `ui/button.tsx` używa `focus-visible:ring-ring` (pełne krycie).
 
 ## Poprawka hover (Faza 3, ręczna weryfikacja 2026-10-14)
 
@@ -114,3 +119,11 @@ Zmiany:
   pełnego `TagInput` zostaje aktywny celowo: usunięcie tagu zwalnia limit.
 - Skutek uboczny: `Skeleton` (`bg-accent`) jest jaśniejszy (20% zamiast 10% bieli). Ekrany auth bez zmian —
   `SubmitButton` nadpisuje hover literałem `hover:bg-purple-500` (C5).
+
+## Półprzezroczysta `--card` (decyzja z przeglądu, 2026-10-14)
+
+- `.dark --card` = `oklch(1 0 0 / 10%)` celowo: przez kartę ma prześwitywać tło `bg-cosmic`.
+- `--popover`, `--secondary` i `--muted` zostają nieprzezroczystymi szarościami shadcn — nie zostały przeniesione do
+  palety „cosmic”. Komponent shadcn, który oczekuje pełnego `bg-card` lub popovera w kolorach palety (Card, Popover,
+  Select), wyjdzie przezroczysty albo w szarościach.
+- Do przemyślenia przy zmianie palety (ustalenie F10 w `reviews/impl-review.md`).

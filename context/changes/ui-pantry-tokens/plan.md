@@ -425,6 +425,27 @@ Nie dotyczy (bez zmian danych). Wycofanie = revert commitów fazy.
 - Kafelek i dostępność: `context/archive/2026-10-12-first-pantry-match/plan.md:318-325`
 - Otwarte kontrole S-03: `context/archive/2026-10-12-first-pantry-match/reviews/impl-review.md:156`
 
+## Addendum: przegląd implementacji (2026-10-14)
+
+Ustalenia z `reviews/impl-review.md` przeniesione do planu jako praca następcza (bez nowych pól w Progress).
+
+- **F2 — fokus przycisków bez obramowania < 3:1.** `ui/button.tsx:8`: `focus-visible:ring-ring/50` →
+  `focus-visible:ring-ring`. `--ring` (purple-400) przy 50% na `--background` ≈ 2.6:1; przyciski `default` i
+  `ghost` nie mają obramowania, więc pierścień jest jedynym wskaźnikiem fokusu. Token `--ring` bez zmian.
+  Weryfikacja: Tab na „Zastosuj filtry” i × w `TagInput` — obrys pełnej jasności; kontrast ≥ 3:1 zapisany w
+  `tokens.md`.
+- **F1 — poprawka hover (zrobione w Fazie 3, e4d59c9).** Opis w „What We're NOT Doing” (hover `primary/90`,
+  `input/50`, `ui/` bez zmian poza `Badge`) jest nieaktualny. Faktycznie: nowe tokeny `--primary-hover` i
+  `--input-hover` (`:root`/`.dark` + `@theme inline`), `.dark --accent` 20% zamiast `white/10`; w `ui/button.tsx`
+  hover `default` = `bg-primary-hover`, `outline` = `dark:hover:bg-accent`, `ghost` = bazowe `hover:bg-accent`; w
+  `ui/input.tsx` `enabled:hover:border-input-hover`. Skutek uboczny: `Skeleton` (`bg-accent`) jaśniejszy. Powód i
+  pomiary: `tokens.md`, sekcja „Poprawka hover”.
+- **F6 — bundle kitchen sink w buildzie produkcyjnym (świadoma decyzja, bez zmian w kodzie).** Strona
+  `/dev/kitchen-sink` zwraca 404 poza `import.meta.env.DEV`, ale `client:load` sprawia, że Astro i tak emituje
+  `dist/client/_astro/KitchenSink.*.js`, serwowany publicznie jako plik statyczny. Akceptujemy: bundle zawiera tylko
+  dane przykładowe, bez sekretów i danych użytkowników. Gdyby kitchen sink kiedyś miał zawierać prawdziwe dane —
+  wstrzykiwać trasę tylko w dev (integracja), zamiast trzymać ją w `src/pages/`.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.

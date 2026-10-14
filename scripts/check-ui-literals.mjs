@@ -1,9 +1,11 @@
 // UI literal scan: files already moved onto design tokens (src/styles/global.css) must not get literal colors
-// or arbitrary px/rem values back. Zero dependencies on purpose.
+// or arbitrary values back. Zero dependencies on purpose.
 // No arguments: scans every file in CLEAN_FILES. With arguments (lint-staged): scans only those that are listed.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Add a file here once it uses tokens only.
 export const CLEAN_FILES = [
@@ -19,11 +21,21 @@ export const CLEAN_FILES = [
   "src/components/auth/ServerError.tsx",
 ];
 
-const LITERAL =
-  /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(|oklch\(|-\[[0-9.]+(px|rem)\]|\b(bg|text|border|ring|outline|from|via|to|fill|stroke|shadow|divide)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black)\b/;
+const PALETTE =
+  "slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black";
+
+const LITERAL = new RegExp(
+  [
+    String.raw`(?<!href=["'])#[0-9a-fA-F]{3,8}\b`, // hex color, not an in-page anchor
+    String.raw`rgba?\(|hsla?\(|oklch\(`,
+    String.raw`-\[(?:[^\]]*\d(?:px|rem|em|vh|vw|svh|dvh|ch|%)|[^\]]*(?:#|rgb|hsl|oklch)|[a-z]+\])`, // arbitrary length or color
+    String.raw`\[[a-z-]+:[^\s\]]+\]`, // arbitrary property, e.g. [color:red]
+    String.raw`\b(?:bg|text|border(?:-[xytrblse])?|ring(?:-offset)?|outline|decoration|caret|accent|from|via|to|fill|stroke|shadow|divide)-(?:${PALETTE})\b`,
+  ].join("|"),
+);
 
 /**
- * Finds literal colors and arbitrary px/rem values, one hit per offending line.
+ * Finds literal colors and arbitrary values, one hit per offending line.
  * @param {string} text
  * @returns {{ line: number; content: string }[]}
  */
@@ -36,7 +48,7 @@ export function findLiterals(text) {
 
 /** @param {string} file */
 function toRepoPath(file) {
-  return path.relative(process.cwd(), path.resolve(file)).replaceAll("\\", "/");
+  return path.relative(ROOT, path.resolve(file)).replaceAll("\\", "/");
 }
 
 function main() {
@@ -45,7 +57,13 @@ function main() {
 
   let hits = 0;
   for (const file of files) {
-    for (const { line, content } of findLiterals(readFileSync(file, "utf8"))) {
+    const absolute = path.join(ROOT, file);
+    if (!existsSync(absolute)) {
+      console.log(`${file}: missing file in CLEAN_FILES`);
+      hits++;
+      continue;
+    }
+    for (const { line, content } of findLiterals(readFileSync(absolute, "utf8"))) {
       console.log(`${file}:${line}: ${content.trim()}`);
       hits++;
     }
