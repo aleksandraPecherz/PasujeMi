@@ -1,10 +1,10 @@
 ---
 change_id: ui-pantry-tokens
 title: Ui pantry tokens
-status: impl_reviewed
+status: archived
 created: 2026-10-14
 updated: 2026-10-14
-archived_at: null
+archived_at: 2026-10-14T21:48:29Z
 ---
 
 ## Notes
