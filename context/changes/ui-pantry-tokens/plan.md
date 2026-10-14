@@ -447,30 +447,30 @@ Nie dotyczy (bez zmian danych). Wycofanie = revert commitów fazy.
 
 #### Automated
 
-- [x] 2.1 Skan literałów na plikach widoku zwraca 0 linii
-- [x] 2.2 Lint, typy, testy i build przechodzą
+- [x] 2.1 Skan literałów na plikach widoku zwraca 0 linii — 13597d4
+- [x] 2.2 Lint, typy, testy i build przechodzą — 13597d4
 
 #### Manual
 
-- [x] 2.3 `/` wygląda jak `before/` poza zamierzonymi różnicami
-- [x] 2.4 Kolory tagów ról bez zmian w spiżarce i na kafelku
-- [x] 2.5 Fokus z klawiatury widoczny na każdej kontrolce
+- [x] 2.3 `/` wygląda jak `before/` poza zamierzonymi różnicami — 13597d4
+- [x] 2.4 Kolory tagów ról bez zmian w spiżarce i na kafelku — 13597d4
+- [x] 2.5 Fokus z klawiatury widoczny na każdej kontrolce — 13597d4
 
 ### Phase 3: Stany i kitchen sink
 
 #### Automated
 
-- [ ] 3.1 Skan literałów na plikach widoku i nowych plikach stanów zwraca 0 linii
-- [ ] 3.2 Strona kitchen sink sprawdza tryb dev
-- [ ] 3.3 Lint, typy, testy i build przechodzą
+- [x] 3.1 Skan literałów na plikach widoku i nowych plikach stanów zwraca 0 linii
+- [x] 3.2 Strona kitchen sink sprawdza tryb dev
+- [x] 3.3 Lint, typy, testy i build przechodzą
 
 #### Manual
 
-- [ ] 3.4 Kitchen sink pokazuje 7 stanów; zrzuty desktop i 360 px zapisane
-- [ ] 3.5 Kitchen sink zwraca 404 w buildzie produkcyjnym
+- [x] 3.4 Kitchen sink pokazuje 7 stanów; zrzuty desktop i 360 px zapisane
+- [x] 3.5 Kitchen sink zwraca 404 w buildzie produkcyjnym
 - [ ] 3.6 Pierwsze wczytanie pokazuje szkielet bez przeskoku układu
 - [ ] 3.7 Błąd serwera ogłaszany przez czytnik ekranu
-- [ ] 3.8 Trzy otwarte kontrole S-03 potwierdzone
+- [x] 3.8 Trzy otwarte kontrole S-03 potwierdzone
 - [ ] 3.9 Ekrany auth: jedyna różnica to odcień błędu
 
 ### Phase 4: Zabezpieczenie

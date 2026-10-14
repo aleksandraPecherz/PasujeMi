@@ -43,6 +43,8 @@
   --warning: oklch(0.555 0.163 48.998);
   --brand-from: oklch(0.546 0.245 262.881);
   --brand-to: oklch(0.558 0.288 302.321);
+  --primary-hover: oklch(0.269 0 0);
+  --input-hover: oklch(0.708 0 0);
 }
 
 .dark {
@@ -58,7 +60,7 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.932 0.032 255.585 / 70%);
-  --accent: oklch(1 0 0 / 10%);
+  --accent: oklch(1 0 0 / 20%);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -84,6 +86,8 @@
   --warning: oklch(0.924 0.12 95.746);
   --brand-from: oklch(0.882 0.059 254.128);
   --brand-to: oklch(0.902 0.063 306.703);
+  --primary-hover: oklch(0.627 0.265 303.9);
+  --input-hover: oklch(1 0 0 / 40%);
 }
 
 @theme inline {
@@ -129,6 +133,8 @@
   --color-warning: var(--warning);
   --color-brand-from: var(--brand-from);
   --color-brand-to: var(--brand-to);
+  --color-primary-hover: var(--primary-hover);
+  --color-input-hover: var(--input-hover);
 }
 
 @utility bg-cosmic {

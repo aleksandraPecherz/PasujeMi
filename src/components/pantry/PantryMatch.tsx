@@ -1,8 +1,10 @@
 import { Lightbulb, SlidersHorizontal } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
+import { EmptyState, LimitNotice, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { usePantryMatch, type PantrySection } from "@/components/hooks/usePantryMatch";
 
 const SECTIONS: { section: PantrySection; label: string; placeholder: string; badgeVariant: TagVariant }[] = [
@@ -63,9 +65,7 @@ export default function PantryMatch() {
             />
           ))}
         </div>
-        <p role="status" className="text-warning mt-3 text-sm empty:hidden">
-          {limitNotice}
-        </p>
+        <LimitNotice message={limitNotice} className="mt-3" />
         <Button type="button" onClick={apply} disabled={loading} className="mt-5 w-full sm:w-auto">
           <SlidersHorizontal aria-hidden="true" />
           Zastosuj filtry
@@ -80,16 +80,18 @@ export default function PantryMatch() {
         <ServerError message={error} />
 
         {showEmptyFiltered && (
-          <p className="border-border bg-card/50 text-muted-foreground rounded-2xl border p-4">
+          <EmptyState>
             Brak przepisów: wszystkie zawierają wykluczony składnik. Usuń któreś wykluczenie i zastosuj filtry ponownie.
-          </p>
+          </EmptyState>
         )}
         {!filtered && !loading && error === null && recipes.length === 0 && (
-          <p className="text-muted-foreground">Nie ma jeszcze żadnych przepisów.</p>
+          <EmptyState>Nie ma jeszcze żadnych przepisów.</EmptyState>
         )}
 
+        {loading && recipes.length === 0 && <RecipeListSkeleton count={4} />}
+
         {recipes.length > 0 && (
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className={cn("grid gap-4 sm:grid-cols-2", loading && "opacity-60")}>
             {recipes.map(({ recipe, match }) => (
               <li key={recipe.id} className="min-w-0">
                 <RecipeTile recipe={recipe} match={match} />
@@ -98,7 +100,7 @@ export default function PantryMatch() {
           </ul>
         )}
 
-        <p role="status" className="text-muted-foreground text-center text-sm">
+        <p role="status" className="sr-only">
           {loading ? "Wczytywanie przepisów…" : ""}
         </p>
 
