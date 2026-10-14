@@ -431,30 +431,30 @@ Nie dotyczy (bez zmian danych). Wycofanie = revert commitów fazy.
 
 #### Automated
 
-- [x] 1.1 Lint, typy, testy i build przechodzą
-- [x] 1.2 `<html>` ma klasę `dark`
-- [x] 1.3 `bg-cosmic` nie zawiera hex
-- [x] 1.4 `@theme inline` zawiera tylko `var(...)` i `calc(...)`
-- [x] 1.5 `src/components/ui/skeleton.tsx` istnieje
+- [x] 1.1 Lint, typy, testy i build przechodzą — 4b63860
+- [x] 1.2 `<html>` ma klasę `dark` — 4b63860
+- [x] 1.3 `bg-cosmic` nie zawiera hex — 4b63860
+- [x] 1.4 `@theme inline` zawiera tylko `var(...)` i `calc(...)` — 4b63860
+- [x] 1.5 `src/components/ui/skeleton.tsx` istnieje — 4b63860
 
 #### Manual
 
-- [x] 1.6 `/` na desktopie i przy 360 px wygląda tak samo jak przed zmianą
-- [x] 1.7 Ekrany auth wyglądają tak samo jak przed zmianą
-- [x] 1.8 `tokens.md` ma źródło każdego tokenu i zmierzony kontrast
+- [x] 1.6 `/` na desktopie i przy 360 px wygląda tak samo jak przed zmianą — 4b63860
+- [x] 1.7 Ekrany auth wyglądają tak samo jak przed zmianą — 4b63860
+- [x] 1.8 `tokens.md` ma źródło każdego tokenu i zmierzony kontrast — 4b63860
 
 ### Phase 2: Widok na tokenach
 
 #### Automated
 
-- [ ] 2.1 Skan literałów na plikach widoku zwraca 0 linii
-- [ ] 2.2 Lint, typy, testy i build przechodzą
+- [x] 2.1 Skan literałów na plikach widoku zwraca 0 linii
+- [x] 2.2 Lint, typy, testy i build przechodzą
 
 #### Manual
 
-- [ ] 2.3 `/` wygląda jak `before/` poza zamierzonymi różnicami
-- [ ] 2.4 Kolory tagów ról bez zmian w spiżarce i na kafelku
-- [ ] 2.5 Fokus z klawiatury widoczny na każdej kontrolce
+- [x] 2.3 `/` wygląda jak `before/` poza zamierzonymi różnicami
+- [x] 2.4 Kolory tagów ról bez zmian w spiżarce i na kafelku
+- [x] 2.5 Fokus z klawiatury widoczny na każdej kontrolce
 
 ### Phase 3: Stany i kitchen sink
 
