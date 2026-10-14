@@ -319,6 +319,8 @@ miejsca; przy `loading` z istniejącą listą lista dostaje `opacity-60` (bez zm
 - `/dev/kitchen-sink` w buildzie produkcyjnym (`npm run preview`) zwraca 404
 - Pierwsze wczytanie `/` pokazuje szkielet, a kafelki pojawiają się bez przeskoku układu
 - Błąd serwera na `/` (np. zatrzymany Supabase) jest ogłaszany przez czytnik ekranu (`role="alert"`)
+  - _Pominięte (2026-10-14):_ wymaga wyłączenia Supabase, a `.dev.vars` wskazuje na produkcję; brak czytnika
+    ekranu. `role="alert"` jest w `ServerError.tsx` i widoczny w sekcji „error” na `/dev/kitchen-sink`.
 - Zamknięcie trzech otwartych kontroli z S-03: komunikat limitu słów widoczny z ikoną, tekst zostaje w polu po
   odrzuconym tagu, „Zastosuj filtry” wyłączony podczas ładowania
 - Ekrany auth: jedyną różnicą względem `before/` jest odcień komunikatu błędu
@@ -468,21 +470,21 @@ Nie dotyczy (bez zmian danych). Wycofanie = revert commitów fazy.
 
 - [x] 3.4 Kitchen sink pokazuje 7 stanów; zrzuty desktop i 360 px zapisane — e4d59c9
 - [x] 3.5 Kitchen sink zwraca 404 w buildzie produkcyjnym — e4d59c9
-- [ ] 3.6 Pierwsze wczytanie pokazuje szkielet bez przeskoku układu
+- [x] 3.6 Pierwsze wczytanie pokazuje szkielet bez przeskoku układu — e4d59c9
 - [ ] 3.7 Błąd serwera ogłaszany przez czytnik ekranu
 - [x] 3.8 Trzy otwarte kontrole S-03 potwierdzone — e4d59c9
-- [ ] 3.9 Ekrany auth: jedyna różnica to odcień błędu
+- [x] 3.9 Ekrany auth: jedyna różnica to odcień błędu — e4d59c9
 
 ### Phase 4: Zabezpieczenie
 
 #### Automated
 
-- [x] 4.1 `npm run check:ui` kończy się kodem 0
-- [x] 4.2 Test skanu przechodzi
-- [x] 4.3 CI uruchamia skan
-- [x] 4.4 Lint, typy i build przechodzą
+- [x] 4.1 `npm run check:ui` kończy się kodem 0 — 0ec0198
+- [x] 4.2 Test skanu przechodzi — 0ec0198
+- [x] 4.3 CI uruchamia skan — 0ec0198
+- [x] 4.4 Lint, typy i build przechodzą — 0ec0198
 
 #### Manual
 
-- [x] 4.5 Literał w wyczyszczonym pliku zatrzymuje commit
-- [x] 4.6 Sekcja `## UI` w `AGENTS.md` jest zrozumiała
+- [x] 4.5 Literał w wyczyszczonym pliku zatrzymuje commit — 0ec0198
+- [x] 4.6 Sekcja `## UI` w `AGENTS.md` jest zrozumiała — 0ec0198
