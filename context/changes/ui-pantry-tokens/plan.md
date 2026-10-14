@@ -460,29 +460,29 @@ Nie dotyczy (bez zmian danych). Wycofanie = revert commitów fazy.
 
 #### Automated
 
-- [x] 3.1 Skan literałów na plikach widoku i nowych plikach stanów zwraca 0 linii
-- [x] 3.2 Strona kitchen sink sprawdza tryb dev
-- [x] 3.3 Lint, typy, testy i build przechodzą
+- [x] 3.1 Skan literałów na plikach widoku i nowych plikach stanów zwraca 0 linii — e4d59c9
+- [x] 3.2 Strona kitchen sink sprawdza tryb dev — e4d59c9
+- [x] 3.3 Lint, typy, testy i build przechodzą — e4d59c9
 
 #### Manual
 
-- [x] 3.4 Kitchen sink pokazuje 7 stanów; zrzuty desktop i 360 px zapisane
-- [x] 3.5 Kitchen sink zwraca 404 w buildzie produkcyjnym
+- [x] 3.4 Kitchen sink pokazuje 7 stanów; zrzuty desktop i 360 px zapisane — e4d59c9
+- [x] 3.5 Kitchen sink zwraca 404 w buildzie produkcyjnym — e4d59c9
 - [ ] 3.6 Pierwsze wczytanie pokazuje szkielet bez przeskoku układu
 - [ ] 3.7 Błąd serwera ogłaszany przez czytnik ekranu
-- [x] 3.8 Trzy otwarte kontrole S-03 potwierdzone
+- [x] 3.8 Trzy otwarte kontrole S-03 potwierdzone — e4d59c9
 - [ ] 3.9 Ekrany auth: jedyna różnica to odcień błędu
 
 ### Phase 4: Zabezpieczenie
 
 #### Automated
 
-- [ ] 4.1 `npm run check:ui` kończy się kodem 0
-- [ ] 4.2 Test skanu przechodzi
-- [ ] 4.3 CI uruchamia skan
-- [ ] 4.4 Lint, typy i build przechodzą
+- [x] 4.1 `npm run check:ui` kończy się kodem 0
+- [x] 4.2 Test skanu przechodzi
+- [x] 4.3 CI uruchamia skan
+- [x] 4.4 Lint, typy i build przechodzą
 
 #### Manual
 
-- [ ] 4.5 Literał w wyczyszczonym pliku zatrzymuje commit
-- [ ] 4.6 Sekcja `## UI` w `AGENTS.md` jest zrozumiała
+- [x] 4.5 Literał w wyczyszczonym pliku zatrzymuje commit
+- [x] 4.6 Sekcja `## UI` w `AGENTS.md` jest zrozumiała
