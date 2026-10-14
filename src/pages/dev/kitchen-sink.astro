@@ -1,0 +1,11 @@
+---
+if (!import.meta.env.DEV) return new Response(null, { status: 404 });
+/* eslint @typescript-eslint/no-misused-promises: "off" -- the rule crashes on a top-level return in frontmatter */
+
+import AppLayout from "@/layouts/AppLayout.astro";
+import KitchenSink from "@/components/dev/KitchenSink";
+---
+
+<AppLayout title="Kitchen sink — PasujeMi">
+  <KitchenSink client:load />
+</AppLayout>

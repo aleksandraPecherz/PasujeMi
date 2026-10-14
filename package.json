@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
     "test": "vitest run",
+    "check:ui": "node scripts/check-ui-literals.mjs",
     "bench:match": "tsx scripts/bench-match.ts",
     "match-keys": "tsx scripts/match-keys.ts"
   },
@@ -61,7 +62,8 @@
   },
   "lint-staged": {
     "*.{ts,tsx,astro}": [
-      "eslint --fix"
+      "eslint --fix",
+      "node scripts/check-ui-literals.mjs"
     ],
     "*.{json,css,md}": [
       "prettier --write"

@@ -1,28 +1,30 @@
 import { Lightbulb, SlidersHorizontal } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
-import { TagInput } from "@/components/pantry/TagInput";
+import { EmptyState, LimitNotice, RecipeListSkeleton } from "@/components/pantry/PantryStates";
+import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { usePantryMatch, type PantrySection } from "@/components/hooks/usePantryMatch";
 
-const SECTIONS: { section: PantrySection; label: string; placeholder: string; tagClassName: string }[] = [
+const SECTIONS: { section: PantrySection; label: string; placeholder: string; badgeVariant: TagVariant }[] = [
   {
     section: "have",
     label: "Mam w domu",
     placeholder: "np. pomidor",
-    tagClassName: "border-emerald-400/40 bg-emerald-500/15",
+    badgeVariant: "have",
   },
   {
     section: "staple",
     label: "Produkty stałe",
     placeholder: "np. sól",
-    tagClassName: "border-blue-400/40 bg-blue-500/15",
+    badgeVariant: "staple",
   },
   {
     section: "exclude",
     label: "Wykluczam",
     placeholder: "np. orzechy",
-    tagClassName: "border-red-400/40 bg-red-500/15",
+    badgeVariant: "exclude",
   },
 ];
 
@@ -35,12 +37,12 @@ export default function PantryMatch() {
     <div className="flex flex-col gap-6">
       <section
         aria-labelledby="pantry-heading"
-        className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl sm:p-6"
+        className="border-border bg-card rounded-2xl border p-4 backdrop-blur-xl sm:p-6"
       >
         <h1 id="pantry-heading" className="mb-2 text-xl font-semibold sm:text-2xl">
           Twoja spiżarka
         </h1>
-        <p className="mb-5 flex items-start gap-2 text-sm text-blue-100/70">
+        <p className="text-muted-foreground mb-5 flex items-start gap-2 text-sm">
           <Lightbulb className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>
             Przyprawy i dodatki, które zawsze masz pod ręką (np. sól, pieprz, olej), dodaj do produktów stałych — liczą
@@ -48,7 +50,7 @@ export default function PantryMatch() {
           </span>
         </p>
         <div className="grid gap-5 md:grid-cols-3">
-          {SECTIONS.map(({ section, label, placeholder, tagClassName }) => (
+          {SECTIONS.map(({ section, label, placeholder, badgeVariant }) => (
             <TagInput
               key={section}
               id={`pantry-${section}`}
@@ -59,19 +61,12 @@ export default function PantryMatch() {
               onRemove={(tag) => {
                 removeTag(section, tag);
               }}
-              tagClassName={tagClassName}
+              tagVariant={badgeVariant}
             />
           ))}
         </div>
-        <p role="status" className="mt-3 text-sm text-amber-200 empty:hidden">
-          {limitNotice}
-        </p>
-        <Button
-          type="button"
-          onClick={apply}
-          disabled={loading}
-          className="mt-5 w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500 sm:w-auto"
-        >
+        <LimitNotice message={limitNotice} className="mt-3" />
+        <Button type="button" onClick={apply} disabled={loading} className="mt-5 w-full sm:w-auto">
           <SlidersHorizontal aria-hidden="true" />
           Zastosuj filtry
         </Button>
@@ -85,16 +80,18 @@ export default function PantryMatch() {
         <ServerError message={error} />
 
         {showEmptyFiltered && (
-          <p className="rounded-2xl border border-white/10 bg-white/5 p-4 text-blue-100/80">
+          <EmptyState>
             Brak przepisów: wszystkie zawierają wykluczony składnik. Usuń któreś wykluczenie i zastosuj filtry ponownie.
-          </p>
+          </EmptyState>
         )}
         {!filtered && !loading && error === null && recipes.length === 0 && (
-          <p className="text-blue-100/70">Nie ma jeszcze żadnych przepisów.</p>
+          <EmptyState>Nie ma jeszcze żadnych przepisów.</EmptyState>
         )}
 
+        {loading && recipes.length === 0 && <RecipeListSkeleton count={4} />}
+
         {recipes.length > 0 && (
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className={cn("grid gap-4 sm:grid-cols-2", loading && "opacity-60")}>
             {recipes.map(({ recipe, match }) => (
               <li key={recipe.id} className="min-w-0">
                 <RecipeTile recipe={recipe} match={match} />
@@ -103,17 +100,12 @@ export default function PantryMatch() {
           </ul>
         )}
 
-        <p role="status" className="text-center text-sm text-blue-100/70">
+        <p role="status" className="sr-only">
           {loading ? "Wczytywanie przepisów…" : ""}
         </p>
 
         {hasMore && (
-          <Button
-            type="button"
-            onClick={loadMore}
-            disabled={loading}
-            className="self-center rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/20"
-          >
+          <Button type="button" variant="outline" onClick={loadMore} disabled={loading} className="self-center">
             Pokaż więcej
           </Button>
         )}

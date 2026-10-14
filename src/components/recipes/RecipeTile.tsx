@@ -1,6 +1,5 @@
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import type { IngredientMatch, MatchedRecipe, Recipe, RecipeIngredient } from "@/types";
 
 interface RecipeTileProps {
@@ -14,7 +13,7 @@ const tagBase = "max-w-full justify-start gap-1 py-1 text-left text-xs whitespac
 function IngredientTag({ ingredient, status }: { ingredient: RecipeIngredient; status?: IngredientMatch }) {
   if (!status) {
     return (
-      <Badge variant="outline" className={cn(tagBase, "border-white/15 bg-white/5 text-white/80")}>
+      <Badge variant="muted" className={tagBase}>
         {ingredient.name}
       </Badge>
     );
@@ -22,18 +21,12 @@ function IngredientTag({ ingredient, status }: { ingredient: RecipeIngredient; s
 
   const have = status.status === "have";
   return (
-    <Badge
-      variant="outline"
-      className={cn(
-        tagBase,
-        have ? "border-emerald-400/40 bg-emerald-500/20 text-emerald-50" : "border-white/15 bg-white/5 text-white/60",
-      )}
-    >
+    <Badge variant={have ? "have" : "muted"} className={tagBase}>
       {have && <Check className="size-3 shrink-0" aria-hidden="true" />}
       <span className="min-w-0 break-words">
         {status.mainExcluded ? (
           <>
-            <span className="line-through decoration-white/50">{ingredient.name}</span>
+            <span className="decoration-muted-foreground line-through">{ingredient.name}</span>
             <span className="sr-only"> (wykluczony)</span>
             {status.via !== null && <> → użyj: {status.via}</>}
           </>
@@ -52,11 +45,11 @@ function IngredientTag({ ingredient, status }: { ingredient: RecipeIngredient; s
 export function RecipeTile({ recipe, match }: RecipeTileProps) {
   const percent = match?.percent ?? null;
   return (
-    <article className="flex min-w-0 flex-col gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl sm:p-5">
+    <article className="border-border bg-card flex min-w-0 flex-col gap-3 rounded-2xl border p-4 backdrop-blur-xl sm:p-5">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="min-w-0 font-semibold break-words text-white">{recipe.name}</h3>
+        <h3 className="text-card-foreground min-w-0 font-semibold break-words">{recipe.name}</h3>
         {percent !== null && (
-          <Badge className="shrink-0 bg-purple-600 text-sm text-white" aria-label={`Dopasowanie ${percent}%`}>
+          <Badge className="shrink-0 text-sm" aria-label={`Dopasowanie ${percent}%`}>
             {percent}%
           </Badge>
         )}

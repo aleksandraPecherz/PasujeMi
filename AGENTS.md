@@ -33,9 +33,16 @@ PasujeMi is a Polish-language recipe-matching web app built on the 10x Astro Sta
 - Merge Tailwind classes with `cn()` from `@/lib/utils`, never by string concatenation.
 - No Next.js directives (`"use client"`); put React hooks in `src/components/hooks/`.
 
+## UI
+
+- Tokens live in `src/styles/global.css`: values in `:root` / `.dark`, published to Tailwind via `@theme inline`. Dark theme comes from `class="dark"` on `<html>` in `src/layouts/Layout.astro`; value sources are recorded in `context/changes/ui-pantry-tokens/tokens.md`.
+- Check `src/components/ui/` before creating a component; add a missing one with `npx shadcn@latest add <name>`. A missing look is a new variant in `ui/`, not a color in `className`.
+- No literal colors or arbitrary values (`bg-purple-600`, `#0a0e1a`, `p-[13px]`) in views — use tokens. `npm run check:ui` (also run by lint-staged and CI) guards the files listed in `CLEAN_FILES` in `scripts/check-ui-literals.mjs`; add a file there once you clean it. `src/components/ui/` is not scanned (upstream shadcn keeps literals like `text-white`, `ring-[3px]`), so a new variant there must use tokens only — the scan will not catch it.
+- Kitchen sink: `/dev/kitchen-sink` (dev only) — add each new component state there when you create it.
+
 ## Testing
 
-No test framework yet; `scripts/smoke.mjs` is the only automated check. Add a runner before writing tests.
+Vitest (`npm test`, also run by CI) picks up `src/**/*.test.ts` and `scripts/**/*.test.ts`. `scripts/smoke.mjs` covers the auth flow against a running server.
 
 ## Commits & CI
 

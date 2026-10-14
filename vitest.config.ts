@@ -8,7 +8,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    // Only app tests; course tooling in .claude/ ships its own scripts.
-    include: ["src/**/*.test.ts"],
+    // App and repo-script tests; course tooling in .claude/ ships its own scripts.
+    include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
   },
 });

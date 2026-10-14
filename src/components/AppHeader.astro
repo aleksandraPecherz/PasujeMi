@@ -1,19 +1,18 @@
 ---
+import { buttonVariants } from "@/components/ui/button";
+
 const { user } = Astro.locals;
 ---
 
-<header class="border-b border-white/10 bg-white/5 backdrop-blur-xl">
+<header class="border-border bg-card/50 border-b backdrop-blur-xl">
   <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-    <a href="/" class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-xl font-bold text-transparent">
+    <a href="/" class="from-brand-from to-brand-to bg-gradient-to-r bg-clip-text text-xl font-bold text-transparent">
       PasujeMi
     </a>
     <div class="flex min-w-0 items-center gap-3 text-sm">
-      <span class="truncate text-blue-100/70">{user?.email}</span>
+      <span class="text-muted-foreground truncate">{user?.email}</span>
       <form method="POST" action="/api/auth/signout" class="shrink-0">
-        <button
-          type="submit"
-          class="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-white transition-colors hover:bg-white/20"
-        >
+        <button type="submit" class:list={[buttonVariants({ variant: "outline", size: "sm" })]}>
           Wyloguj
         </button>
       </form>
