@@ -16,18 +16,17 @@ interface Call {
   range: [number, number] | null;
 }
 
-interface Result {
-  data: Row[];
-  error: null;
-  count: number | null;
-}
+type Result =
+  | { data: Row[]; error: null; count: number | null }
+  | { data: null; error: { code: string; message: string }; count: null };
 
 /**
  * Minimal stand-in for the PostgREST query builder: `select` (with `{ count }`), `order("name" | "id")` applied in
  * call order, `range`, `or` (`col.is.null`, `col.neq.value`), `in("id", …)` and `overrideTypes`. It caps every
  * response at MAX_ROWS like the real server and projects the selected columns, so a query that forgets a column or a
  * page fails the test. `count` is the number of filtered rows before `range`, sent only when the query asks for it
- * and `omitCount` is off (a server that sends no total).
+ * and `omitCount` is off (a server that sends no total). With a count, a range that starts past it fails with
+ * PGRST103 (416), as on the real server.
  */
 function fakeClient(
   rows: Row[],
@@ -98,6 +97,9 @@ function fakeClient(
       // `in` does not keep any particular order.
       else if (shuffleIn) result = [...result].reverse();
       const [from, to] = this.call.range ?? [0, Infinity];
+      if (this.call.count !== null && from > result.length) {
+        return { data: null, error: { code: "PGRST103", message: "Requested range not satisfiable" }, count: null };
+      }
       result = result.slice(from, Math.min(to + 1, from + MAX_ROWS));
       const columns = this.call.select.split(",").map((column) => column.trim());
       const data = result.map((row) => Object.fromEntries(columns.map((column) => [column, row[column]])) as Row);
@@ -196,6 +198,14 @@ describe("listRecipes", () => {
 
     expect(result.recipes.map((recipe) => recipe.id)).toEqual(["d", "b"]);
     expect(result.total).toBeNull();
+  });
+
+  it("returns an empty last page, not an error, past the end of the catalog", async () => {
+    const { supabase } = fakeClient(rows);
+
+    const result = await listRecipes(supabase, { limit: 2, offset: 10 });
+
+    expect(result).toEqual({ recipes: [], hasMore: false, total: null });
   });
 });
 

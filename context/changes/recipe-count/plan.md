@@ -286,6 +286,6 @@ Nie dotyczy: bez zmian schematu. Kontrakt API rozszerza się o pole, a jedynym k
 
 - [x] 2.6 `/dev/kitchen-sink`: sekcja `count` za `error`, cztery formy w jasnym i ciemnym motywie — 95f7463
 - [x] 2.7 `/` bez filtrów: licznik pokazuje liczbę całego katalogu
-- [x] 2.8 `/` → „Zastosuj filtry”: licznik znika na czas ładowania i wraca z nową liczbą
-- [x] 2.9 `/` → „Pokaż więcej”: licznik zostaje widoczny z tą samą liczbą
+- [ ] 2.8 `/` → „Zastosuj filtry”: licznik znika na czas ładowania i wraca z nową liczbą
+- [ ] 2.9 `/` → „Pokaż więcej”: licznik zostaje widoczny z tą samą liczbą
 - [x] 2.10 Smoke na działającym serwerze z lokalnym Supabase przechodzi: `npm run smoke`

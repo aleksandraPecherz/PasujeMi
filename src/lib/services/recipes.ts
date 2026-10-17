@@ -60,6 +60,10 @@ export async function listRecipes(
     .range(offset, offset + limit)
     .overrideTypes<RecipeRow[], { merge: false }>();
 
+  // With a count, PostgREST rejects a page that starts past the total (416) instead of returning no rows.
+  if (error?.code === "PGRST103") {
+    return { recipes: [], hasMore: false, total: null };
+  }
   if (error) {
     throw error;
   }

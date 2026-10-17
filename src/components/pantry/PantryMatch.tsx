@@ -4,6 +4,7 @@ import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/comp
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import { recipeCountLabel } from "@/lib/recipe-count";
 import { cn } from "@/lib/utils";
 import { usePantryMatch, type PantrySection } from "@/components/hooks/usePantryMatch";
 
@@ -113,7 +114,7 @@ export default function PantryMatch() {
         )}
 
         <p role="status" className="sr-only">
-          {loading ? "Wczytywanie przepisów…" : ""}
+          {loading ? "Wczytywanie przepisów…" : recipes.length > 0 && total !== null ? recipeCountLabel(total) : ""}
         </p>
 
         {hasMore && (
