@@ -276,16 +276,16 @@ Nie dotyczy: bez zmian schematu. Kontrakt API rozszerza się o pole, a jedynym k
 
 #### Automated
 
-- [x] 2.1 Testy przechodzą, w tym `src/lib/recipe-count.test.ts`: `npm test`
-- [x] 2.2 Brak literałów kolorów w plikach UI: `npm run check:ui`
-- [x] 2.3 Lint przechodzi: `npm run lint`
-- [x] 2.4 Typy przechodzą: `npx astro check`
-- [x] 2.5 Build przechodzi: `npm run build`
+- [x] 2.1 Testy przechodzą, w tym `src/lib/recipe-count.test.ts`: `npm test` — 95f7463
+- [x] 2.2 Brak literałów kolorów w plikach UI: `npm run check:ui` — 95f7463
+- [x] 2.3 Lint przechodzi: `npm run lint` — 95f7463
+- [x] 2.4 Typy przechodzą: `npx astro check` — 95f7463
+- [x] 2.5 Build przechodzi: `npm run build` — 95f7463
 
 #### Manual
 
-- [x] 2.6 `/dev/kitchen-sink`: sekcja `count` za `error`, cztery formy w jasnym i ciemnym motywie
-- [ ] 2.7 `/` bez filtrów: licznik pokazuje liczbę całego katalogu
-- [ ] 2.8 `/` → „Zastosuj filtry”: licznik znika na czas ładowania i wraca z nową liczbą
-- [ ] 2.9 `/` → „Pokaż więcej”: licznik zostaje widoczny z tą samą liczbą
-- [ ] 2.10 Smoke na działającym serwerze z lokalnym Supabase przechodzi: `npm run smoke`
+- [x] 2.6 `/dev/kitchen-sink`: sekcja `count` za `error`, cztery formy w jasnym i ciemnym motywie — 95f7463
+- [x] 2.7 `/` bez filtrów: licznik pokazuje liczbę całego katalogu
+- [x] 2.8 `/` → „Zastosuj filtry”: licznik znika na czas ładowania i wraca z nową liczbą
+- [x] 2.9 `/` → „Pokaż więcej”: licznik zostaje widoczny z tą samą liczbą
+- [x] 2.10 Smoke na działającym serwerze z lokalnym Supabase przechodzi: `npm run smoke`
