@@ -504,10 +504,10 @@ Zachowanie:
 
 #### Automated
 
-- [x] 3.1 Typy przechodzą: `npx astro check`
-- [x] 3.2 Lint przechodzi: `npm run lint`
-- [x] 3.3 Testy przechodzą: `npm test`
-- [x] 3.4 Build przechodzi: `npm run build`
+- [x] 3.1 Typy przechodzą: `npx astro check` — 4f9d784
+- [x] 3.2 Lint przechodzi: `npm run lint` — 4f9d784
+- [x] 3.3 Testy przechodzą: `npm test` — 4f9d784
+- [x] 3.4 Build przechodzi: `npm run build` — 4f9d784
 - [ ] 3.5 Smoke przechodzi lokalnie na zresetowanej bazie i w CI: `BASE_URL=http://localhost:4321 npm run smoke`
 
 #### Manual
