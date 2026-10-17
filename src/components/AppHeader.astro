@@ -1,4 +1,5 @@
 ---
+import ThemeToggle from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
 
 const { user } = Astro.locals;
@@ -11,6 +12,7 @@ const { user } = Astro.locals;
     </a>
     <div class="flex min-w-0 items-center gap-3 text-sm">
       <span class="text-muted-foreground truncate">{user?.email}</span>
+      <ThemeToggle client:load />
       <form method="POST" action="/api/auth/signout" class="shrink-0">
         <button type="submit" class:list={[buttonVariants({ variant: "outline", size: "sm" })]}>
           Wyloguj

@@ -304,37 +304,37 @@ Nie ma danych do migracji. Użytkownicy bez zapisanego wyboru zobaczą motyw zgo
 
 #### Automated
 
-- [x] 2.1 Nowe testy motywu przechodzą razem z resztą: `npm test`
-- [x] 2.2 W `Layout.astro` nie ma stałej klasy: `rg 'class="dark"' src` zwraca 0 trafień
-- [x] 2.3 Strażnik literałów przechodzi: `npm run check:ui`
-- [x] 2.4 Linting przechodzi: `npm run lint`
-- [x] 2.5 Type check przechodzi: `npx astro check`
-- [x] 2.6 Build przechodzi: `npm run build`
+- [x] 2.1 Nowe testy motywu przechodzą razem z resztą: `npm test` — 84fbafb
+- [x] 2.2 W `Layout.astro` nie ma stałej klasy: `rg 'class="dark"' src` zwraca 0 trafień — 84fbafb
+- [x] 2.3 Strażnik literałów przechodzi: `npm run check:ui` — 84fbafb
+- [x] 2.4 Linting przechodzi: `npm run lint` — 84fbafb
+- [x] 2.5 Type check przechodzi: `npx astro check` — 84fbafb
+- [x] 2.6 Build przechodzi: `npm run build` — 84fbafb
 
 #### Manual
 
-- [x] 2.7 Bez zapisu w `localStorage` motyw idzie za systemem (ciemny/jasny), bez błysku przy przeładowaniu
-- [x] 2.8 `localStorage.setItem("theme", ...)` + przeładowanie → motyw zgodny z zapisem, niezależnie od systemu
-- [x] 2.9 Wyłączony JavaScript → strona jasna
-- [x] 2.10 Zablokowane dane witryn → motyw z systemu, bez błędu w konsoli
-- [x] 2.11 Zmiana motywu systemu przy otwartej karcie, bez zapisu, niczego nie przełącza
+- [x] 2.7 Bez zapisu w `localStorage` motyw idzie za systemem (ciemny/jasny), bez błysku przy przeładowaniu — 84fbafb
+- [x] 2.8 `localStorage.setItem("theme", ...)` + przeładowanie → motyw zgodny z zapisem, niezależnie od systemu — 84fbafb
+- [x] 2.9 Wyłączony JavaScript → strona jasna — 84fbafb
+- [x] 2.10 Zablokowane dane witryn → motyw z systemu, bez błędu w konsoli — 84fbafb
+- [x] 2.11 Zmiana motywu systemu przy otwartej karcie, bez zapisu, niczego nie przełącza — 84fbafb
 
 ### Phase 3: Przełącznik w UI
 
 #### Automated
 
-- [ ] 3.1 Strażnik literałów przechodzi: `npm run check:ui`
-- [ ] 3.2 Linting przechodzi: `npm run lint`
-- [ ] 3.3 Type check przechodzi: `npx astro check`
-- [ ] 3.4 Testy przechodzą: `npm test`
-- [ ] 3.5 Build przechodzi: `npm run build`
+- [x] 3.1 Strażnik literałów przechodzi: `npm run check:ui`
+- [x] 3.2 Linting przechodzi: `npm run lint`
+- [x] 3.3 Type check przechodzi: `npx astro check`
+- [x] 3.4 Testy przechodzą: `npm test`
+- [x] 3.5 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 3.6 Przełącznik działa w nagłówku i na trzech stronach auth; wybór zachowany po przeładowaniu i po zalogowaniu
-- [ ] 3.7 Brak błysku złego motywu przy przeładowaniu w obu trybach
-- [ ] 3.8 Przełącznik obsługuje klawiaturę, ma widoczny focus ring i dostępną nazwę
-- [ ] 3.9 Wysokość `icon` (`size-9`) obok „Wyloguj” (`h-8`) wygląda akceptowalnie
-- [ ] 3.10 Na szerokości 360 × 640 przełącznik nie zasłania karty auth
-- [ ] 3.11 Kontrast w jasnym trybie ≥ 4,5:1 dla `text-primary`, `text-muted-foreground`, `text-destructive` na `bg-card` i placeholdera na polu
-- [ ] 3.12 Zrzuty kitchen sink i stron auth w obu trybach zapisane w `context/changes/theme-toggle/screenshots/`
+- [x] 3.6 Przełącznik działa w nagłówku i na trzech stronach auth; wybór zachowany po przeładowaniu i po zalogowaniu
+- [x] 3.7 Brak błysku złego motywu przy przeładowaniu w obu trybach
+- [x] 3.8 Przełącznik obsługuje klawiaturę, ma widoczny focus ring i dostępną nazwę
+- [x] 3.9 Wysokość `icon` (`size-9`) obok „Wyloguj” (`h-8`) wygląda akceptowalnie
+- [x] 3.10 Na szerokości 360 × 640 przełącznik nie zasłania karty auth
+- [x] 3.11 Kontrast w jasnym trybie ≥ 4,5:1 dla `text-primary`, `text-muted-foreground`, `text-destructive` na `bg-card` i placeholdera na polu
+- [x] 3.12 Zrzuty kitchen sink i stron auth w obu trybach zapisane w `context/changes/theme-toggle/screenshots/`
