@@ -56,8 +56,16 @@ function isMatch(value: unknown, ingredientCount: number): value is RecipeMatch 
 }
 
 // Status and body shape first, content second (context/foundation/lessons.md).
-function parsePage(body: unknown, withMatch: boolean): { items: ListedRecipe[]; hasMore: boolean } | null {
-  if (!isObject(body) || !Array.isArray(body.recipes) || typeof body.hasMore !== "boolean") {
+function parsePage(
+  body: unknown,
+  withMatch: boolean,
+): { items: ListedRecipe[]; hasMore: boolean; total: number | null } | null {
+  if (
+    !isObject(body) ||
+    !Array.isArray(body.recipes) ||
+    typeof body.hasMore !== "boolean" ||
+    !(typeof body.total === "number" || body.total === null)
+  ) {
     return null;
   }
   const items: ListedRecipe[] = [];
@@ -75,10 +83,11 @@ function parsePage(body: unknown, withMatch: boolean): { items: ListedRecipe[]; 
       items.push({ recipe: entry });
     }
   }
-  return { items, hasMore: body.hasMore };
+  return { items, hasMore: body.hasMore, total: body.total };
 }
 
-type PageResult = { ok: true; items: ListedRecipe[]; hasMore: boolean } | { ok: false; message: string };
+type PageResult =
+  { ok: true; items: ListedRecipe[]; hasMore: boolean; total: number | null } | { ok: false; message: string };
 
 // The same check as addTag, so a request above the endpoint's limits never leaves the browser.
 function exceedsLimits(filters: PantryLists): boolean {
@@ -120,8 +129,12 @@ export function usePantryMatch() {
   const [applied, setApplied] = useState<PantryLists>(EMPTY_LISTS);
   const [recipes, setRecipes] = useState<ListedRecipe[]>([]);
   const [hasMore, setHasMore] = useState(false);
+  // All recipes of the shown list, not only the loaded pages; null when the server could not count them.
+  const [total, setTotal] = useState<number | null>(null);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
+  // A request from offset 0 (new filters) is in flight: the old count is hidden, while "Pokaż więcej" keeps it.
+  const [reloading, setReloading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // Why the last tag was not added because of the request limits; cleared by the next successful edit.
   const [limitNotice, setLimitNotice] = useState<string | null>(null);
@@ -135,6 +148,7 @@ export function usePantryMatch() {
       return;
     }
     setLoading(false);
+    setReloading(false);
     if (!result.ok) {
       setError(result.message);
       return;
@@ -143,6 +157,7 @@ export function usePantryMatch() {
     setApplied(filters);
     setRecipes((prev) => (pageOffset === 0 ? result.items : [...prev, ...result.items]));
     setHasMore(result.hasMore);
+    setTotal(result.total);
     // Advance by the page size, not by the rows received: the service may drop a recipe deleted mid-request.
     setOffset(pageOffset + PAGE_SIZE);
   }, []);
@@ -154,6 +169,7 @@ export function usePantryMatch() {
       const controller = new AbortController();
       inFlight.current = controller;
       setLoading(true);
+      setReloading(pageOffset === 0);
       void requestPage(filters, pageOffset, controller.signal).then((result) => {
         commit(id, filters, pageOffset, result);
       });
@@ -161,7 +177,7 @@ export function usePantryMatch() {
     [commit],
   );
 
-  // Initial view: the plain FR-005 list (no filters); `loading` starts as true, so no state is set here.
+  // Initial view: the plain FR-005 list (no filters); `loading` and `reloading` start as true, so no state is set here.
   useEffect(() => {
     const id = ++requestId.current;
     const controller = new AbortController();
@@ -224,8 +240,10 @@ export function usePantryMatch() {
     loadMore,
     recipes,
     hasMore,
+    total,
     offset,
     loading,
+    reloading,
     error,
     /** Whether the shown list was requested with any tags. */
     filtered: hasFilters(applied),

@@ -50,16 +50,20 @@ function toRecipe(row: RecipeRow): Recipe {
 export async function listRecipes(
   supabase: SupabaseClient,
   { limit, offset }: { limit: number; offset: number },
-): Promise<{ recipes: Recipe[]; hasMore: boolean }> {
+): Promise<{ recipes: Recipe[]; hasMore: boolean; total: number | null }> {
   // Fetch one extra row to know whether another page exists.
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from("recipes")
-    .select(RECIPE_COLUMNS)
+    .select(RECIPE_COLUMNS, { count: "exact" })
     .order("name", { ascending: true })
     .order("id", { ascending: true })
     .range(offset, offset + limit)
     .overrideTypes<RecipeRow[], { merge: false }>();
 
+  // With a count, PostgREST rejects a page that starts past the total (416) instead of returning no rows.
+  if (error?.code === "PGRST103") {
+    return { recipes: [], hasMore: false, total: null };
+  }
   if (error) {
     throw error;
   }
@@ -67,6 +71,8 @@ export async function listRecipes(
   return {
     recipes: data.slice(0, limit).map(toRecipe),
     hasMore: data.length > limit,
+    // `null` when PostgREST sends no count (no Content-Range total), so the client can hide the counter.
+    total: count,
   };
 }
 
@@ -115,7 +121,7 @@ export async function matchRecipes(
   supabase: SupabaseClient,
   pantry: { have: string[]; staple: string[]; exclude: string[] },
   { limit, offset }: { limit: number; offset: number },
-): Promise<{ recipes: MatchedRecipe[]; hasMore: boolean }> {
+): Promise<{ recipes: MatchedRecipe[]; hasMore: boolean; total: number }> {
   // 1. Stored keys of the whole catalog: ranking by % cannot be paged in SQL.
   const keyRows = await fetchAllPages((from, to) =>
     supabase
@@ -164,8 +170,10 @@ export async function matchRecipes(
   const ranked = rankRecipes(candidates, pantryKeys);
   const page = ranked.slice(offset, offset + limit);
   const hasMore = ranked.length > offset + limit;
+  // The ranked count; a recipe dropped in step 4 (deleted, or excluded after recomputing its keys) still counts here.
+  const total = ranked.length;
   if (page.length === 0) {
-    return { recipes: [], hasMore };
+    return { recipes: [], hasMore, total };
   }
 
   // 4. Full rows of the page only, put back in ranking order (`in` does not keep it).
@@ -200,5 +208,5 @@ export async function matchRecipes(
       recipes.push({ ...toRecipe(row), match: resolveMatch(current, row.ingredients) });
     }
   }
-  return { recipes, hasMore };
+  return { recipes, hasMore, total };
 }

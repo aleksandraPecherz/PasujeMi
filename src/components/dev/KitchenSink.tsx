@@ -3,7 +3,7 @@ import { SlidersHorizontal, X } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
 import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignUpForm";
-import { EmptyState, LimitNotice, RecipeListSkeleton } from "@/components/pantry/PantryStates";
+import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
@@ -196,6 +196,13 @@ export default function KitchenSink() {
 
       <StateSection title="error" note="ServerError z komunikatem (role=alert).">
         <ServerError message="Nie udało się pobrać przepisów. Spróbuj ponownie." />
+      </StateSection>
+
+      <StateSection title="count" note="Licznik nad listą przepisów; odmiana: 1 przepis, 2–4 przepisy, 5+ przepisów.">
+        <RecipeCount total={1} />
+        <RecipeCount total={3} />
+        <RecipeCount total={12} />
+        <RecipeCount total={22} />
       </StateSection>
 
       <StateSection title="empty" note="Oba puste stany listy przepisów.">

@@ -1,9 +1,10 @@
 import { Lightbulb, SlidersHorizontal } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
-import { EmptyState, LimitNotice, RecipeListSkeleton } from "@/components/pantry/PantryStates";
+import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import { recipeCountLabel } from "@/lib/recipe-count";
 import { cn } from "@/lib/utils";
 import { usePantryMatch, type PantrySection } from "@/components/hooks/usePantryMatch";
 
@@ -29,8 +30,21 @@ const SECTIONS: { section: PantrySection; label: string; placeholder: string; ba
 ];
 
 export default function PantryMatch() {
-  const { lists, limitNotice, addTag, removeTag, apply, loadMore, recipes, hasMore, loading, error, filtered } =
-    usePantryMatch();
+  const {
+    lists,
+    limitNotice,
+    addTag,
+    removeTag,
+    apply,
+    loadMore,
+    recipes,
+    hasMore,
+    total,
+    loading,
+    reloading,
+    error,
+    filtered,
+  } = usePantryMatch();
   const showEmptyFiltered = filtered && !loading && error === null && recipes.length === 0;
 
   return (
@@ -87,6 +101,8 @@ export default function PantryMatch() {
 
         {loading && recipes.length === 0 && <RecipeListSkeleton count={4} />}
 
+        {recipes.length > 0 && total !== null && !reloading && <RecipeCount total={total} />}
+
         {recipes.length > 0 && (
           <ul className={cn("grid gap-4 sm:grid-cols-2", loading && "opacity-60")}>
             {recipes.map(({ recipe, match }) => (
@@ -98,7 +114,7 @@ export default function PantryMatch() {
         )}
 
         <p role="status" className="sr-only">
-          {loading ? "Wczytywanie przepisów…" : ""}
+          {loading ? "Wczytywanie przepisów…" : recipes.length > 0 && total !== null ? recipeCountLabel(total) : ""}
         </p>
 
         {hasMore && (
