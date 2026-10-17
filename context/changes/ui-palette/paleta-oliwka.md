@@ -111,7 +111,7 @@ Zostawić bez zmian: `--sidebar-*` (nieużywane) można ustawić jak `--card`/`-
 | --------------------------------- | ----- | ------------------------------------ |
 | tekst / tło                       | 5,79  | 9,68                                 |
 | tekst przycisku / primary         | 5,65  | 5,29                                 |
-| muted-foreground / tło            | 4,59  | 5,8                                  |
+| muted-foreground / tło            | 4,59  | 6,09                                 |
 | muted-foreground / muted          | —     | 4,81                                 |
 | tekst błędu (destructive) / tło   | 4,84  | 5,06                                 |
 | tekst błędu (destructive) / karta | 5,05  | 4,54                                 |
