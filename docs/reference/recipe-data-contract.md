@@ -22,11 +22,12 @@
 | `protein_g`     | `proteinG`      | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                           |
 | `carbs_g`       | `carbsG`        | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                           |
 | `fat_g`         | `fatG`          | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                           |
+| `author_id`     | —               | `uuid` / `null`         | z sesji (`auth.uid()`), `on delete set null`; seed ma `null`; poza `Recipe`    |
 | `created_at`    | —               | `timestamptz`           | domyślnie `now()`                                                              |
 
 `numeric` przychodzi z PostgREST jako tekst — serwis zamienia go na `number` (`null` zostaje `null`).
 
-Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk; zapisu przez API na razie nie ma (dojdzie w S-05–S-07 addytywną migracją).
+Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`; edycja i usuwanie dojdą w S-06 i S-07.
 
 ## Kształt składnika
 
