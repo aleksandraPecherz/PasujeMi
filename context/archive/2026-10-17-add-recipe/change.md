@@ -1,10 +1,10 @@
 ---
 change_id: add-recipe
 title: Add recipe
-status: impl_reviewed
+status: archived
 created: 2026-10-17
-updated: 2026-10-18
-archived_at: null
+updated: 2026-10-17
+archived_at: 2026-10-17T23:17:14Z
 ---
 
 ## Notes

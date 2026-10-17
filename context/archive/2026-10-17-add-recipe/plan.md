@@ -121,6 +121,7 @@ Addytywna migracja, która dodaje autora i uprawnienie do wstawiania. Do tego te
 **Intent**: Wprowadzić autorstwo i insert przez `authenticated` z egzekwowaniem po stronie bazy. Insert od użytkownika nie może ustawić `id`, `created_at` ani kluczy dopasowania. Nagłówek migracji ma wyjaśniać, że klucze zostają `null` przy zapisie użytkownika (decyzja 3). To uzupełnia nieaktualny komentarz „only the service role … later recipe writes” z migracji S-03, której nie wolno edytować.
 
 **Contract**:
+
 - `author_id uuid null default auth.uid() references auth.users(id) on delete set null`.
 - Indeks `recipes_author_id_idx` na `author_id`, pod przyszłe zapytania S-06 i pod `on delete set null`.
 - `comment on column public.recipes.author_id` mówi, że autora ustawia sesja (`auth.uid()`). Mówi też, że import F-02 (service role) wpisuje jawnie UUID autorki aplikacji, a wiersze seeda mają `null`.
@@ -135,11 +136,13 @@ Addytywna migracja, która dodaje autora i uprawnienie do wstawiania. Do tego te
 **Intent**: Udowodnić po stronie danych, że insert przepuszcza tylko własnego autora i tylko dozwolone kolumny. Krok zgodny z lesson „Assert status and body type before content”: najpierw status, potem `jq -e` na typie i kodzie.
 
 **Contract**: Nowy krok w jobie `smoke`, „Check recipe insert permissions”, po kroku „Check that recipes are hidden from the anon key”. Krok:
+
 - zakłada dwóch użytkowników (A i B) przez `POST $API_URL/auth/v1/signup` z `ANON_KEY`;
 - bierze ich `access_token` i `user.id`, sprawdzając `jq -e` na typie;
 - dla każdego przypadku wysyła `POST $API_URL/rest/v1/recipes` z poprawną treścią przepisu i oczekuje odmowy.
 
 Przypadki:
+
 - anon → 401 i `code == "42501"`;
 - A z `author_id` B → 403 i `42501`;
 - A z `author_id: null` → 403 i `42501`;
@@ -155,6 +158,7 @@ Na końcu krok sprawdza service role, że w tabeli nadal jest dokładnie 5 wiers
 **Intent**: Usunąć nieaktualne „zapisu przez API na razie nie ma” i opisać autora.
 
 **Contract**:
+
 - W tabeli „Kształt rekordu” dochodzi wiersz `author_id`: `uuid` albo `null`, z sesji, `on delete set null`, bez pola w `Recipe`.
 - Akapit „Dostęp (RLS)” mówi, że `authenticated` wstawia tylko jako siebie, bez `match_keys`, przez `POST /api/recipes`, a edycja i usuwanie przyjdą w S-06 i S-07.
 
@@ -189,6 +193,7 @@ Czysty moduł w `src/lib/recipes/`, który sprawdza i normalizuje wejście przep
 **Intent**: Jedno miejsce na limity z decyzji 5. Ograniczają pracę CPU na żądanie (lesson „Bound user-driven CPU work per request”) i koszt fallbacku kluczy na jeden przepis.
 
 **Contract**: Eksportowane stałe:
+
 - `MAX_RECIPE_NAME_LENGTH = 120`
 - `MAX_INGREDIENTS = 40`
 - `MAX_SUBSTITUTES = 5`
@@ -212,6 +217,7 @@ Komentarz nagłówka wskazuje, kto ich używa, wzorem `src/lib/matching/limits.t
 **Intent**: Zamienić nieznane body na `NewRecipe` albo listę błędów z polskimi komunikatami, przypiętymi do ścieżek pól. Formularz pokazuje te błędy przy polach, a API odsyła je w `issues`. Walidator przepisuje tylko znane pola. Ignoruje `id`, `authorId`, `matchKeys` i inne klucze, bo autor pochodzi z sesji.
 
 **Contract**:
+
 - `export const RECIPE_KINDS = ["na słodko", "na wytrawnie", "na ciepło", "na zimno"] as const satisfies readonly RecipeKind[]`. To runtime'owa lista do checkboxów i walidacji.
 - `export type NewRecipe = Omit<Recipe, "id">`.
 - `export interface RecipeIssue { path: string; message: string }`. Ścieżki w notacji z kropkami: `name`, `steps.2`, `ingredients.0.product`, `ingredients.1.substitutes.0.amount`, `kcal`.
@@ -219,6 +225,7 @@ Komentarz nagłówka wskazuje, kto ich używa, wzorem `src/lib/matching/limits.t
 - `export function defaultProduct(name: string): string`, czyli `name.trim().toLocaleLowerCase("pl")`. Formularz używa jej do automatycznego wypełniania.
 
 Reguły:
+
 - **Teksty** są przycinane. Nazwa przepisu nie może być pusta.
 - **Kroki:** 1 do `MAX_STEPS` niepustych kroków. Puste kroki to błąd, nie są pomijane w ciszy.
 - **Składniki:** 1 do `MAX_INGREDIENTS`, każdy z niepustym `name`. Pusty `product` dostaje `defaultProduct(name)`.
@@ -238,6 +245,7 @@ Reguły:
 **Intent**: Przypadki brzegowe reguł i limitów.
 
 **Contract**: Testy pokrywają:
+
 - minimalny poprawny przepis;
 - pełny przepis z przykładu w kontrakcie (`recipe-data-contract.md`, „Przykład rekordu”) bez `id`;
 - domyślny `product` („Mleko 1,5%” → „mleko 1,5%”) i zachowanie podanego `product`;
@@ -275,6 +283,7 @@ Serwis zapisu i handler `POST` obok istniejącego `GET`. Do tego kroki smoke.
 **Intent**: Zapis przepisu z mapowaniem camelCase na snake_case, w lustrze `toRecipe`. Zwraca wiersz w kształcie `Recipe`.
 
 **Contract**: `export async function createRecipe(supabase: SupabaseClient, authorId: string, recipe: NewRecipe): Promise<Recipe>`. Funkcja:
+
 - wstawia kolumny treści i `author_id: authorId`;
 - nie przekazuje `match_keys`, `match_keys_version`, `id` ani `created_at`;
 - woła `.select(RECIPE_COLUMNS).single()` i mapuje wynik przez `toRecipe`;
@@ -287,6 +296,7 @@ Serwis zapisu i handler `POST` obok istniejącego `GET`. Do tego kroki smoke.
 **Intent**: Cienki endpoint wzorem `GET`: kolejno sprawdza żądanie, waliduje, zapisuje i mapuje błędy. Limit body jest sprawdzany, zanim body zostanie sparsowane.
 
 **Contract**: `export const POST: APIRoute`. Kolejność kroków:
+
 1. Typ MIME z `Content-Type` bez parametrów (`split(";")[0].trim().toLowerCase()`) różny od `application/json` → 415 `{ error: "unsupported_media_type" }`. Nie `includes`, bo `text/plain; x=application/json` przeszłoby bez preflightu CORS.
 2. `Content-Length` > `MAX_RECIPE_BODY_BYTES` → 413 `{ error: "payload_too_large" }`.
 3. `await request.text()`. Długość w bajtach (`TextEncoder`) > limit → 413.
@@ -305,6 +315,7 @@ Jeśli `locals.user` jest pusty mimo middleware, handler zwraca 401 `unauthorize
 **Intent**: Sprawdzić zapis przez zbudowaną aplikację.
 
 **Contract**:
+
 - `request()` dostaje opcję `json`, która wysyła body JSON z `Content-Type: application/json`.
 - Nowy krok przed „signup creates account”: „anonymous recipe post gets 401” → 401 `unauthorized`.
 - Nowe kroki **po** „signed-in user matches recipes to the pantry”:
@@ -354,12 +365,14 @@ Strona `/recipes/new` z wyspą formularza, stanem sukcesu i linkiem w nagłówku
 **Intent**: Stan formularza i wysyłka. Hook trzyma wiersze składników, zamienników i kroków. Dla każdego wiersza pamięta, czy `product` był ręcznie zmieniony (decyzja 4). Mapuje `issues` z API albo z lokalnego `parseRecipeInput` na błędy pól i obsługuje stany `idle`, `submitting`, `saved` i `error`.
 
 **Contract**: Hook zwraca:
+
 - stan pól;
 - akcje: dodaj i usuń składnik, zamiennik, krok; zmień pole; przełącz rodzaj;
 - `submit()`, `reset()`;
 - `status`, `fieldErrors: Record<string, string>`, `serverError: string | null`, `saved: Recipe | null`.
 
 Zachowanie:
+
 - Zmiana `name` składnika aktualizuje `product` przez `defaultProduct`, dopóki użytkownik go nie edytował.
 - Akcje dodawania nie przekraczają limitów z `limits.ts`.
 - Przed wysyłką hook zamienia stan na body. Ilość z przecinkiem jest zamieniana na liczbę, a puste pola opcjonalne na `null`. Hook waliduje body lokalnie tym samym `parseRecipeInput` i dopiero wtedy wysyła `fetch("/api/recipes", { method: "POST", … })`.
@@ -377,6 +390,7 @@ Zachowanie:
 **Intent**: Widok formularza w karcie sekcji, wzorem `PantryMatch.tsx:52-53`. Wymagane pola są oznaczone. Etykiety kcal i makro mówią wprost „na 1 porcję”.
 
 **Contract**:
+
 - **`RecipeForm`** (default export) tylko woła `useRecipeForm` i renderuje `RecipeSaved`, gdy `status === "saved"`, a w przeciwnym razie `RecipeFormView`. Ten sam podział co hook i bezstanowe `PantryStates.tsx` w spiżarce. Dzięki niemu kitchen sink pokazuje stany bez mockowania `fetch`.
 - **`RecipeFormView`** (bez stanu) dostaje w propsach stan pól, `fieldErrors`, `status`, `serverError` i handlery z hooka. Zawiera:
   - nazwę;
@@ -396,6 +410,7 @@ Zachowanie:
 **Intent**: Trasa formularza chroniona przez istniejący middleware oraz link w nagłówku.
 
 **Contract**:
+
 - `new.astro` używa `AppLayout title="Dodaj przepis"` z `<RecipeForm client:load />`, wzorem `src/pages/index.astro`.
 - `AppHeader` dostaje link „Dodaj przepis” w grupie z e-mailem, przez `buttonVariants`:
   - nowy wariant `nav-current` z `aria-current="page"`, gdy `Astro.url.pathname === "/recipes/new"`;
@@ -410,6 +425,7 @@ Zachowanie:
 **Intent**: Nowe stany komponentów są widoczne w `/dev/kitchen-sink`, a nowe pliki widoków pilnuje skan literałów.
 
 **Contract**:
+
 - Kitchen sink dostaje sekcje: pusty formularz, błędy pól, wysyłka (`submitting`), błąd serwera i stan „Przepis dodany”. Są renderowane przez `RecipeFormView` i `RecipeSaved` z przykładowym stanem i pustymi handlerami. Dochodzi też przycisk w wariancie `nav-current`.
 - Do `CLEAN_FILES` dochodzą `src/pages/recipes/new.astro`, `src/components/recipes/RecipeForm.tsx`, `src/components/recipes/RecipeFormView.tsx`, `src/components/recipes/IngredientFields.tsx` i `src/components/recipes/RecipeSaved.tsx`.
 

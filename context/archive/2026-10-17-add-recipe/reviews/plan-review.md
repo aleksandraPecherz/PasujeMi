@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: S-05 Ręczne dodawanie przepisu
 
 - **Plan**: context/changes/add-recipe/plan.md
@@ -9,15 +10,16 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
 | Architectural Fitness | WARNING |
-| Blind Spots | PASS |
-| Plan Completeness | WARNING |
+| Blind Spots           | PASS    |
+| Plan Completeness     | WARNING |
 
 ## Grounding
+
 7/7 paths ✓, 7/7 symbols ✓, brief↔plan ✓, Progress↔Phase ✓
 
 ## Findings

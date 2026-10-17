@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: S-05 Ręczne dodawanie przepisu
 
 - **Plan**: context/changes/add-recipe/plan.md
@@ -10,14 +11,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | PASS |
-| Safety & Quality | WARNING |
-| Architecture | WARNING |
-| Pattern Consistency | PASS |
-| Success Criteria | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | PASS    |
+| Safety & Quality    | WARNING |
+| Architecture        | WARNING |
+| Pattern Consistency | PASS    |
+| Success Criteria    | PASS    |
 
 Automated checks re-run locally: `npm test` (146 passed), `npm run lint`, `npm run check:ui`, `npx astro check` (0 errors), `npm run build` — all pass. `db reset`, CI `smoke` job and local `npm run smoke` were not re-run in this review (need Supabase/running server). Manual items 1.4, 3.6, 3.7, 4.6–4.10 are ticked in Progress with phase commit SHAs; no contradicting evidence in the diff.
 
