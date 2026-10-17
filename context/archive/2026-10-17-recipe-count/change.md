@@ -1,10 +1,10 @@
 ---
 change_id: recipe-count
 title: Recipe count
-status: impl_reviewed
+status: archived
 created: 2026-10-17
 updated: 2026-10-17
-archived_at: null
+archived_at: 2026-10-17T18:18:04Z
 ---
 
 ## Notes

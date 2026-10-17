@@ -6,6 +6,7 @@ Domykamy kod próby z #24 (rozpakowany ze stasha, niezacommitowany). Nad listą 
 „Znaleziono N przepisów”, gdzie N to liczba wszystkich przepisów pokazanej listy, a nie tylko wczytanych stron.
 
 Plan dodaje trzy rzeczy do kodu próby:
+
 - **Brak liczby z bazy.** Licznik się chowa zamiast pokazywać 0.
 - **Ładowanie nowych filtrów.** Licznik znika na czas ładowania, żeby nie pokazywać nieaktualnej liczby.
 - **Testy.** Dochodzą brakujące testy serwisu i odmiany.
@@ -87,6 +88,7 @@ więc między fazami nic się nie psuje, a obie fazy i tak trafiają do jednego 
 `total` w `listRecipes` mówi, kiedy pojawia się `null`.
 
 **Contract**:
+
 - `listRecipes(...)` zwraca `Promise<{ recipes: Recipe[]; hasMore: boolean; total: number | null }>`, gdzie
   `total: count` bez `?? 0`.
 - `matchRecipes` zostaje przy `total: number`. To podtyp `number | null`, więc oba endpointy dają ten sam kształt
@@ -99,6 +101,7 @@ więc między fazami nic się nie psuje, a obie fazy i tak trafiają do jednego 
 **Intent**: Rozszerzyć `fakeClient` tak, żeby obsłużył `listRecipes`, i dopisać brakujące asercje `total` (decyzja 4).
 
 **Contract**:
+
 - **`fakeClient`, zmiany:**
   - `order()` przyjmuje kolejno `name` i `id` i sortuje stabilnie w kolejności wywołań; dla każdej innej kolumny
     nadal rzuca wyjątek.
@@ -145,6 +148,7 @@ Odmiana przechodzi do testowalnej funkcji.
 licznik tylko przy nowych filtrach, a nie przy „Pokaż więcej” (decyzja 3).
 
 **Contract**:
+
 - `parsePage` akceptuje `typeof body.total === "number" || body.total === null`. Brak pola albo inny typ nadal daje
   `null` (błąd „nieoczekiwana odpowiedź”).
 - `PageResult` i stan `total` mają typ `number | null`. Stan startowy to `null`.
@@ -171,6 +175,7 @@ przepisów, nie jest wspólnym helperem (decyzja 5). `RecipeCount` zostaje kompo
 klasami tokenów.
 
 **Contract**:
+
 - `export function recipeCountLabel(total: number): string` zwraca pełny tekst „Znaleziono N <forma>”. Formy:
   CLDR `one` → „przepis”, `few` → „przepisy”, pozostałe → „przepisów” (`Intl.PluralRules("pl")`, przeniesione z
   `PantryStates.tsx`).
@@ -184,6 +189,7 @@ klasami tokenów.
 **Intent**: Chronić pułapki polskiej odmiany (12–14 i 112 → „-ów”, ale 22–24 → „-y”).
 
 **Contract**: Pełne teksty dla:
+
 - 1 → „Znaleziono 1 przepis”
 - 2, 4, 22, 24, 102 → „… przepisy”
 - 0, 5, 11, 12, 14, 21, 112 → „… przepisów”
