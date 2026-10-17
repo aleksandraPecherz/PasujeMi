@@ -1,10 +1,13 @@
 import { useState, type ReactNode } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
+import SignInForm from "@/components/auth/SignInForm";
+import SignUpForm from "@/components/auth/SignUpForm";
 import { EmptyState, LimitNotice, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import { authErrorMessage } from "@/lib/auth-errors";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
 import type { Recipe, RecipeIngredient, RecipeMatch } from "@/types";
 
@@ -63,6 +66,8 @@ const SAMPLE_TAGS: { id: string; label: string; placeholder: string; variant: Ta
 ];
 
 const FULL_TAGS = Array.from({ length: MAX_TAGS }, (_, i) => `produkt ${i + 1}`);
+
+const SAMPLE_EMAIL = "ola@przyklad.pl";
 
 const LIMIT_MESSAGE = `Za dużo produktów naraz (limit ${MAX_TOKENS} słów we wszystkich listach). Usuń któryś produkt.`;
 
@@ -136,7 +141,8 @@ export default function KitchenSink() {
       <div>
         <h1 className="text-xl font-semibold sm:text-2xl">Kitchen sink</h1>
         <p className="text-muted-foreground text-sm">
-          Widok spiżarki w każdym z 7 stanów: default, hover, focus-visible, disabled, error, empty, loading.
+          Widok spiżarki w każdym z 7 stanów: default, hover, focus-visible, disabled, error, empty, loading; dalej
+          formularze logowania i rejestracji.
         </p>
       </div>
 
@@ -202,6 +208,31 @@ export default function KitchenSink() {
       <StateSection title="loading" note="Szkielet listy przy pierwszym wczytaniu; komunikat limitu słów.">
         <RecipeListSkeleton count={4} />
         <LimitNotice message={LIMIT_MESSAGE} />
+      </StateSection>
+
+      <StateSection
+        title="Formularze logowania"
+        note="Pusty formularz logowania; logowanie po złym haśle i rejestracja po błędzie — e-mail zostaje, hasła są puste. Na stronie fokus trafia na pole hasła; tutaj jest wyłączony, żeby strona nie przewijała się sama."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="bg-cosmic rounded-2xl p-6">
+            <SignInForm idPrefix="ks-signin-empty-" />
+          </div>
+          <div className="bg-cosmic rounded-2xl p-6">
+            <SignInForm
+              idPrefix="ks-signin-error-"
+              initialEmail={SAMPLE_EMAIL}
+              serverError={authErrorMessage("invalid_credentials")}
+            />
+          </div>
+          <div className="bg-cosmic rounded-2xl p-6">
+            <SignUpForm
+              idPrefix="ks-signup-error-"
+              initialEmail={SAMPLE_EMAIL}
+              serverError={authErrorMessage("user_already_exists")}
+            />
+          </div>
+        </div>
       </StateSection>
     </div>
   );

@@ -17,3 +17,23 @@ export function authErrorMessage(code: string | null): string | null {
   if (!code) return null;
   return Object.hasOwn(AUTH_ERROR_MESSAGES, code) ? AUTH_ERROR_MESSAGES[code] : FALLBACK_MESSAGE;
 }
+
+// Longest valid e-mail address (RFC 5321 path limit); anything longer is dropped, not truncated.
+export const MAX_EMAIL_LENGTH = 254;
+
+function cleanEmail(value: string | null): string {
+  const email = value?.trim() ?? "";
+  return email.length <= MAX_EMAIL_LENGTH ? email : "";
+}
+
+// Builds the redirect after a failed auth attempt. It takes only the e-mail, so a password cannot end up in the URL.
+export function authErrorRedirect(path: "/auth/signin" | "/auth/signup", code: string, email: string | null): string {
+  const params = new URLSearchParams({ error: code });
+  const cleaned = cleanEmail(email);
+  if (cleaned) params.set("email", cleaned);
+  return `${path}?${params.toString()}`;
+}
+
+export function emailFromQuery(value: string | null): string {
+  return cleanEmail(value);
+}

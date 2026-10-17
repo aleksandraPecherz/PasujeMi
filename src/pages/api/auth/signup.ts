@@ -1,19 +1,21 @@
 import type { APIRoute } from "astro";
+import { authErrorRedirect } from "@/lib/auth-errors";
 import { createClient } from "@/lib/supabase";
 
 export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
-  const email = form.get("email") as string;
+  const rawEmail = form.get("email");
+  const email = typeof rawEmail === "string" ? rawEmail : null;
   const password = form.get("password") as string;
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
-    return context.redirect("/auth/signup?error=not_configured");
+    return context.redirect(authErrorRedirect("/auth/signup", "not_configured", email));
   }
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { error } = await supabase.auth.signUp({ email: email ?? "", password });
 
   if (error) {
-    return context.redirect(`/auth/signup?error=${encodeURIComponent(error.code ?? "unknown")}`);
+    return context.redirect(authErrorRedirect("/auth/signup", error.code ?? "unknown", email));
   }
 
   return context.redirect("/auth/confirm-email");
