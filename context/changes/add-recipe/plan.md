@@ -496,9 +496,9 @@ Zachowanie:
 
 #### Automated
 
-- [x] 2.1 Testy przechodzą: `npm test`
-- [x] 2.2 Typy przechodzą: `npx astro check`
-- [x] 2.3 Lint przechodzi: `npm run lint`
+- [x] 2.1 Testy przechodzą: `npm test` — b16cae2
+- [x] 2.2 Typy przechodzą: `npx astro check` — b16cae2
+- [x] 2.3 Lint przechodzi: `npm run lint` — b16cae2
 
 ### Phase 3: POST /api/recipes
 
