@@ -24,6 +24,16 @@ export const CLEAN_FILES = [
   "src/components/recipes/RecipeFormView.tsx",
   "src/components/recipes/IngredientFields.tsx",
   "src/components/recipes/RecipeSaved.tsx",
+  "src/pages/auth/signin.astro",
+  "src/pages/auth/signup.astro",
+  "src/pages/auth/confirm-email.astro",
+  "src/components/auth/FormField.tsx",
+  "src/components/auth/PasswordToggle.tsx",
+  "src/components/auth/SignUpForm.tsx",
+  "src/components/auth/SubmitButton.tsx",
+  "src/components/auth/SignInForm.tsx",
+  "src/layouts/Layout.astro",
+  "src/components/ThemeToggle.tsx",
 ];
 
 const PALETTE =

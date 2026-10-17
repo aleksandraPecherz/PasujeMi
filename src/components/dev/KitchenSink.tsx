@@ -9,6 +9,7 @@ import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
@@ -328,6 +329,15 @@ export default function KitchenSink() {
         note="Stan po zapisie: komunikat, kafelek, Dodaj kolejny i Przejdź do listy."
       >
         <RecipeSaved recipe={RECIPE} onAddAnother={NOOP} autoFocus={false} />
+      </StateSection>
+
+      <StateSection
+        title="Przełącznik motywu"
+        note="Stany: default, hover i focus-visible (najedź kursorem / przejdź klawiszem Tab). Ikona zależy od trybu: księżyc w jasnym, słońce w ciemnym; kliknięcie przełącza motyw i pokazuje drugi stan."
+      >
+        <div>
+          <ThemeToggle />
+        </div>
       </StateSection>
 
       <StateSection

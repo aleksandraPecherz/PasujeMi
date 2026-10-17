@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Banner from "@/components/Banner.astro";
 import { missingConfigs } from "@/lib/config-status";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 interface Props {
   title?: string;
@@ -11,10 +12,13 @@ const { title = "PasujeMi" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="pl" class="dark">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="color-scheme" content="light dark" />
+    {/* eslint-disable-next-line astro/no-set-html-directive */}
+    <script is:inline set:html={THEME_INIT_SCRIPT}></script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>{title}</title>
   </head>

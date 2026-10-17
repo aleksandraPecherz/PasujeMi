@@ -69,7 +69,7 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
   const missingChars = MIN_PASSWORD_LENGTH - password.length;
   const passwordHint =
     !errors.password && password.length > 0 && missingChars > 0 ? (
-      <p className="mt-1 text-xs text-blue-100/50">
+      <p className="text-muted-foreground mt-1 text-xs">
         Brakuje jeszcze {missingChars} {polishCharsWord(missingChars)}
       </p>
     ) : undefined;

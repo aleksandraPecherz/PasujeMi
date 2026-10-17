@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const isAutoConfirmed = import.meta.env.DEV;
 
@@ -19,14 +20,17 @@ const content = isAutoConfirmed
 ---
 
 <Layout title={`${content.heading} · PasujeMi`}>
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
+  <div class="bg-cosmic relative flex min-h-screen items-center justify-center p-4">
+    <div class="absolute top-4 right-4">
+      <ThemeToggle client:load />
+    </div>
+    <div class="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center text-card-foreground backdrop-blur-xl">
       <div class="mb-4 text-5xl">{content.emoji}</div>
-      <h1 class="mb-3 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+      <h1 class="mb-3 bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-2xl font-bold text-transparent">
         {content.heading}
       </h1>
-      <p class="mb-6 text-blue-100/80">{content.description}</p>
-      <a href="/auth/signin" class="text-sm text-purple-300 hover:underline">
+      <p class="mb-6 text-muted-foreground">{content.description}</p>
+      <a href="/auth/signin" class="text-sm text-foreground underline hover:no-underline">
         {content.linkText}
       </a>
     </div>
