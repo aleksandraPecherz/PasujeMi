@@ -8,6 +8,8 @@ import {
   resolveMatch,
   type RankCandidate,
 } from "@/lib/matching";
+import { MAX_RECOMPUTED_RECIPES } from "@/lib/recipes/limits";
+import type { NewRecipe } from "@/lib/recipes/validate";
 import type { MatchKeys, MatchedRecipe, Recipe, RecipeIngredient, RecipeKind } from "@/types";
 
 const RECIPE_COLUMNS = "id, name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g";
@@ -76,6 +78,36 @@ export async function listRecipes(
   };
 }
 
+/**
+ * Inserts a recipe as `authorId` (RLS requires it to be the session user).
+ * `match_keys` stay null: `authenticated` has no grant on them, and `matchRecipes` computes them per request.
+ */
+export async function createRecipe(supabase: SupabaseClient, authorId: string, recipe: NewRecipe): Promise<Recipe> {
+  const { data, error } = await supabase
+    .from("recipes")
+    .insert({
+      name: recipe.name,
+      steps: recipe.steps,
+      ingredients: recipe.ingredients,
+      prep_time_min: recipe.prepTimeMin,
+      servings: recipe.servings,
+      kinds: recipe.kinds,
+      kcal: recipe.kcal,
+      protein_g: recipe.proteinG,
+      carbs_g: recipe.carbsG,
+      fat_g: recipe.fatG,
+      author_id: authorId,
+    })
+    .select(RECIPE_COLUMNS)
+    .single()
+    .overrideTypes<RecipeRow, { merge: false }>();
+
+  if (error) {
+    throw error;
+  }
+  return toRecipe(data);
+}
+
 /** PostgREST returns at most `max_rows` rows per request (supabase/config.toml), so the catalog is read in pages. */
 const PAGE_SIZE = 1000;
 
@@ -134,18 +166,21 @@ export async function matchRecipes(
 
   // 2. Rows without keys or with keys of another version: compute them in memory for this request only
   //    (`authenticated` cannot write; scripts/match-keys.ts persists them). Filtered on the server, because an
-  //    `in('id', …)` list of 1000 UUIDs would not fit in the URL.
+  //    `in('id', …)` list of 1000 UUIDs would not fit in the URL. At most MAX_RECOMPUTED_RECIPES rows are computed
+  //    per request to bound CPU; the rest are left out of the ranking until the script stores their keys.
   const freshKeys = new Map<string, MatchKeys>();
   if (keyRows.some((row) => row.match_keys === null || row.match_keys_version !== MATCH_KEYS_VERSION)) {
-    const staleRows = await fetchAllPages((from, to) =>
-      supabase
-        .from("recipes")
-        .select("id, ingredients")
-        .or(`match_keys.is.null,match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`)
-        .order("id", { ascending: true })
-        .range(from, to)
-        .overrideTypes<IngredientsRow[], { merge: false }>(),
-    );
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("id, ingredients")
+      .or(`match_keys.is.null,match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`)
+      .order("id", { ascending: true })
+      .range(0, MAX_RECOMPUTED_RECIPES - 1)
+      .overrideTypes<IngredientsRow[], { merge: false }>();
+    if (error) {
+      throw error;
+    }
+    const staleRows = data;
     for (const row of staleRows) {
       freshKeys.set(row.id, computeMatchKeys(row.ingredients));
     }

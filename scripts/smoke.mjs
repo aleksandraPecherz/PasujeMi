@@ -20,7 +20,7 @@ function storeCookies(response) {
   }
 }
 
-async function request(path, { method = "GET", form } = {}) {
+async function request(path, { method = "GET", form, json } = {}) {
   const response = await fetch(BASE_URL + path, {
     method,
     redirect: "manual",
@@ -28,13 +28,25 @@ async function request(path, { method = "GET", form } = {}) {
       Cookie: cookieHeader(),
       Origin: BASE_URL,
       ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      ...(json ? { "Content-Type": "application/json" } : {}),
     },
-    body: form ? new URLSearchParams(form).toString() : undefined,
+    body: form ? new URLSearchParams(form).toString() : json ? JSON.stringify(json) : undefined,
   });
   storeCookies(response);
   const isJson = (response.headers.get("content-type") ?? "").includes("application/json");
   const body = isJson ? await response.json() : await response.text();
   return { status: response.status, location: response.headers.get("location") ?? "", body };
+}
+
+// A valid recipe for POST /api/recipes. The ingredient is yogurt on purpose: the step that adds it runs after the
+// pantry-match step and `exclude=jogurt` hides it, so a repeated run on a local database keeps `total === 4`.
+function newRecipe(overrides = {}) {
+  return {
+    name: `Smoke ${Date.now()}`,
+    steps: ["Wymieszaj."],
+    ingredients: [{ name: "Jogurt naturalny", product: "", amount: 100, unit: "g", substitutes: [] }],
+    ...overrides,
+  };
 }
 
 // `location` must match exactly.
@@ -45,6 +57,11 @@ const steps = [
   [
     "anonymous api request gets 401",
     () => request("/api/recipes"),
+    { status: 401, check: (body) => body?.error === "unauthorized" },
+  ],
+  [
+    "anonymous recipe post gets 401",
+    () => request("/api/recipes", { method: "POST", json: newRecipe() }),
     { status: 401, check: (body) => body?.error === "unauthorized" },
   ],
   [
@@ -110,6 +127,20 @@ const steps = [
         );
       },
     },
+  ],
+  [
+    "signed-in user adds a recipe",
+    () => request("/api/recipes", { method: "POST", json: newRecipe() }),
+    {
+      status: 201,
+      check: (body) =>
+        typeof body?.recipe?.id === "string" && body.recipe.ingredients?.[0]?.product === "jogurt naturalny",
+    },
+  ],
+  [
+    "invalid recipe is rejected",
+    () => request("/api/recipes", { method: "POST", json: newRecipe({ ingredients: [] }) }),
+    { status: 400, check: (body) => body?.error === "invalid_recipe" && Array.isArray(body?.issues) },
   ],
   [
     "app shell renders for signed-in user",
