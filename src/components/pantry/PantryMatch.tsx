@@ -35,10 +35,7 @@ export default function PantryMatch() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section
-        aria-labelledby="pantry-heading"
-        className="border-border bg-card rounded-2xl border p-4 backdrop-blur-xl sm:p-6"
-      >
+      <section aria-labelledby="pantry-heading" className="border-border bg-card rounded-2xl border p-4 sm:p-6">
         <h1 id="pantry-heading" className="mb-2 text-xl font-semibold sm:text-2xl">
           Twoja spiżarka
         </h1>

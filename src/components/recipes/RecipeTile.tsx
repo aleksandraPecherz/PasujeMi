@@ -45,7 +45,7 @@ function IngredientTag({ ingredient, status }: { ingredient: RecipeIngredient; s
 export function RecipeTile({ recipe, match }: RecipeTileProps) {
   const percent = match?.percent ?? null;
   return (
-    <article className="border-border bg-card flex min-w-0 flex-col gap-3 rounded-2xl border p-4 backdrop-blur-xl sm:p-5">
+    <article className="border-border bg-card flex min-w-0 flex-col gap-3 rounded-2xl border p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-card-foreground min-w-0 font-semibold break-words">{recipe.name}</h3>
         {percent !== null && (

@@ -313,28 +313,28 @@ Brak danych do migracji. Wycofanie to revert commitów tej zmiany.
 
 #### Manual
 
-- [ ] 1.6 Zrzuty before istnieją i powstały przed edycją global.css
-- [ ] 1.7 Tabela kontrastu w tokens.md spełnia progi
+- [x] 1.6 Zrzuty before istnieją i powstały przed edycją global.css
+- [x] 1.7 Tabela kontrastu w tokens.md spełnia progi
 - [x] 1.8 / ma oliwkowe tło i karty, bez błędów konsoli
 
 ### Phase 2: Warianty i komponenty
 
 #### Automated
 
-- [ ] 2.1 Brak backdrop-blur w trzech kartach
-- [ ] 2.2 Brak bg-destructive/60 w ui/
-- [ ] 2.3 Brak alfy w wariantach tagów badge.tsx
-- [ ] 2.4 npm run lint przechodzi
-- [ ] 2.5 npx astro check przechodzi
-- [ ] 2.6 npm run check:ui przechodzi
-- [ ] 2.7 npm test przechodzi
-- [ ] 2.8 npm run build przechodzi
-- [ ] 2.9 Build zawiera color-mix z currentcolor 20%
+- [x] 2.1 Brak backdrop-blur w trzech kartach
+- [x] 2.2 Brak bg-destructive/60 w ui/
+- [x] 2.3 Brak alfy w wariantach tagów badge.tsx
+- [x] 2.4 npm run lint przechodzi
+- [x] 2.5 npx astro check przechodzi
+- [x] 2.6 npm run check:ui przechodzi
+- [x] 2.7 npm test przechodzi
+- [x] 2.8 npm run build przechodzi
+- [x] 2.9 Build zawiera color-mix z currentcolor 20%
 
 #### Manual
 
-- [ ] 2.10 Hover × używa currentcolor, nie --accent
-- [ ] 2.11 Tagi w spiżarce i na kafelku mają pełne tło z palety
+- [x] 2.10 Hover × używa currentcolor, nie --accent
+- [x] 2.11 Tagi w spiżarce i na kafelku mają pełne tło z palety
 
 ### Phase 3: Weryfikacja wizualna
 

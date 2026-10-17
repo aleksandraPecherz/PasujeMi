@@ -68,7 +68,7 @@ const LIMIT_MESSAGE = `Za dużo produktów naraz (limit ${MAX_TOKENS} słów we 
 
 function StateSection({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
-    <section className="border-border bg-card flex flex-col gap-4 rounded-2xl border p-4 backdrop-blur-xl sm:p-6">
+    <section className="border-border bg-card flex flex-col gap-4 rounded-2xl border p-4 sm:p-6">
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
         {note && <p className="text-muted-foreground text-sm">{note}</p>}

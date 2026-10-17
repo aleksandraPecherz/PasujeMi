@@ -65,7 +65,7 @@ export function TagInput({ id, label, placeholder, tags, onAdd, onRemove, tagVar
                 <span className="min-w-0 break-words">{tag}</span>
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="ghost-current"
                   size="icon"
                   onClick={() => {
                     onRemove(tag);
