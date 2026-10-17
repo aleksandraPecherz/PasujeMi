@@ -288,36 +288,36 @@ Nie ma danych do migracji. Użytkownicy bez zapisanego wyboru zobaczą motyw zgo
 
 #### Automated
 
-- [x] 1.1 Strażnik literałów przechodzi z rozszerzoną listą: `npm run check:ui`
-- [x] 1.2 Linting przechodzi: `npm run lint`
-- [x] 1.3 Type check przechodzi: `npx astro check`
-- [x] 1.4 Testy przechodzą: `npm test`
-- [x] 1.5 Build przechodzi: `npm run build`
+- [x] 1.1 Strażnik literałów przechodzi z rozszerzoną listą: `npm run check:ui` — 67b558c
+- [x] 1.2 Linting przechodzi: `npm run lint` — 67b558c
+- [x] 1.3 Type check przechodzi: `npx astro check` — 67b558c
+- [x] 1.4 Testy przechodzą: `npm test` — 67b558c
+- [x] 1.5 Build przechodzi: `npm run build` — 67b558c
 
 #### Manual
 
-- [x] 1.6 `/auth/signin`, `/auth/signup`, `/auth/confirm-email` są czytelne w ciemnym trybie (tekst, linki, pola, przycisk, placeholdery)
-- [x] 1.7 Stany formularza w kitchen sink (pusty, błąd serwera, błąd pola, podpowiedź hasła, focus, hover pola, przycisk `pending`) bez regresji układu
-- [x] 1.8 Przycisk „Zaloguj się”/„Załóż konto” używa koloru `primary`; nie ma fioletu ani błękitu
+- [x] 1.6 `/auth/signin`, `/auth/signup`, `/auth/confirm-email` są czytelne w ciemnym trybie (tekst, linki, pola, przycisk, placeholdery) — 67b558c
+- [x] 1.7 Stany formularza w kitchen sink (pusty, błąd serwera, błąd pola, podpowiedź hasła, focus, hover pola, przycisk `pending`) bez regresji układu — 67b558c
+- [x] 1.8 Przycisk „Zaloguj się”/„Załóż konto” używa koloru `primary`; nie ma fioletu ani błękitu — 67b558c
 
 ### Phase 2: Mechanizm motywu
 
 #### Automated
 
-- [ ] 2.1 Nowe testy motywu przechodzą razem z resztą: `npm test`
-- [ ] 2.2 W `Layout.astro` nie ma stałej klasy: `rg 'class="dark"' src` zwraca 0 trafień
-- [ ] 2.3 Strażnik literałów przechodzi: `npm run check:ui`
-- [ ] 2.4 Linting przechodzi: `npm run lint`
-- [ ] 2.5 Type check przechodzi: `npx astro check`
-- [ ] 2.6 Build przechodzi: `npm run build`
+- [x] 2.1 Nowe testy motywu przechodzą razem z resztą: `npm test`
+- [x] 2.2 W `Layout.astro` nie ma stałej klasy: `rg 'class="dark"' src` zwraca 0 trafień
+- [x] 2.3 Strażnik literałów przechodzi: `npm run check:ui`
+- [x] 2.4 Linting przechodzi: `npm run lint`
+- [x] 2.5 Type check przechodzi: `npx astro check`
+- [x] 2.6 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.7 Bez zapisu w `localStorage` motyw idzie za systemem (ciemny/jasny), bez błysku przy przeładowaniu
-- [ ] 2.8 `localStorage.setItem("theme", ...)` + przeładowanie → motyw zgodny z zapisem, niezależnie od systemu
-- [ ] 2.9 Wyłączony JavaScript → strona jasna
-- [ ] 2.10 Zablokowane dane witryn → motyw z systemu, bez błędu w konsoli
-- [ ] 2.11 Zmiana motywu systemu przy otwartej karcie, bez zapisu, niczego nie przełącza
+- [x] 2.7 Bez zapisu w `localStorage` motyw idzie za systemem (ciemny/jasny), bez błysku przy przeładowaniu
+- [x] 2.8 `localStorage.setItem("theme", ...)` + przeładowanie → motyw zgodny z zapisem, niezależnie od systemu
+- [x] 2.9 Wyłączony JavaScript → strona jasna
+- [x] 2.10 Zablokowane dane witryn → motyw z systemu, bez błędu w konsoli
+- [x] 2.11 Zmiana motywu systemu przy otwartej karcie, bez zapisu, niczego nie przełącza
 
 ### Phase 3: Przełącznik w UI
 

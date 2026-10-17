@@ -27,6 +27,7 @@ export const CLEAN_FILES = [
   "src/components/auth/SignUpForm.tsx",
   "src/components/auth/SubmitButton.tsx",
   "src/components/auth/SignInForm.tsx",
+  "src/layouts/Layout.astro",
 ];
 
 const PALETTE =
