@@ -6,6 +6,7 @@ import SignUpForm from "@/components/auth/SignUpForm";
 import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
@@ -215,6 +216,15 @@ export default function KitchenSink() {
       <StateSection title="loading" note="Szkielet listy przy pierwszym wczytaniu; komunikat limitu słów.">
         <RecipeListSkeleton count={4} />
         <LimitNotice message={LIMIT_MESSAGE} />
+      </StateSection>
+
+      <StateSection
+        title="Przełącznik motywu"
+        note="Stany: default, hover i focus-visible (najedź kursorem / przejdź klawiszem Tab). Ikona zależy od trybu: księżyc w jasnym, słońce w ciemnym; kliknięcie przełącza motyw i pokazuje drugi stan."
+      >
+        <div>
+          <ThemeToggle />
+        </div>
       </StateSection>
 
       <StateSection
