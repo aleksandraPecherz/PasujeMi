@@ -48,3 +48,4 @@ Vitest (`npm test`, also run by CI) picks up `src/**/*.test.ts` and `scripts/**/
 
 - Short imperative, sentence-case subjects (e.g. `Enforce LF line endings via .gitattributes`); no prefix convention.
 - Run `npm run lint` and `npx astro check` before pushing (@.github/workflows/ci.yml).
+- Windows: when `git mv` or `mv` of a folder fails with `Permission denied` (e.g. `/10x-archive`), move it yourself with `powershell -NoProfile -Command "Move-Item <src> <dest>"`, then stage both paths by name (`git add <src> <dest>`) so git records a rename, and continue. Don't ask the user to move it by hand.
