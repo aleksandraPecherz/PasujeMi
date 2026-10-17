@@ -57,6 +57,7 @@ Endpointy auth po każdym błędzie przekierowują z `error` i `email`; logika w
 **Intent**: Dodać budowanie URL błędu z e-mailem oraz bezpieczny odczyt e-maila z URL, żeby endpointy i strony stosowały tę samą regułę (przycięcie, limit długości) i żeby hasło strukturalnie nie mogło trafić do URL.
 
 **Contract**:
+
 - `MAX_EMAIL_LENGTH = 254`.
 - `authErrorRedirect(path: "/auth/signin" | "/auth/signup", code: string, email: string | null): string` — buduje `path?error=<code>[&email=<email>]` przez `URLSearchParams`; e-mail po `trim()` dołączany tylko gdy niepusty i ≤ `MAX_EMAIL_LENGTH`.
 - `emailFromQuery(value: string | null): string` — zwraca przycięty e-mail albo `""`, gdy brak lub dłuższy niż limit.
@@ -125,6 +126,7 @@ Strony przekazują e-mail do formularzy; formularze startują z wypełnionym e-m
 **Intent**: Zasilić stan e-maila wartością startową, ustawić fokus na pierwszym polu hasła, gdy strona o to prosi, i umożliwić unikalne id przy wielu formularzach na stronie.
 
 **Contract**:
+
 - Props formularzy: `initialEmail?: string` (domyślnie `""`, zasila `useState`), `autoFocusPassword?: boolean`, `idPrefix?: string` (domyślnie `""`).
 - Pola: `id={`${idPrefix}email`}` + jawne `name="email"` (analogicznie `password`, `confirmPassword`).
 - `FormField` dostaje opcjonalny `autoFocus?: boolean` przekazywany do `<input>`; ustawiany tylko na polu `password`.

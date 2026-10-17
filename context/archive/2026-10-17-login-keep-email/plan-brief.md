@@ -16,26 +16,28 @@ Po błędzie logowania lub rejestracji użytkownik widzi komunikat, wpisany e-ma
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) |
-| --- | --- | --- |
-| Podejście | E-mail w przekierowaniu (`?error=…&email=…`) | Wybrane w issue/poleceniu; najmniejsza zmiana przy zwykłym POST. |
-| Wstawienie e-maila | Prop `initialEmail` zasila `useState` | Formularze są kontrolowane, więc `defaultValue` by nie zadziałał. |
-| Budowanie URL | Helper `authErrorRedirect` w `src/lib/auth-errors.ts` + test | Jedna reguła dla 4 przekierowań; sygnatura nie przyjmuje hasła. |
-| Limit e-maila | 254 znaki, przy zapisie i odczycie | Wartość z URL jest niezaufana; React i tak ją escapuje. |
-| `?email=` bez `?error=` | Ignorowany | Nie otwieramy nowej ścieżki wejścia. |
-| Fokus | Pole hasła, tylko gdy e-mail wrócił z URL | Użytkownik od razu poprawia hasło. |
-| Kitchen sink | Nowa sekcja „Formularze logowania” za „loading” | Osobna grupa auth, nie miesza się z błędem spiżarni. |
-| Link signup→signin z e-mailem | Poza zakresem | Issue dotyczy tego samego formularza. |
+| Decision                      | Choice                                                       | Why (1 sentence)                                                  |
+| ----------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Podejście                     | E-mail w przekierowaniu (`?error=…&email=…`)                 | Wybrane w issue/poleceniu; najmniejsza zmiana przy zwykłym POST.  |
+| Wstawienie e-maila            | Prop `initialEmail` zasila `useState`                        | Formularze są kontrolowane, więc `defaultValue` by nie zadziałał. |
+| Budowanie URL                 | Helper `authErrorRedirect` w `src/lib/auth-errors.ts` + test | Jedna reguła dla 4 przekierowań; sygnatura nie przyjmuje hasła.   |
+| Limit e-maila                 | 254 znaki, przy zapisie i odczycie                           | Wartość z URL jest niezaufana; React i tak ją escapuje.           |
+| `?email=` bez `?error=`       | Ignorowany                                                   | Nie otwieramy nowej ścieżki wejścia.                              |
+| Fokus                         | Pole hasła, tylko gdy e-mail wrócił z URL                    | Użytkownik od razu poprawia hasło.                                |
+| Kitchen sink                  | Nowa sekcja „Formularze logowania” za „loading”              | Osobna grupa auth, nie miesza się z błędem spiżarni.              |
+| Link signup→signin z e-mailem | Poza zakresem                                                | Issue dotyczy tego samego formularza.                             |
 
 ## Scope
 
 **In scope:**
+
 - 4 przekierowania błędów w `signin.ts` i `signup.ts`
 - Strony `/auth/signin` i `/auth/signup`, formularze `SignInForm`, `SignUpForm`, `FormField` (`autoFocus`)
 - Test Vitest helpera, aktualizacja `scripts/smoke.mjs`
 - Sekcja w kitchen sinku
 
 **Out of scope:**
+
 - Wysyłka przez `fetch` bez przeładowania
 - Przenoszenie e-maila linkami między stronami
 - Czyszczenie literalnych kolorów w auth
@@ -47,10 +49,10 @@ Endpoint → `authErrorRedirect(path, code, email)` → `302 /auth/signin?error=
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Przekierowanie z e-mailem | Helper + test, 4 przekierowania, smoke z nowym `location` | Smoke porównuje `location` dokładnie, więc kodowanie musi się zgadzać |
-| 2. Formularze i kitchen sink | E-mail i fokus w formularzach, sekcja w kitchen sinku | Duplikaty id i autoFocus w kitchen sinku (rozwiązane: `idPrefix`, fokus jako jawny prop) |
+| Phase                        | What it delivers                                          | Key risk                                                                                 |
+| ---------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1. Przekierowanie z e-mailem | Helper + test, 4 przekierowania, smoke z nowym `location` | Smoke porównuje `location` dokładnie, więc kodowanie musi się zgadzać                    |
+| 2. Formularze i kitchen sink | E-mail i fokus w formularzach, sekcja w kitchen sinku     | Duplikaty id i autoFocus w kitchen sinku (rozwiązane: `idPrefix`, fokus jako jawny prop) |
 
 **Prerequisites:** lokalny Supabase z wyłączonym potwierdzaniem e-maila (dla `npm run smoke`).
 **Estimated effort:** ~1 sesja, 2 fazy.
