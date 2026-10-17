@@ -1,7 +1,7 @@
 ---
 change_id: recipe-count
 title: Recipe count
-status: planned
+status: implementing
 created: 2026-10-17
 updated: 2026-10-17
 archived_at: null

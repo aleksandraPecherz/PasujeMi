@@ -268,9 +268,9 @@ Nie dotyczy: bez zmian schematu. Kontrakt API rozszerza się o pole, a jedynym k
 
 #### Automated
 
-- [ ] 1.1 Testy przechodzą, w tym nowe testy `listRecipes` i asercje `total` w `matchRecipes`: `npm test`
-- [ ] 1.2 Lint przechodzi: `npm run lint`
-- [ ] 1.3 Typy przechodzą: `npx astro check`
+- [x] 1.1 Testy przechodzą, w tym nowe testy `listRecipes` i asercje `total` w `matchRecipes`: `npm test`
+- [x] 1.2 Lint przechodzi: `npm run lint`
+- [x] 1.3 Typy przechodzą: `npx astro check`
 
 ### Phase 2: Hook, widok i odmiana
 

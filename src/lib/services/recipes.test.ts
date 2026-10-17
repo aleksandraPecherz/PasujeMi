@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { MATCH_KEYS_VERSION, computeMatchKeys } from "@/lib/matching";
-import { matchRecipes } from "@/lib/services/recipes";
+import { listRecipes, matchRecipes } from "@/lib/services/recipes";
 import type { MatchKeys, RecipeIngredient } from "@/types";
 
 /** PostgREST `max_rows` (supabase/config.toml): a request never returns more rows than this. */
@@ -11,34 +11,47 @@ type Row = Record<string, unknown> & { id: string };
 
 interface Call {
   select: string;
+  count: string | null;
   filters: string[];
   range: [number, number] | null;
 }
 
+interface Result {
+  data: Row[];
+  error: null;
+  count: number | null;
+}
+
 /**
- * Minimal stand-in for the PostgREST query builder: `select`, `order("id")`, `range`, `or` (`col.is.null`,
- * `col.neq.value`), `in("id", …)` and `overrideTypes`. It caps every response at MAX_ROWS like the real server and
- * projects the selected columns, so a query that forgets a column or a page fails the test.
+ * Minimal stand-in for the PostgREST query builder: `select` (with `{ count }`), `order("name" | "id")` applied in
+ * call order, `range`, `or` (`col.is.null`, `col.neq.value`), `in("id", …)` and `overrideTypes`. It caps every
+ * response at MAX_ROWS like the real server and projects the selected columns, so a query that forgets a column or a
+ * page fails the test. `count` is the number of filtered rows before `range`, sent only when the query asks for it
+ * and `omitCount` is off (a server that sends no total).
  */
 function fakeClient(
   rows: Row[],
-  { shuffleIn = false, afterKeyQuery }: { shuffleIn?: boolean; afterKeyQuery?: () => void } = {},
+  {
+    shuffleIn = false,
+    omitCount = false,
+    afterKeyQuery,
+  }: { shuffleIn?: boolean; omitCount?: boolean; afterKeyQuery?: () => void } = {},
 ) {
   const calls: Call[] = [];
 
-  class Query implements PromiseLike<{ data: Row[]; error: null }> {
+  class Query implements PromiseLike<Result> {
     private readonly call: Call;
     private predicates: ((row: Row) => boolean)[] = [];
-    private ordered = false;
+    private orderBy: string[] = [];
 
-    constructor(columns: string) {
-      this.call = { select: columns, filters: [], range: null };
+    constructor(columns: string, options?: { count?: string }) {
+      this.call = { select: columns, count: options?.count ?? null, filters: [], range: null };
       calls.push(this.call);
     }
 
     order(column: string) {
-      if (column !== "id") throw new Error(`unexpected order by ${column}`);
-      this.ordered = true;
+      if (column !== "name" && column !== "id") throw new Error(`unexpected order by ${column}`);
+      this.orderBy.push(column);
       return this;
     }
 
@@ -69,32 +82,43 @@ function fakeClient(
       return this;
     }
 
-    private run(): Row[] {
+    private run(): Result {
       let result = rows.filter((row) => this.predicates.every((predicate) => predicate(row)));
-      if (this.ordered) result = [...result].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+      const count = this.call.count !== null && !omitCount ? result.length : null;
+      // Earlier `order` calls win; later ones break ties.
+      if (this.orderBy.length > 0) {
+        result = [...result].sort((a, b) => {
+          for (const column of this.orderBy) {
+            const [x, y] = [String(a[column]), String(b[column])];
+            if (x !== y) return x < y ? -1 : 1;
+          }
+          return 0;
+        });
+      }
       // `in` does not keep any particular order.
       else if (shuffleIn) result = [...result].reverse();
       const [from, to] = this.call.range ?? [0, Infinity];
       result = result.slice(from, Math.min(to + 1, from + MAX_ROWS));
       const columns = this.call.select.split(",").map((column) => column.trim());
-      return result.map((row) => Object.fromEntries(columns.map((column) => [column, row[column]])) as Row);
+      const data = result.map((row) => Object.fromEntries(columns.map((column) => [column, row[column]])) as Row);
+      return { data, error: null, count };
     }
 
-    then<T1 = { data: Row[]; error: null }, T2 = never>(
-      onFulfilled?: ((value: { data: Row[]; error: null }) => T1 | PromiseLike<T1>) | null,
+    then<T1 = Result, T2 = never>(
+      onFulfilled?: ((value: Result) => T1 | PromiseLike<T1>) | null,
       onRejected?: ((reason: unknown) => T2 | PromiseLike<T2>) | null,
     ): PromiseLike<T1 | T2> {
-      const data = this.run();
+      const result = this.run();
       // Lets a test change the table between the key query and the queries after it.
       if (this.call.select.includes("match_keys")) afterKeyQuery?.();
-      return Promise.resolve({ data, error: null }).then(onFulfilled, onRejected);
+      return Promise.resolve(result).then(onFulfilled, onRejected);
     }
   }
 
   const client = {
     from(table: string) {
       if (table !== "recipes") throw new Error(`unexpected table ${table}`);
-      return { select: (columns: string) => new Query(columns) };
+      return { select: (columns: string, options?: { count?: string }) => new Query(columns, options) };
     },
   };
   return { supabase: client as unknown as SupabaseClient, calls };
@@ -133,6 +157,48 @@ function recipeRow(
 
 const page = { limit: 10, offset: 0 };
 
+describe("listRecipes", () => {
+  // Ids out of name order, and a shared name that only the id breaks.
+  const rows = [
+    recipeRow("e", ["sól"], { name: "Babka" }),
+    recipeRow("d", ["sól"], { name: "Awokado" }),
+    recipeRow("c", ["sól"], { name: "Ciasto" }),
+    recipeRow("b", ["sól"], { name: "Babka" }),
+    recipeRow("a", ["sól"], { name: "Dal" }),
+  ];
+
+  it("returns a middle page in name order with the whole catalog count", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    const result = await listRecipes(supabase, { limit: 2, offset: 1 });
+
+    expect(result.recipes.map((recipe) => recipe.id)).toEqual(["b", "e"]);
+    expect(result.hasMore).toBe(true);
+    expect(result.total).toBe(rows.length);
+    // One extra row tells whether another page exists.
+    expect(calls).toMatchObject([{ count: "exact", range: [1, 3] }]);
+  });
+
+  it("reports no further page on the last one and keeps the total", async () => {
+    const { supabase } = fakeClient(rows);
+
+    const result = await listRecipes(supabase, { limit: 2, offset: 4 });
+
+    expect(result.recipes.map((recipe) => recipe.id)).toEqual(["a"]);
+    expect(result.hasMore).toBe(false);
+    expect(result.total).toBe(rows.length);
+  });
+
+  it("returns a null total, not 0, when the server sends no count", async () => {
+    const { supabase } = fakeClient(rows, { omitCount: true });
+
+    const result = await listRecipes(supabase, { limit: 2, offset: 0 });
+
+    expect(result.recipes.map((recipe) => recipe.id)).toEqual(["d", "b"]);
+    expect(result.total).toBeNull();
+  });
+});
+
 describe("matchRecipes", () => {
   it("ranks the whole catalog when it is longer than one PostgREST page", async () => {
     const rows = Array.from({ length: 2 * MAX_ROWS + 1 }, (_, i) =>
@@ -146,6 +212,8 @@ describe("matchRecipes", () => {
 
     expect(result.recipes[0]).toMatchObject({ id: "r99999", name: "Ostatni", match: { percent: 100 } });
     expect(result.hasMore).toBe(true);
+    // The whole ranked catalog, not the page.
+    expect(result.total).toBe(rows.length);
     const keyCalls = calls.filter((call) => call.select.includes("match_keys"));
     expect(keyCalls.map((call) => call.range)).toEqual([
       [0, 999],
@@ -193,6 +261,16 @@ describe("matchRecipes", () => {
     // An exclusion applies to a stale row as well.
     const excluded = await matchRecipes(supabase, { have: ["pomidor"], staple: [], exclude: ["jogurt"] }, page);
     expect(excluded.recipes.map((recipe) => recipe.id)).toEqual(["a", "c"]);
+    // Excluded recipes are not ranked, so they do not count either.
+    expect(excluded.total).toBe(2);
+
+    // A page past the ranked recipes is empty but still reports their count.
+    const beyond = await matchRecipes(
+      supabase,
+      { have: ["pomidor"], staple: [], exclude: ["jogurt"] },
+      { limit: 10, offset: 2 },
+    );
+    expect(beyond).toEqual({ recipes: [], hasMore: false, total: 2 });
   });
 
   it("leaves out a stale row that the fallback no longer returns instead of ranking its old keys", async () => {
