@@ -1,10 +1,10 @@
 ---
 change_id: ui-palette
 title: Ui palette
-status: impl_reviewed
+status: archived
 created: 2026-10-17
 updated: 2026-10-17
-archived_at: null
+archived_at: 2026-10-17T13:54:35Z
 ---
 
 ## Notes
