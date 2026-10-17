@@ -1,7 +1,7 @@
 ---
 change_id: ui-palette
 title: Ui palette
-status: implementing
+status: implemented
 created: 2026-10-17
 updated: 2026-10-17
 archived_at: null

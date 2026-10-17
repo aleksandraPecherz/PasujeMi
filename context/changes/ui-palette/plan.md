@@ -340,14 +340,14 @@ Brak danych do migracji. Wycofanie to revert commitów tej zmiany.
 
 #### Automated
 
-- [x] 3.1 Brak localhost_4321_*.png w commicie
-- [x] 3.2 npm run check:ui przechodzi
+- [x] 3.1 Brak localhost_4321_*.png w commicie — 88f378a
+- [x] 3.2 npm run check:ui przechodzi — 88f378a
 
 #### Manual
 
-- [x] 3.3 Zrzuty after istnieją, pantry-main bez nagłówka i e-maila
-- [x] 3.4 Hover × widoczny na trzech tagach, fokus z pierścieniem
-- [x] 3.5 ServerError czytelny w kitchen sinku
-- [x] 3.6 Tag brak informacji odróżnia się od karty ramką
-- [x] 3.7 Logo w nagłówku czytelne
-- [x] 3.8 Przypomnienie o AGENTS.md w change.md Notes
+- [x] 3.3 Zrzuty after istnieją, pantry-main bez nagłówka i e-maila — 88f378a
+- [x] 3.4 Hover × widoczny na trzech tagach, fokus z pierścieniem — 88f378a
+- [x] 3.5 ServerError czytelny w kitchen sinku — 88f378a
+- [x] 3.6 Tag brak informacji odróżnia się od karty ramką — 88f378a
+- [x] 3.7 Logo w nagłówku czytelne — 88f378a
+- [x] 3.8 Przypomnienie o AGENTS.md w change.md Notes — 88f378a
