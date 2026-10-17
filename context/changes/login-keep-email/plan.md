@@ -200,9 +200,9 @@ Nie dotyczy. Stare linki `?error=…` bez `email` działają jak dotąd (pusty e
 
 #### Automated
 
-- [ ] 1.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 1.2 Lint przechodzi: `npm run lint`
-- [ ] 1.3 Typy przechodzą: `npx astro check`
+- [x] 1.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 1.2 Lint przechodzi: `npm run lint`
+- [x] 1.3 Typy przechodzą: `npx astro check`
 - [ ] 1.4 Smoke test przechodzi na uruchomionym serwerze: `npm run smoke`
 
 #### Manual
