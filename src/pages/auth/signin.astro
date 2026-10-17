@@ -1,9 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import SignInForm from "@/components/auth/SignInForm";
-import { authErrorMessage } from "@/lib/auth-errors";
+import { authErrorMessage, emailFromQuery } from "@/lib/auth-errors";
 
 const error = authErrorMessage(Astro.url.searchParams.get("error"));
+// The e-mail is kept only after a failed attempt; a bare ?email= does not prefill the form.
+const email = error ? emailFromQuery(Astro.url.searchParams.get("email")) : "";
 ---
 
 <Layout title="Zaloguj się · PasujeMi">
@@ -12,7 +14,7 @@ const error = authErrorMessage(Astro.url.searchParams.get("error"));
       <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
         Zaloguj się
       </h1>
-      <SignInForm serverError={error} client:load />
+      <SignInForm serverError={error} initialEmail={email} autoFocusPassword={Boolean(email)} client:load />
       <p class="mt-4 text-center text-sm text-blue-100/60">
         Nie masz konta?{" "}
         <a href="/auth/signup" class="text-purple-300 hover:underline">

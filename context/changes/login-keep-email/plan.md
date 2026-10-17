@@ -200,28 +200,28 @@ Nie dotyczy. Stare linki `?error=…` bez `email` działają jak dotąd (pusty e
 
 #### Automated
 
-- [x] 1.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 1.2 Lint przechodzi: `npm run lint`
-- [x] 1.3 Typy przechodzą: `npx astro check`
+- [x] 1.1 Testy jednostkowe przechodzą: `npm test` — 0ab89eb
+- [x] 1.2 Lint przechodzi: `npm run lint` — 0ab89eb
+- [x] 1.3 Typy przechodzą: `npx astro check` — 0ab89eb
 - [ ] 1.4 Smoke test przechodzi na uruchomionym serwerze: `npm run smoke`
 
 #### Manual
 
-- [ ] 1.5 W DevTools (Network) przekierowanie po złym haśle ma `Location` z `error` i `email`, bez hasła
+- [x] 1.5 W DevTools (Network) przekierowanie po złym haśle ma `Location` z `error` i `email`, bez hasła
 
 ### Phase 2: Formularze i kitchen sink
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Typy przechodzą: `npx astro check`
-- [ ] 2.4 Strażnik UI przechodzi: `npm run check:ui`
-- [ ] 2.5 Build przechodzi: `npm run build`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Typy przechodzą: `npx astro check`
+- [x] 2.4 Strażnik UI przechodzi: `npm run check:ui`
+- [x] 2.5 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.6 `/auth/signin`: złe hasło → komunikat błędu, e-mail wpisany, hasło puste z fokusem; poprawne hasło po tym → logowanie działa
-- [ ] 2.7 `/auth/signup`: błąd (np. istniejące konto) → e-mail wpisany, oba pola haseł puste, fokus na haśle
-- [ ] 2.8 Wejście na `/auth/signin?email=a@b.pl` (bez `error`) → pole e-mail puste
-- [ ] 2.9 `/dev/kitchen-sink`: sekcja „Formularze logowania” za „loading”, etykiety klikają właściwe pola, strona nie przewija się sama przy wczytaniu
+- [x] 2.6 `/auth/signin`: złe hasło → komunikat błędu, e-mail wpisany, hasło puste z fokusem; poprawne hasło po tym → logowanie działa
+- [x] 2.7 `/auth/signup`: błąd (np. istniejące konto) → e-mail wpisany, oba pola haseł puste, fokus na haśle
+- [x] 2.8 Wejście na `/auth/signin?email=a@b.pl` (bez `error`) → pole e-mail puste
+- [x] 2.9 `/dev/kitchen-sink`: sekcja „Formularze logowania” za „loading”, etykiety klikają właściwe pola, strona nie przewija się sama przy wczytaniu
