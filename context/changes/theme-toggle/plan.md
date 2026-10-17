@@ -323,18 +323,18 @@ Nie ma danych do migracji. Użytkownicy bez zapisanego wyboru zobaczą motyw zgo
 
 #### Automated
 
-- [x] 3.1 Strażnik literałów przechodzi: `npm run check:ui`
-- [x] 3.2 Linting przechodzi: `npm run lint`
-- [x] 3.3 Type check przechodzi: `npx astro check`
-- [x] 3.4 Testy przechodzą: `npm test`
-- [x] 3.5 Build przechodzi: `npm run build`
+- [x] 3.1 Strażnik literałów przechodzi: `npm run check:ui` — ce90ca1
+- [x] 3.2 Linting przechodzi: `npm run lint` — ce90ca1
+- [x] 3.3 Type check przechodzi: `npx astro check` — ce90ca1
+- [x] 3.4 Testy przechodzą: `npm test` — ce90ca1
+- [x] 3.5 Build przechodzi: `npm run build` — ce90ca1
 
 #### Manual
 
-- [x] 3.6 Przełącznik działa w nagłówku i na trzech stronach auth; wybór zachowany po przeładowaniu i po zalogowaniu
-- [x] 3.7 Brak błysku złego motywu przy przeładowaniu w obu trybach
-- [x] 3.8 Przełącznik obsługuje klawiaturę, ma widoczny focus ring i dostępną nazwę
-- [x] 3.9 Wysokość `icon` (`size-9`) obok „Wyloguj” (`h-8`) wygląda akceptowalnie
-- [x] 3.10 Na szerokości 360 × 640 przełącznik nie zasłania karty auth
-- [x] 3.11 Kontrast w jasnym trybie ≥ 4,5:1 dla `text-primary`, `text-muted-foreground`, `text-destructive` na `bg-card` i placeholdera na polu
-- [x] 3.12 Zrzuty kitchen sink i stron auth w obu trybach zapisane w `context/changes/theme-toggle/screenshots/`
+- [x] 3.6 Przełącznik działa w nagłówku i na trzech stronach auth; wybór zachowany po przeładowaniu i po zalogowaniu — ce90ca1
+- [x] 3.7 Brak błysku złego motywu przy przeładowaniu w obu trybach — ce90ca1
+- [x] 3.8 Przełącznik obsługuje klawiaturę, ma widoczny focus ring i dostępną nazwę — ce90ca1
+- [x] 3.9 Wysokość `icon` (`size-9`) obok „Wyloguj” (`h-8`) wygląda akceptowalnie — ce90ca1
+- [x] 3.10 Na szerokości 360 × 640 przełącznik nie zasłania karty auth — ce90ca1
+- [x] 3.11 Kontrast w jasnym trybie ≥ 4,5:1 dla `text-primary`, `text-muted-foreground`, `text-destructive` na `bg-card` i placeholdera na polu — ce90ca1
+- [x] 3.12 Zrzuty kitchen sink i stron auth w obu trybach zapisane w `context/changes/theme-toggle/screenshots/` — ce90ca1
