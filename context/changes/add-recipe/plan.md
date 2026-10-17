@@ -508,27 +508,27 @@ Zachowanie:
 - [x] 3.2 Lint przechodzi: `npm run lint` — 4f9d784
 - [x] 3.3 Testy przechodzą: `npm test` — 4f9d784
 - [x] 3.4 Build przechodzi: `npm run build` — 4f9d784
-- [ ] 3.5 Smoke przechodzi lokalnie na zresetowanej bazie i w CI: `BASE_URL=http://localhost:4321 npm run smoke`
+- [x] 3.5 Smoke przechodzi lokalnie na zresetowanej bazie i w CI: `BASE_URL=http://localhost:4321 npm run smoke`
 
 #### Manual
 
-- [ ] 3.6 `curl` z sesją: przepis z 41 składnikami dostaje 400 z błędem na `ingredients`, a body ponad 100 KB dostaje 413
-- [ ] 3.7 Wstawiony przepis ma `author_id` zalogowanego użytkownika i `match_keys = null`, a `/api/recipes/match` dopasowuje go przez fallback
+- [x] 3.6 `curl` z sesją: przepis z 41 składnikami dostaje 400 z błędem na `ingredients`, a body ponad 100 KB dostaje 413
+- [x] 3.7 Wstawiony przepis ma `author_id` zalogowanego użytkownika i `match_keys = null`, a `/api/recipes/match` dopasowuje go przez fallback
 
 ### Phase 4: Formularz, strona i nawigacja
 
 #### Automated
 
-- [ ] 4.1 Skan literałów przechodzi: `npm run check:ui`
-- [ ] 4.2 Lint przechodzi: `npm run lint`
-- [ ] 4.3 Typy przechodzą: `npx astro check`
-- [ ] 4.4 Testy przechodzą: `npm test`
-- [ ] 4.5 Build przechodzi: `npm run build`
+- [x] 4.1 Skan literałów przechodzi: `npm run check:ui`
+- [x] 4.2 Lint przechodzi: `npm run lint`
+- [x] 4.3 Typy przechodzą: `npx astro check`
+- [x] 4.4 Testy przechodzą: `npm test`
+- [x] 4.5 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 4.6 Dodanie przepisu z zamiennikiem pokazuje kafelek, a „Przejdź do listy” prowadzi na `/` z licznikiem większym o 1
-- [ ] 4.7 Pole „produkt” wypełnia się nazwą małymi literami i przestaje się synchronizować po ręcznej edycji
-- [ ] 4.8 Błędy walidacji pokazują się przy polach, a fokus trafia na pierwsze błędne pole
-- [ ] 4.9 Formularz jest użyteczny na telefonie (360 px) i na desktopie, w motywie ciemnym, a link w nagłówku ma stan bieżącej strony
-- [ ] 4.10 `/dev/kitchen-sink` pokazuje nowe stany formularza
+- [x] 4.6 Dodanie przepisu z zamiennikiem pokazuje kafelek, a „Przejdź do listy” prowadzi na `/` z licznikiem większym o 1
+- [x] 4.7 Pole „produkt” wypełnia się nazwą małymi literami i przestaje się synchronizować po ręcznej edycji
+- [x] 4.8 Błędy walidacji pokazują się przy polach, a fokus trafia na pierwsze błędne pole
+- [x] 4.9 Formularz jest użyteczny na telefonie (360 px) i na desktopie, w motywie ciemnym, a link w nagłówku ma stan bieżącej strony
+- [x] 4.10 `/dev/kitchen-sink` pokazuje nowe stany formularza

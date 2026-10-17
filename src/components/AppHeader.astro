@@ -2,6 +2,7 @@
 import { buttonVariants } from "@/components/ui/button";
 
 const { user } = Astro.locals;
+const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
 ---
 
 <header class="border-border bg-card/50 border-b backdrop-blur-xl">
@@ -10,6 +11,13 @@ const { user } = Astro.locals;
       PasujeMi
     </a>
     <div class="flex min-w-0 items-center gap-3 text-sm">
+      <a
+        href="/recipes/new"
+        aria-current={onNewRecipe ? "page" : undefined}
+        class:list={[buttonVariants({ variant: onNewRecipe ? "nav-current" : "ghost", size: "sm" }), "shrink-0"]}
+      >
+        Dodaj przepis
+      </a>
       <span class="text-muted-foreground truncate">{user?.email}</span>
       <form method="POST" action="/api/auth/signout" class="shrink-0">
         <button type="submit" class:list={[buttonVariants({ variant: "outline", size: "sm" })]}>

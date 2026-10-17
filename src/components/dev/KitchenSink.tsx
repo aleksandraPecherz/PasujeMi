@@ -5,6 +5,9 @@ import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignUpForm";
 import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
+import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
+import { RecipeFormView } from "@/components/recipes/RecipeFormView";
+import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
 import { authErrorMessage } from "@/lib/auth-errors";
@@ -66,6 +69,72 @@ const SAMPLE_TAGS: { id: string; label: string; placeholder: string; variant: Ta
 ];
 
 const FULL_TAGS = Array.from({ length: MAX_TAGS }, (_, i) => `produkt ${i + 1}`);
+
+const NOOP = () => undefined;
+const NOOP_ACTIONS: RecipeFormActions = {
+  setName: NOOP,
+  setNumber: NOOP,
+  toggleKind: NOOP,
+  addIngredient: NOOP,
+  removeIngredient: NOOP,
+  setIngredient: NOOP,
+  addSubstitute: NOOP,
+  removeSubstitute: NOOP,
+  setSubstitute: NOOP,
+  addStep: NOOP,
+  removeStep: NOOP,
+  setStep: NOOP,
+};
+
+// A form with an ingredient that has a substitute, one step, a kind and the amount without a unit (the field errors below).
+function filledForm(): RecipeFormState {
+  const form = emptyRecipeForm();
+  return {
+    ...form,
+    name: "Owsianka z jabłkiem",
+    ingredients: [
+      {
+        ...form.ingredients[0],
+        name: "Mleko 1,5%",
+        product: "mleko 1,5%",
+        amount: "200",
+        unit: "",
+        substitutes: [
+          {
+            key: "ks-sub",
+            name: "Napój owsiany",
+            product: "napój owsiany",
+            productEdited: false,
+            amount: "",
+            unit: "",
+          },
+        ],
+      },
+    ],
+    steps: [{ ...form.steps[0], text: "Podgrzej mleko i dodaj płatki." }],
+    kinds: ["na słodko"],
+    prepTimeMin: "10",
+  };
+}
+
+const FORM_ERRORS: Record<string, string> = {
+  "ingredients.0.unit": "Jednostka: podaj jednostkę razem z ilością.",
+  kcal: "Kcal: wartość od 0 do 10000.",
+};
+
+function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) {
+  return (
+    <RecipeFormView
+      form={filledForm()}
+      fieldErrors={{}}
+      status="idle"
+      serverError={null}
+      actions={NOOP_ACTIONS}
+      onSubmit={NOOP}
+      {...props}
+    />
+  );
+}
 
 const SAMPLE_EMAIL = "ola@przyklad.pl";
 
@@ -215,6 +284,50 @@ export default function KitchenSink() {
       <StateSection title="loading" note="Szkielet listy przy pierwszym wczytaniu; komunikat limitu słów.">
         <RecipeListSkeleton count={4} />
         <LimitNotice message={LIMIT_MESSAGE} />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: pusty"
+        note="Pusty formularz /recipes/new (jedno puste pole składnika i kroku). Przycisk w nagłówku w wariancie nav-current (bieżąca strona) obok ghost."
+      >
+        <div className="flex flex-wrap gap-3">
+          <Button type="button" variant="ghost" size="sm">
+            Dodaj przepis
+          </Button>
+          <Button type="button" variant="nav-current" size="sm" aria-current="page">
+            Dodaj przepis
+          </Button>
+        </div>
+        <RecipeFormView
+          form={emptyRecipeForm()}
+          fieldErrors={{}}
+          status="idle"
+          serverError={null}
+          actions={NOOP_ACTIONS}
+          onSubmit={NOOP}
+        />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: błędy pól"
+        note="Ilość bez jednostki i kcal poza zakresem (aria-invalid, tekst pod polem)."
+      >
+        <SampleRecipeForm fieldErrors={FORM_ERRORS} status="error" />
+      </StateSection>
+
+      <StateSection title="Formularz przepisu: wysyłka" note="Przycisk wyłączony z aria-busy.">
+        <SampleRecipeForm status="submitting" />
+      </StateSection>
+
+      <StateSection title="Formularz przepisu: błąd serwera" note="ServerError nad przyciskiem zapisu.">
+        <SampleRecipeForm status="error" serverError="Nie udało się zapisać przepisu. Spróbuj ponownie." />
+      </StateSection>
+
+      <StateSection
+        title="Przepis dodany"
+        note="Stan po zapisie: komunikat, kafelek, Dodaj kolejny i Przejdź do listy."
+      >
+        <RecipeSaved recipe={RECIPE} onAddAnother={NOOP} autoFocus={false} />
       </StateSection>
 
       <StateSection
