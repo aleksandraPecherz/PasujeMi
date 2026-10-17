@@ -80,10 +80,11 @@ jobs:
             status=$(curl -s -o insert.json -w '%{http_code}' "$API_URL/rest/v1/recipes" \
               -H "apikey: $ANON_KEY" -H "Authorization: Bearer $2" -H "Content-Type: application/json" -d "$body")
             echo "$1: $status $(cat insert.json)"
-            [ "$status" = "$4" ]
+            # $4 lists the accepted statuses: PostgREST answers anon with 401 or 403 depending on its version.
+            [[ " $4 " == *" $status "* ]]
             jq -e 'type == "object" and .code == "42501"' insert.json > /dev/null
           }
-          expect_denied "anon" "$ANON_KEY" '{}' 401
+          expect_denied "anon" "$ANON_KEY" '{}' "401 403"
           expect_denied "A as B" "$token_a" "{\"author_id\":\"$id_b\"}" 403
           expect_denied "A with null author" "$token_a" '{"author_id":null}' 403
           expect_denied "A with match_keys" "$token_a" "{\"author_id\":\"$id_a\",\"match_keys\":{}}" 403

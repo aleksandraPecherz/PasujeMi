@@ -33,6 +33,29 @@ export const GET: APIRoute = async (context) => {
   }
 };
 
+/** Reads the body as text; returns `null` and stops reading as soon as it exceeds `maxBytes`. */
+async function readTextWithLimit(request: Request, maxBytes: number): Promise<string | null> {
+  if (!request.body) {
+    return "";
+  }
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let received = 0;
+  let text = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) {
+      return text + decoder.decode();
+    }
+    received += value.byteLength;
+    if (received > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+}
+
 export const POST: APIRoute = async (context) => {
   const { request } = context;
   const user = context.locals.user;
@@ -52,8 +75,9 @@ export const POST: APIRoute = async (context) => {
   if (declaredLength > MAX_RECIPE_BODY_BYTES) {
     return Response.json({ error: "payload_too_large" }, { status: 413 });
   }
-  const text = await request.text();
-  if (new TextEncoder().encode(text).length > MAX_RECIPE_BODY_BYTES) {
+  // A chunked request has no Content-Length, so the body is also counted while it is read.
+  const text = await readTextWithLimit(request, MAX_RECIPE_BODY_BYTES);
+  if (text === null) {
     return Response.json({ error: "payload_too_large" }, { status: 413 });
   }
 

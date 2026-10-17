@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MAX_INGREDIENTS, MAX_STEPS, MAX_SUBSTITUTES } from "@/lib/recipes/limits";
 import { defaultProduct, parseRecipeInput, type RecipeIssue } from "@/lib/recipes/validate";
 import type { Recipe, RecipeKind } from "@/types";
@@ -185,6 +185,7 @@ function withOptionField(row: OptionRow, field: OptionField, value: string): Opt
 export function useRecipeForm() {
   const [form, setForm] = useState<RecipeFormState>(emptyRecipeForm);
   const [status, setStatus] = useState<RecipeFormStatus>("idle");
+  const submittingRef = useRef(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [saved, setSaved] = useState<Recipe | null>(null);
@@ -292,7 +293,8 @@ export function useRecipeForm() {
   }
 
   async function submit() {
-    if (status === "submitting") return;
+    // A ref, not `status`: two events before the next render would both see the old status.
+    if (submittingRef.current) return;
     setServerError(null);
 
     const body = toBody(form);
@@ -304,7 +306,13 @@ export function useRecipeForm() {
 
     setFieldErrors({});
     setStatus("submitting");
-    const result = await sendRecipe(parsed.value);
+    submittingRef.current = true;
+    let result: Awaited<ReturnType<typeof sendRecipe>>;
+    try {
+      result = await sendRecipe(parsed.value);
+    } finally {
+      submittingRef.current = false;
+    }
     if (result.ok) {
       setSaved(result.recipe);
       setStatus("saved");

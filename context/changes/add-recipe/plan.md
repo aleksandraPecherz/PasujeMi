@@ -74,6 +74,7 @@ Weryfikacja: wszystkie kryteria Automated z faz 1–4, zielony job `smoke` w CI 
 6. **Decyzja dla F-02 (do zastosowania w imporcie):** przepisy z importu F-02 mają jako autorkę autorkę aplikacji (Aleksandrę Pęcherz). Import działa jako service role i omija RLS, a `default auth.uid()` dałby tam `null`. Dlatego import **wpisuje jej UUID z `auth.users` jawnie** w `author_id` każdego wstawianego wiersza. Decyzja jest zapisana w tym planie, a w migracji w komentarzu kolumny `author_id`. Plan F-02 ma ją przejąć.
 7. **Po zapisie:** strona formularza pokazuje komunikat sukcesu, kafelek zapisanego przepisu oraz przyciski „Dodaj kolejny” i „Przejdź do listy” (`/`). To realizuje „od razu widzi go na liście” z roadmapy bez zmian w liście S-02 i S-03.
 8. **Testy:** Vitest dla walidatora, krok CI z testem RLS przez PostgREST i kroki smoke dla `POST /api/recipes`.
+9. **Odstępstwo (impl-review F1):** `matchRecipes` przelicza w pamięci najwyżej `MAX_RECOMPUTED_RECIPES = 200` przepisów bez aktualnych kluczy na żądanie (`src/lib/recipes/limits.ts`). Reszta jest pomijana w rankingu do czasu `npm run match-keys`. Bez limitu insertów na autora. Wartość jest tymczasowa i do zweryfikowania pomiarem CPU w #19.
 
 ## What We're NOT Doing
 

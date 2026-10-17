@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { MATCH_KEYS_VERSION, computeMatchKeys } from "@/lib/matching";
+import { MAX_RECOMPUTED_RECIPES } from "@/lib/recipes/limits";
 import { listRecipes, matchRecipes } from "@/lib/services/recipes";
 import type { MatchKeys, RecipeIngredient } from "@/types";
 
@@ -265,7 +266,7 @@ describe("matchRecipes", () => {
     expect(fallback).toMatchObject({
       select: "id, ingredients",
       filters: [`or:match_keys.is.null,match_keys_version.is.null,match_keys_version.neq.${MATCH_KEYS_VERSION}`],
-      range: [0, 999],
+      range: [0, MAX_RECOMPUTED_RECIPES - 1],
     });
 
     // An exclusion applies to a stale row as well.
@@ -281,6 +282,23 @@ describe("matchRecipes", () => {
       { limit: 10, offset: 2 },
     );
     expect(beyond).toEqual({ recipes: [], hasMore: false, total: 2 });
+  });
+
+  it("computes keys for at most MAX_RECOMPUTED_RECIPES stale rows and leaves the rest out of the ranking", async () => {
+    const rows = Array.from({ length: MAX_RECOMPUTED_RECIPES + 5 }, (_, i) =>
+      recipeRow(`r${String(i).padStart(4, "0")}`, ["sól"], { keys: null, version: null }),
+    );
+    rows.push(recipeRow("z-current", ["sól"]));
+    const { supabase } = fakeClient(rows);
+
+    const result = await matchRecipes(supabase, { have: ["sól"], staple: [], exclude: [] }, { limit: 500, offset: 0 });
+
+    // The cap first-come by id, plus the row that already has current keys.
+    expect(result.total).toBe(MAX_RECOMPUTED_RECIPES + 1);
+    expect(result.recipes.map((recipe) => recipe.id)).not.toContain(
+      `r${String(MAX_RECOMPUTED_RECIPES).padStart(4, "0")}`,
+    );
+    expect(result.recipes.map((recipe) => recipe.id)).toContain("z-current");
   });
 
   it("leaves out a stale row that the fallback no longer returns instead of ranking its old keys", async () => {

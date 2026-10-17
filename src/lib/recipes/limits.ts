@@ -15,3 +15,9 @@ export const MAX_KCAL = 10000;
 export const MAX_MACRO_G = 1000;
 /** Request body size checked before parsing; bounds the per-request work (10 ms CPU on Workers Free). */
 export const MAX_RECIPE_BODY_BYTES = 100000;
+/**
+ * Recipes without current match keys that one /api/recipes/match request computes in memory (10 ms CPU on Workers
+ * Free). Rows over the cap are left out of the ranking until `npm run match-keys` stores their keys. Provisional:
+ * the value is to be checked with a CPU measurement (#19).
+ */
+export const MAX_RECOMPUTED_RECIPES = 200;
