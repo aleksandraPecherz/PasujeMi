@@ -7,10 +7,15 @@ import { ServerError } from "@/components/auth/ServerError";
 
 interface Props {
   serverError?: string | null;
+  initialEmail?: string;
+  // Set by the page after a failed attempt; the kitchen sink leaves it off so it does not steal focus.
+  autoFocusPassword?: boolean;
+  // Keeps label/input ids unique when several forms share a page (kitchen sink).
+  idPrefix?: string;
 }
 
-export default function SignInForm({ serverError }: Props) {
-  const [email, setEmail] = useState("");
+export default function SignInForm({ serverError, initialEmail = "", autoFocusPassword, idPrefix = "" }: Props) {
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -42,7 +47,8 @@ export default function SignInForm({ serverError }: Props) {
   return (
     <form method="POST" action="/api/auth/signin" className="space-y-4" onSubmit={handleSubmit} noValidate>
       <FormField
-        id="email"
+        id={`${idPrefix}email`}
+        name="email"
         type="email"
         label="E-mail"
         value={email}
@@ -56,7 +62,9 @@ export default function SignInForm({ serverError }: Props) {
       />
 
       <FormField
-        id="password"
+        id={`${idPrefix}password`}
+        name="password"
+        autoFocus={autoFocusPassword}
         label="Hasło"
         type={showPassword ? "text" : "password"}
         value={password}

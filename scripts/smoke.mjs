@@ -38,7 +38,7 @@ async function request(path, { method = "GET", form } = {}) {
 }
 
 // `location` must match exactly.
-// `check(body)` is an optional predicate on the body (parsed JSON, otherwise text).
+// `check(body, location)` is an optional predicate on the body (parsed JSON, otherwise text) and the `location`.
 const steps = [
   ["anonymous root redirects to signin", () => request("/"), { status: 302, location: "/auth/signin" }],
   ["signin page renders for anonymous user", () => request("/auth/signin"), { status: 200 }],
@@ -55,7 +55,15 @@ const steps = [
   [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
-    { status: 302, location: "/auth/signin?error=invalid_credentials" },
+    {
+      status: 302,
+      location: `/auth/signin?${new URLSearchParams({ error: "invalid_credentials", email }).toString()}`,
+      // The redirect keeps the e-mail but must never carry the password.
+      check: (_body, location) => {
+        const params = new URLSearchParams(location.split("?")[1] ?? "");
+        return !params.has("password") && ![...params.values()].includes("wrong");
+      },
+    },
   ],
   [
     "signin accepts correct password",
@@ -123,7 +131,7 @@ for (const [name, run, expected] of steps) {
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location === expected.location) &&
-    (expected.check === undefined || expected.check(actual.body));
+    (expected.check === undefined || expected.check(actual.body, actual.location));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
