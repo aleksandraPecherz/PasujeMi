@@ -280,6 +280,12 @@ Nie ma danych do migracji. Użytkownicy bez zapisanego wyboru zobaczą motyw zgo
 - Wzorzec CSS/wariant: `src/styles/global.css:4`
 - Wzorzec testu: `src/lib/recipe-count.test.ts`
 
+## Addenda (impl-review 2026-10-18)
+
+- **Autofill w `ui/input.tsx`** (poza zakresem planu): faza 1 dodała regułę `autofill:` (inset box-shadow z `--background`/`--input`, `-webkit-text-fill-color`), bo Chrome maluje autouzupełnione pola tłem UA, ignorując `bg-*`. Zostaje; reguła używa tylko tokenów, ale `check:ui` nie skanuje `ui/`. Wypełnienie to `--background`, nie `bg-card`.
+- **Linki na stronach auth**: zamiast `text-purple-300` → `text-primary` używają `text-foreground underline hover:no-underline`. Dlatego `text-primary` na `bg-card` (3.11) nie dotyczy już tekstu na kartach auth.
+- **Zrzuty (3.12)**: w `screenshots/` są tylko zrzuty kitchen sink (jasny/ciemny, płasko, bez podkatalogów `light/`/`dark/`). Strony `/auth/signin`, `/auth/signup`, `/auth/confirm-email` sprawdzono ręcznie, bez zapisanych zrzutów.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.

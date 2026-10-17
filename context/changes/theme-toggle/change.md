@@ -1,7 +1,7 @@
 ---
 change_id: theme-toggle
 title: Przełącznik jasny/ciemny motyw
-status: implemented
+status: impl_reviewed
 created: 2026-10-17
 updated: 2026-10-18
 archived_at: null
