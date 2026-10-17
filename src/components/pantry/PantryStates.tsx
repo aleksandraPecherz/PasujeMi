@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { recipeCountLabel } from "@/lib/recipe-count";
 import { cn } from "@/lib/utils";
 
 /** Why the last tag was not added (request limits); the status region stays mounted so the message is announced. */
@@ -15,6 +16,11 @@ export function LimitNotice({ message, className }: { message: string | null; cl
       )}
     </p>
   );
+}
+
+/** "Znaleziono N przepisów" above the recipe list; `total` counts every page, not only the loaded ones. */
+export function RecipeCount({ total, className }: { total: number; className?: string }) {
+  return <p className={cn("text-muted-foreground text-sm", className)}>{recipeCountLabel(total)}</p>;
 }
 
 export function EmptyState({ children }: { children: ReactNode }) {

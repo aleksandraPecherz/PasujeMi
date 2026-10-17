@@ -268,23 +268,23 @@ Nie dotyczy: bez zmian schematu. Kontrakt API rozszerza się o pole, a jedynym k
 
 #### Automated
 
-- [x] 1.1 Testy przechodzą, w tym nowe testy `listRecipes` i asercje `total` w `matchRecipes`: `npm test`
-- [x] 1.2 Lint przechodzi: `npm run lint`
-- [x] 1.3 Typy przechodzą: `npx astro check`
+- [x] 1.1 Testy przechodzą, w tym nowe testy `listRecipes` i asercje `total` w `matchRecipes`: `npm test` — a1a3a93
+- [x] 1.2 Lint przechodzi: `npm run lint` — a1a3a93
+- [x] 1.3 Typy przechodzą: `npx astro check` — a1a3a93
 
 ### Phase 2: Hook, widok i odmiana
 
 #### Automated
 
-- [ ] 2.1 Testy przechodzą, w tym `src/lib/recipe-count.test.ts`: `npm test`
-- [ ] 2.2 Brak literałów kolorów w plikach UI: `npm run check:ui`
-- [ ] 2.3 Lint przechodzi: `npm run lint`
-- [ ] 2.4 Typy przechodzą: `npx astro check`
-- [ ] 2.5 Build przechodzi: `npm run build`
+- [x] 2.1 Testy przechodzą, w tym `src/lib/recipe-count.test.ts`: `npm test`
+- [x] 2.2 Brak literałów kolorów w plikach UI: `npm run check:ui`
+- [x] 2.3 Lint przechodzi: `npm run lint`
+- [x] 2.4 Typy przechodzą: `npx astro check`
+- [x] 2.5 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.6 `/dev/kitchen-sink`: sekcja `count` za `error`, cztery formy w jasnym i ciemnym motywie
+- [x] 2.6 `/dev/kitchen-sink`: sekcja `count` za `error`, cztery formy w jasnym i ciemnym motywie
 - [ ] 2.7 `/` bez filtrów: licznik pokazuje liczbę całego katalogu
 - [ ] 2.8 `/` → „Zastosuj filtry”: licznik znika na czas ładowania i wraca z nową liczbą
 - [ ] 2.9 `/` → „Pokaż więcej”: licznik zostaje widoczny z tą samą liczbą

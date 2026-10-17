@@ -71,6 +71,8 @@ const steps = [
       check: (body) =>
         Array.isArray(body?.recipes) &&
         typeof body?.hasMore === "boolean" &&
+        typeof body?.total === "number" &&
+        body.total >= 5 &&
         body.recipes.length >= 5 &&
         body.recipes.every((recipe) => recipe.steps.length > 0 && recipe.ingredients.length > 0),
     },
@@ -83,7 +85,7 @@ const steps = [
       // Shape first, then content (context/foundation/lessons.md). Every yogurt option in the seed contains "jogurt",
       // so the muffins are hidden; the other 4 seeded recipes stay, sorted by a non-increasing %.
       check: (body) => {
-        if (!Array.isArray(body?.recipes) || typeof body?.hasMore !== "boolean") return false;
+        if (!Array.isArray(body?.recipes) || typeof body?.hasMore !== "boolean" || body?.total !== 4) return false;
         const names = body.recipes.map((recipe) => recipe.name);
         const percents = body.recipes.map((recipe) => recipe.match?.percent);
         return (
