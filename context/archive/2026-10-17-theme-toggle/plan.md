@@ -120,6 +120,7 @@ Dodaje logikę wyboru motywu i skrypt przed renderem. Bez przełącznika motyw d
 **Intent**: Jedno źródło prawdy dla klucza `localStorage`, reguły wyboru motywu, zapisu wyboru i treści skryptu inline. Test dowodzi reguł bez DOM.
 
 **Contract**:
+
 - `THEME_STORAGE_KEY = "theme"`, typ `Theme = "light" | "dark"`.
 - `resolveTheme(stored: string | null, systemDark: boolean): Theme` — `"light"`/`"dark"` wygrywa; każda inna wartość i `null` → według `systemDark`.
 - `applyTheme(theme: Theme): void` — ustawia/zdejmuje klasę `dark` na `document.documentElement`.
