@@ -484,13 +484,13 @@ Zachowanie:
 
 #### Automated
 
-- [x] 1.1 Migracja aplikuje się na czystej bazie razem z seedem: `npx supabase db reset`
+- [x] 1.1 Migracja aplikuje się na czystej bazie razem z seedem: `npx supabase db reset` — e0455c0
 - [ ] 1.2 Job `smoke` w CI przechodzi z nowym krokiem „Check recipe insert permissions”
-- [x] 1.3 Lint przechodzi: `npm run lint`
+- [x] 1.3 Lint przechodzi: `npm run lint` — e0455c0
 
 #### Manual
 
-- [x] 1.4 W Supabase Studio lokalnie: kolumna `author_id` ma FK `on delete set null`, polityka `recipes_insert_own` jest widoczna, a 5 wierszy seeda ma `author_id = null`
+- [x] 1.4 W Supabase Studio lokalnie: kolumna `author_id` ma FK `on delete set null`, polityka `recipes_insert_own` jest widoczna, a 5 wierszy seeda ma `author_id = null` — e0455c0
 
 ### Phase 2: Wspólne limity i walidator
 
