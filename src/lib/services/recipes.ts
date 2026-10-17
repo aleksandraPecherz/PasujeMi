@@ -8,6 +8,7 @@ import {
   resolveMatch,
   type RankCandidate,
 } from "@/lib/matching";
+import type { NewRecipe } from "@/lib/recipes/validate";
 import type { MatchKeys, MatchedRecipe, Recipe, RecipeIngredient, RecipeKind } from "@/types";
 
 const RECIPE_COLUMNS = "id, name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g";
@@ -74,6 +75,36 @@ export async function listRecipes(
     // `null` when PostgREST sends no count (no Content-Range total), so the client can hide the counter.
     total: count,
   };
+}
+
+/**
+ * Inserts a recipe as `authorId` (RLS requires it to be the session user).
+ * `match_keys` stay null: `authenticated` has no grant on them, and `matchRecipes` computes them per request.
+ */
+export async function createRecipe(supabase: SupabaseClient, authorId: string, recipe: NewRecipe): Promise<Recipe> {
+  const { data, error } = await supabase
+    .from("recipes")
+    .insert({
+      name: recipe.name,
+      steps: recipe.steps,
+      ingredients: recipe.ingredients,
+      prep_time_min: recipe.prepTimeMin,
+      servings: recipe.servings,
+      kinds: recipe.kinds,
+      kcal: recipe.kcal,
+      protein_g: recipe.proteinG,
+      carbs_g: recipe.carbsG,
+      fat_g: recipe.fatG,
+      author_id: authorId,
+    })
+    .select(RECIPE_COLUMNS)
+    .single()
+    .overrideTypes<RecipeRow, { merge: false }>();
+
+  if (error) {
+    throw error;
+  }
+  return toRecipe(data);
 }
 
 /** PostgREST returns at most `max_rows` rows per request (supabase/config.toml), so the catalog is read in pages. */

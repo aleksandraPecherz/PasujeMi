@@ -485,7 +485,7 @@ Zachowanie:
 #### Automated
 
 - [x] 1.1 Migracja aplikuje się na czystej bazie razem z seedem: `npx supabase db reset` — e0455c0
-- [ ] 1.2 Job `smoke` w CI przechodzi z nowym krokiem „Check recipe insert permissions”
+- [x] 1.2 Job `smoke` w CI przechodzi z nowym krokiem „Check recipe insert permissions” — e0455c0
 - [x] 1.3 Lint przechodzi: `npm run lint` — e0455c0
 
 #### Manual
@@ -504,10 +504,10 @@ Zachowanie:
 
 #### Automated
 
-- [ ] 3.1 Typy przechodzą: `npx astro check`
-- [ ] 3.2 Lint przechodzi: `npm run lint`
-- [ ] 3.3 Testy przechodzą: `npm test`
-- [ ] 3.4 Build przechodzi: `npm run build`
+- [x] 3.1 Typy przechodzą: `npx astro check`
+- [x] 3.2 Lint przechodzi: `npm run lint`
+- [x] 3.3 Testy przechodzą: `npm test`
+- [x] 3.4 Build przechodzi: `npm run build`
 - [ ] 3.5 Smoke przechodzi lokalnie na zresetowanej bazie i w CI: `BASE_URL=http://localhost:4321 npm run smoke`
 
 #### Manual
