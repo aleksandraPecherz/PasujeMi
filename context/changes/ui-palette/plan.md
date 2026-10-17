@@ -313,41 +313,41 @@ Brak danych do migracji. Wycofanie to revert commitów tej zmiany.
 
 #### Manual
 
-- [x] 1.6 Zrzuty before istnieją i powstały przed edycją global.css
-- [x] 1.7 Tabela kontrastu w tokens.md spełnia progi
+- [x] 1.6 Zrzuty before istnieją i powstały przed edycją global.css — 06da291
+- [x] 1.7 Tabela kontrastu w tokens.md spełnia progi — 06da291
 - [x] 1.8 / ma oliwkowe tło i karty, bez błędów konsoli
 
 ### Phase 2: Warianty i komponenty
 
 #### Automated
 
-- [x] 2.1 Brak backdrop-blur w trzech kartach
-- [x] 2.2 Brak bg-destructive/60 w ui/
-- [x] 2.3 Brak alfy w wariantach tagów badge.tsx
-- [x] 2.4 npm run lint przechodzi
-- [x] 2.5 npx astro check przechodzi
-- [x] 2.6 npm run check:ui przechodzi
-- [x] 2.7 npm test przechodzi
-- [x] 2.8 npm run build przechodzi
-- [x] 2.9 Build zawiera color-mix z currentcolor 20%
+- [x] 2.1 Brak backdrop-blur w trzech kartach — 06da291
+- [x] 2.2 Brak bg-destructive/60 w ui/ — 06da291
+- [x] 2.3 Brak alfy w wariantach tagów badge.tsx — 06da291
+- [x] 2.4 npm run lint przechodzi — 06da291
+- [x] 2.5 npx astro check przechodzi — 06da291
+- [x] 2.6 npm run check:ui przechodzi — 06da291
+- [x] 2.7 npm test przechodzi — 06da291
+- [x] 2.8 npm run build przechodzi — 06da291
+- [x] 2.9 Build zawiera color-mix z currentcolor 20% — 06da291
 
 #### Manual
 
-- [x] 2.10 Hover × używa currentcolor, nie --accent
-- [x] 2.11 Tagi w spiżarce i na kafelku mają pełne tło z palety
+- [x] 2.10 Hover × używa currentcolor, nie --accent — 06da291
+- [x] 2.11 Tagi w spiżarce i na kafelku mają pełne tło z palety — 06da291
 
 ### Phase 3: Weryfikacja wizualna
 
 #### Automated
 
-- [ ] 3.1 Brak localhost_4321_*.png w commicie
-- [ ] 3.2 npm run check:ui przechodzi
+- [x] 3.1 Brak localhost_4321_*.png w commicie
+- [x] 3.2 npm run check:ui przechodzi
 
 #### Manual
 
-- [ ] 3.3 Zrzuty after istnieją, pantry-main bez nagłówka i e-maila
-- [ ] 3.4 Hover × widoczny na trzech tagach, fokus z pierścieniem
-- [ ] 3.5 ServerError czytelny w kitchen sinku
-- [ ] 3.6 Tag brak informacji odróżnia się od karty ramką
-- [ ] 3.7 Logo w nagłówku czytelne
-- [ ] 3.8 Przypomnienie o AGENTS.md w change.md Notes
+- [x] 3.3 Zrzuty after istnieją, pantry-main bez nagłówka i e-maila
+- [x] 3.4 Hover × widoczny na trzech tagach, fokus z pierścieniem
+- [x] 3.5 ServerError czytelny w kitchen sinku
+- [x] 3.6 Tag brak informacji odróżnia się od karty ramką
+- [x] 3.7 Logo w nagłówku czytelne
+- [x] 3.8 Przypomnienie o AGENTS.md w change.md Notes
