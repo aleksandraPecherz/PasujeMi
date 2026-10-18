@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: S-06 Autor edytuje i usuwa swój przepis
 
 - **Plan**: context/changes/author-edits-own-recipe/plan.md
@@ -10,14 +11,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | WARNING |
-| Safety & Quality | WARNING |
-| Architecture | PASS |
-| Pattern Consistency | PASS |
-| Success Criteria | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | WARNING |
+| Safety & Quality    | WARNING |
+| Architecture        | PASS    |
+| Pattern Consistency | PASS    |
+| Success Criteria    | PASS    |
 
 Notes: Phase 4 not reviewed (4.4 — production migration — still unchecked). Re-run now: `npm test` (288 passed), `npm run lint`, `npm run check:ui`, `npx astro check` (0 errors), `npm run build` — all pass. `supabase db reset` and the CI RLS step were not re-run locally (Docker/CI); Progress marks them done.
 

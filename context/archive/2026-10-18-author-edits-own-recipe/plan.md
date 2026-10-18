@@ -65,6 +65,7 @@ Migracja daje autorowi update i delete własnych wierszy oraz trigger zerujący 
 **Intent**: Otworzyć update i delete tylko dla autora i zagwarantować, że edycja składników unieważnia klucze dopasowania. Komentarz nagłówka rozszerza model z migracji S-05: „zapisy użytkowników — insert i update składników — zostawiają klucze null”; zapowiada admina w S-07.
 
 **Contract**:
+
 - `grant update (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g) on public.recipes to authenticated` — bez `id`, `created_at`, `author_id`, `match_keys`, `match_keys_version`.
 - `grant delete on public.recipes to authenticated`.
 - Polityka `recipes_update_own`: `for update to authenticated using (author_id = (select auth.uid())) with check (author_id = (select auth.uid()))`.
@@ -78,6 +79,7 @@ Migracja daje autorowi update i delete własnych wierszy oraz trigger zerujący 
 **Intent**: Dowieść reguł S-06 przez PostgREST z anon key i tokenami, na wierszu, który krok sam wstawia i usuwa. Najpierw status i typ ciała, potem treść (lessons.md).
 
 **Contract**: nowy krok „Check recipe update and delete permissions” między krokiem insert a „Compute recipe match keys”. Signup A i B (nowy `suffix`); A wstawia przepis (`Prefer: return=representation`, mleko) i zapisuje `id`; `trap` usuwa go service role przy wyjściu. Przypadki (PATCH/DELETE z `Prefer: return=representation`):
+
 - service role ustawia `match_keys` i `match_keys_version = 2`; A zmienia tylko `name` → 200, tablica z 1 wierszem, klucze dalej nie-null (odczyt service role);
 - A zmienia `ingredients` (mleko → orzechy) → 200, 1 wiersz; service role widzi `match_keys` i `match_keys_version` = null;
 - B zmienia `name` → 200, `[]`; B usuwa → 200, `[]`; service role widzi wiersz bez zmian;
@@ -125,6 +127,7 @@ Wspólny odczyt body JSON, `getRecipe` z autorem, `updateRecipe` / `deleteRecipe
 **Intent**: Strona szczegółów i edycji muszą znać autora; zapis i usunięcie przekładają brak wiersza po RLS na `null` / `false`. Mapowanie pól `NewRecipe` → wiersz współdzielone przez insert i update (update bez `author_id`).
 
 **Contract**:
+
 - `getRecipe(supabase, id): Promise<{ recipe: Recipe; authorId: string | null } | null>` — select `RECIPE_COLUMNS` + `author_id`; `RECIPE_COLUMNS` i `Recipe` bez zmian.
 - `updateRecipe(supabase, id, recipe: NewRecipe): Promise<Recipe | null>` — niepoprawne id → `null` bez zapytania; `.update(...).eq("id", id).select(RECIPE_COLUMNS).maybeSingle()`; brak wiersza → `null`; błąd → throw.
 - `deleteRecipe(supabase, id): Promise<boolean>` — niepoprawne id → `false` bez zapytania; `.delete().eq("id", id).select("id")`; `true` gdy usunięto wiersz.
@@ -137,6 +140,7 @@ Wspólny odczyt body JSON, `getRecipe` z autorem, `updateRecipe` / `deleteRecipe
 **Intent**: `PUT` z pełnym przepisem i tym samym walidatorem co `POST`; `DELETE`. Cudzy i nieistniejący przepis są nieodróżnialne (404).
 
 **Contract**:
+
 - `PUT`: 401 `unauthorized` (bez użytkownika) → 404 `not_found` (niepoprawne id) → `readJsonBody` → 400 `invalid_recipe` z `issues` → 503 `not_configured` → `updateRecipe`: `null` → 404 `not_found`, sukces → 200 `{ recipe }`, wyjątek → 500 `database_error` + `console.error`.
 - `DELETE`: 401 → 404 (niepoprawne id) → 503 → `deleteRecipe`: `false` → 404 `not_found`, `true` → 204 bez ciała, wyjątek → 500.
 
@@ -195,6 +199,7 @@ Strona `/recipes/[id]/edit` z formularzem S-05, przyciski autora z oknem potwier
 **Intent**: Ten sam hook obsługuje dodawanie i edycję: stan początkowy z `Recipe`, cel zapisu zależny od trybu, przekierowanie po udanej edycji.
 
 **Contract**:
+
 - `useRecipeForm({ recipe }: { recipe?: Recipe } = {})`.
 - Eksportowana `recipeToFormState(recipe: Recipe): RecipeFormState` — odwrotność `toBody`: liczby na tekst, `null` na `""`, `productEdited = product !== defaultProduct(name)`, nowe klucze przez `nextKey()`. Eksport `toBody` na potrzeby testu.
 - `sendRecipe` przyjmuje cel: dodawanie `POST /api/recipes` + `201`, edycja `PUT /api/recipes/${id}` + `200`. Nowy komunikat dla 404: „Nie znaleziono przepisu albo nie możesz go edytować.”. Mapowanie `400 invalid_recipe` bez zmian.
@@ -223,6 +228,7 @@ Strona `/recipes/[id]/edit` z formularzem S-05, przyciski autora z oknem potwier
 **Intent**: Autor widzi „Edytuj” (link do `/recipes/[id]/edit`) i „Usuń” obok „Wróć do listy”. „Usuń” otwiera `AlertDialog` z nazwą przepisu i informacją, że operacji nie można cofnąć. Po potwierdzeniu: `DELETE`, a przy 204 `window.location.assign("/")`.
 
 **Contract**:
+
 - `useDeleteRecipe(recipeId)` → `{ status: "idle" | "deleting" | "error", error: string | null, remove() }`. Status przed ciałem; 204 → przekierowanie; 404 → „Nie znaleziono przepisu. Mógł zostać już usunięty.”; 401 → komunikat wygasłej sesji; błąd sieci / inne → komunikat ogólny. Błąd pokazany w dialogu, dialog zostaje otwarty; w trakcie usuwania oba przyciski dialogu są zablokowane.
 - Dialog sterowany (`open` / `onOpenChange`): `onOpenChange(false)` jest ignorowane przy `status === "deleting"` (Escape, „Anuluj”). Radix `AlertDialog.Action` zamyka dialog przy każdym kliknięciu, więc przycisk potwierdzenia woła `event.preventDefault()` przed `remove()`.
 - `RecipeAuthorActions({ recipeId, recipeName })` — wyspa; prezentacja wydzielona tak, żeby kitchen sink mógł pokazać stany bez sieci (`RecipeAuthorActionsView` z propsami `status`, `error`, `onConfirm` i opcjonalnym `defaultOpen`, którym kitchen sink pokazuje stany „w trakcie” i „błąd” od razu otwarte).
@@ -394,5 +400,5 @@ Każda edycja składników wrzuca przepis do puli przeliczanej per żądanie w `
 #### Manual
 
 - [x] 4.3 `npm run smoke` przechodzi lokalnie na Supabase z Dockera (`.env` / `.dev.vars` wskazują `supabase start`, nie produkcję) — ab97e50
-- [ ] 4.4 Autorka zastosowała migrację `20261018120000` na produkcji przed merge i sprawdziła, że lista i dopasowanie działają
+- [x] 4.4 Autorka zastosowała migrację `20261018120000` na produkcji przed merge i sprawdziła, że lista i dopasowanie działają
 - [x] 4.5 Opis PR zawiera „Closes #8” — ab97e50
