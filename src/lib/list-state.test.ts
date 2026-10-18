@@ -141,6 +141,20 @@ describe("sessionStorage access", () => {
     expect(readSnapshot()).toBeNull();
   });
 
+  it("stops saving after sign-out starts", async () => {
+    vi.resetModules();
+    const store: Record<string, string> = {};
+    stubStorage(store);
+    const fresh = await import("@/lib/list-state");
+    fresh.writeSnapshot(SNAPSHOT);
+    fresh.endListState();
+    expect(store[LIST_STATE_KEY]).toBeUndefined();
+    // What pagehide / visibilitychange do while the page is left.
+    fresh.writeSnapshot(SNAPSHOT);
+    expect(store[LIST_STATE_KEY]).toBeUndefined();
+    expect(fresh.readSnapshot()).toBeNull();
+  });
+
   it("does not throw when storage is blocked", () => {
     stubStorage({}, true);
     expect(() => {
