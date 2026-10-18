@@ -14,7 +14,9 @@
     "test": "vitest run",
     "check:ui": "node scripts/check-ui-literals.mjs",
     "bench:match": "tsx scripts/bench-match.ts",
-    "match-keys": "tsx scripts/match-keys.ts"
+    "match-keys": "tsx scripts/match-keys.ts",
+    "import-recipes": "tsx scripts/import-recipes.ts",
+    "import-recipes:write": "tsx scripts/import-recipes.ts --write"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
@@ -50,6 +52,7 @@
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "exceljs": "^4.4.0",
     "husky": "9.1.7",
     "lint-staged": "^16.3.3",
     "prettier": "^3.9.6",
