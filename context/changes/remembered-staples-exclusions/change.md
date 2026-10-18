@@ -1,7 +1,7 @@
 ---
 change_id: remembered-staples-exclusions
 title: Remembered staples exclusions
-status: implementing
+status: impl_reviewed
 created: 2026-10-18
 updated: 2026-10-18
 archived_at: null

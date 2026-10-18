@@ -311,18 +311,18 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 
 #### Automated
 
-- [x] 3.1 Testy kolejki i `list-state`: `npm test`
-- [x] 3.2 Lint, typy, literały UI, build: `npm run lint`, `npx astro check`, `npm run check:ui`, `npm run build`
+- [x] 3.1 Testy kolejki i `list-state`: `npm test` — 3a22164
+- [x] 3.2 Lint, typy, literały UI, build: `npm run lint`, `npx astro check`, `npm run check:ui`, `npm run build` — 3a22164
 - [ ] 3.3 `npm run smoke` w CI przechodzi
 
 #### Manual
 
-- [x] 3.4 Stałe i wykluczenia wracają po wylogowaniu i zalogowaniu, „Mam w domu” puste, lista od razu dopasowana
-- [x] 3.12 Start z zapisanym wykluczeniem: jedno żądanie dopasowania, wykluczony przepis nie miga, błąd nie daje listy bez filtrów
-- [x] 3.5 Szybkie edycje: stan po odświeżeniu zgadza się z ostatnim, nigdy dwa PUT naraz
-- [x] 3.6 Powrót ze szczegółów: `have` i lista ze snapshotu, stałe z bazy, komunikat przy przekroczeniu limitu
+- [x] 3.4 Stałe i wykluczenia wracają po wylogowaniu i zalogowaniu, „Mam w domu” puste, lista od razu dopasowana — 3a22164
+- [x] 3.12 Start z zapisanym wykluczeniem: jedno żądanie dopasowania, wykluczony przepis nie miga, błąd nie daje listy bez filtrów — 3a22164
+- [x] 3.5 Szybkie edycje: stan po odświeżeniu zgadza się z ostatnim, nigdy dwa PUT naraz — 3a22164
+- [x] 3.6 Powrót ze szczegółów: `have` i lista ze snapshotu, stałe z bazy, komunikat przy przekroczeniu limitu — 3a22164
 - [ ] 3.7 Ponad 60 słów w stałych i wykluczeniach → komunikat limitu, tag nie dodany
 - [ ] 3.8 Nieudany zapis → komunikat bez ponowień, czyszczony przez kolejny udany zapis
-- [x] 3.9 Przelogowanie w innej karcie → 409 i komunikat, konto B bez zmian
-- [x] 3.10 `/dev/kitchen-sink` pokazuje nowe stany w obu motywach
+- [x] 3.9 Przelogowanie w innej karcie → 409 i komunikat, konto B bez zmian — 3a22164
+- [x] 3.10 `/dev/kitchen-sink` pokazuje nowe stany w obu motywach — 3a22164
 - [ ] 3.11 Autorka zastosowała migrację na produkcji przed merge

@@ -49,7 +49,7 @@ const UUID_IN_PROPS = /userId.{0,40}?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-
 function decodeEntities(html) {
   return html
     .replace(/&#x([0-9a-f]+);/gi, (_m, hex) => String.fromCodePoint(parseInt(hex, 16)))
-    .replace(/&#(d+);/g, (_m, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&#(\d+);/g, (_m, dec) => String.fromCodePoint(Number(dec)))
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, "&");
 }
