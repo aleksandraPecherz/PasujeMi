@@ -3,8 +3,8 @@ import {
   MAX_TAG_LENGTH,
   MAX_TAGS,
   MAX_TOKENS,
-  MAX_URL_LENGTH,
   countTokens,
+  exceedsMatchUrl,
 } from "@/lib/matching/limits";
 import type { PantryLists, PantrySection } from "@/types";
 
@@ -19,8 +19,6 @@ export interface ListSnapshot {
 }
 
 const SECTIONS: PantrySection[] = ["have", "staple", "exclude"];
-// Worst-case prefix of the match request (path plus two numeric params), so the URL check stays in step with the island.
-const URL_PREFIX = "/api/recipes/match?limit=50&offset=100&";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -43,11 +41,7 @@ function parseLists(value: unknown): PantryLists | null {
   }
   const all = [...lists.have, ...lists.staple, ...lists.exclude];
   if (countTokens(all) > MAX_TOKENS) return null;
-  const params = new URLSearchParams();
-  for (const section of SECTIONS) {
-    for (const tag of lists[section]) params.append(section, tag);
-  }
-  if (URL_PREFIX.length + params.toString().length > MAX_URL_LENGTH) return null;
+  if (exceedsMatchUrl(lists)) return null;
   return lists;
 }
 
