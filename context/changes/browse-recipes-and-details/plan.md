@@ -306,18 +306,18 @@ Nie dotyczy: brak zmian schematu, RLS ani danych. Wycofanie to usunięcie nowych
 
 #### Automated
 
-- [x] 3.1 Unit tests pass (parse/limity/round-trip/storage zablokowane): `npm test`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Type check passes: `npx astro check`
-- [x] 3.4 UI literal guard passes: `npm run check:ui`
-- [x] 3.5 Production build passes: `npm run build`
+- [x] 3.1 Unit tests pass (parse/limity/round-trip/storage zablokowane): `npm test` — 2ad18bf
+- [x] 3.2 Linting passes: `npm run lint` — 2ad18bf
+- [x] 3.3 Type check passes: `npx astro check` — 2ad18bf
+- [x] 3.4 UI literal guard passes: `npm run check:ui` — 2ad18bf
+- [x] 3.5 Production build passes: `npm run build` — 2ad18bf
 
 #### Manual
 
-- [x] 3.6 Dodaj tagi, zastosuj filtry, kliknij „Pokaż więcej” (min. raz), przewiń, otwórz przepis, „wstecz” → te same tagi w polach, te same filtry, tyle samo przepisów i ta sama pozycja przewijania
-- [x] 3.7 To samo przez link „Wróć do listy” na stronie szczegółów
-- [x] 3.8 Tagi dopisane, ale niezastosowane przed wejściem w szczegóły, są po powrocie w polach (bez zmiany wyświetlonej listy)
-- [x] 3.9 Nowa karta z `/` zaczyna z pustą spiżarką i pierwszymi 10 przepisami
-- [x] 3.10 Uszkodzony lub zbyt duży wpis w `sessionStorage` (edycja w DevTools) jest ignorowany i lista ładuje się normalnie
-- [x] 3.11 Z zablokowanym `sessionStorage` strona działa jak dotąd, bez błędów w konsoli
-- [x] 3.12 Pierwsze wejście bez snapshotu i odświeżenie strony nie psują listy (brak migania pustych tagów dłużej niż stan ładowania)
+- [x] 3.6 Dodaj tagi, zastosuj filtry, kliknij „Pokaż więcej” (min. raz), przewiń, otwórz przepis, „wstecz” → te same tagi w polach, te same filtry, tyle samo przepisów i ta sama pozycja przewijania — 2ad18bf
+- [x] 3.7 To samo przez link „Wróć do listy” na stronie szczegółów — 2ad18bf
+- [x] 3.8 Tagi dopisane, ale niezastosowane przed wejściem w szczegóły, są po powrocie w polach (bez zmiany wyświetlonej listy) — 2ad18bf
+- [x] 3.9 Nowa karta z `/` zaczyna z pustą spiżarką i pierwszymi 10 przepisami — 2ad18bf
+- [x] 3.10 Uszkodzony lub zbyt duży wpis w `sessionStorage` (edycja w DevTools) jest ignorowany i lista ładuje się normalnie — 2ad18bf
+- [x] 3.11 Z zablokowanym `sessionStorage` strona działa jak dotąd, bez błędów w konsoli — 2ad18bf
+- [x] 3.12 Pierwsze wejście bez snapshotu i odświeżenie strony nie psują listy (brak migania pustych tagów dłużej niż stan ładowania) — 2ad18bf
