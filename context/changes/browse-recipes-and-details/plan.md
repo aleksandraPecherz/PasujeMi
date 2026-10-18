@@ -289,35 +289,35 @@ Nie dotyczy: brak zmian schematu, RLS ani danych. Wycofanie to usunięcie nowych
 
 #### Automated
 
-- [x] 2.1 Unit tests still pass: `npm test`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Type check passes: `npx astro check`
-- [x] 2.4 UI literal guard passes: `npm run check:ui`
+- [x] 2.1 Unit tests still pass: `npm test` — e995e36
+- [x] 2.2 Linting passes: `npm run lint` — e995e36
+- [x] 2.3 Type check passes: `npx astro check` — e995e36
+- [x] 2.4 UI literal guard passes: `npm run check:ui` — e995e36
 
 #### Manual
 
-- [x] 2.5 Kliknięcie w dowolne miejsce kafelka (także w tag składnika) otwiera szczegóły tego przepisu
-- [x] 2.6 Klawiatura: Tab zatrzymuje się raz na kafelek, widoczny jest pierścień fokusu, Enter otwiera szczegóły
-- [x] 2.7 Kafelek w podglądzie po dodaniu przepisu (`RecipeSaved`) prowadzi do szczegółów nowego przepisu
-- [x] 2.8 `/dev/kitchen-sink` pokazuje kafelki i widok szczegółów w jasnym i ciemnym motywie
-- [x] 2.9 Na stronie szczegółów długiego przepisu link „Wróć do listy” jest widoczny na górze i pod krokami
+- [x] 2.5 Kliknięcie w dowolne miejsce kafelka (także w tag składnika) otwiera szczegóły tego przepisu — e995e36
+- [x] 2.6 Klawiatura: Tab zatrzymuje się raz na kafelek, widoczny jest pierścień fokusu, Enter otwiera szczegóły — e995e36
+- [x] 2.7 Kafelek w podglądzie po dodaniu przepisu (`RecipeSaved`) prowadzi do szczegółów nowego przepisu — e995e36
+- [x] 2.8 `/dev/kitchen-sink` pokazuje kafelki i widok szczegółów w jasnym i ciemnym motywie — e995e36
+- [x] 2.9 Na stronie szczegółów długiego przepisu link „Wróć do listy” jest widoczny na górze i pod krokami — e995e36
 
 ### Phase 3: Zachowanie stanu listy
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass (parse/limity/round-trip/storage zablokowane): `npm test`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 Type check passes: `npx astro check`
-- [ ] 3.4 UI literal guard passes: `npm run check:ui`
-- [ ] 3.5 Production build passes: `npm run build`
+- [x] 3.1 Unit tests pass (parse/limity/round-trip/storage zablokowane): `npm test`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 Type check passes: `npx astro check`
+- [x] 3.4 UI literal guard passes: `npm run check:ui`
+- [x] 3.5 Production build passes: `npm run build`
 
 #### Manual
 
-- [ ] 3.6 Dodaj tagi, zastosuj filtry, kliknij „Pokaż więcej” (min. raz), przewiń, otwórz przepis, „wstecz” → te same tagi w polach, te same filtry, tyle samo przepisów i ta sama pozycja przewijania
-- [ ] 3.7 To samo przez link „Wróć do listy” na stronie szczegółów
-- [ ] 3.8 Tagi dopisane, ale niezastosowane przed wejściem w szczegóły, są po powrocie w polach (bez zmiany wyświetlonej listy)
-- [ ] 3.9 Nowa karta z `/` zaczyna z pustą spiżarką i pierwszymi 10 przepisami
-- [ ] 3.10 Uszkodzony lub zbyt duży wpis w `sessionStorage` (edycja w DevTools) jest ignorowany i lista ładuje się normalnie
-- [ ] 3.11 Z zablokowanym `sessionStorage` strona działa jak dotąd, bez błędów w konsoli
-- [ ] 3.12 Pierwsze wejście bez snapshotu i odświeżenie strony nie psują listy (brak migania pustych tagów dłużej niż stan ładowania)
+- [x] 3.6 Dodaj tagi, zastosuj filtry, kliknij „Pokaż więcej” (min. raz), przewiń, otwórz przepis, „wstecz” → te same tagi w polach, te same filtry, tyle samo przepisów i ta sama pozycja przewijania
+- [x] 3.7 To samo przez link „Wróć do listy” na stronie szczegółów
+- [x] 3.8 Tagi dopisane, ale niezastosowane przed wejściem w szczegóły, są po powrocie w polach (bez zmiany wyświetlonej listy)
+- [x] 3.9 Nowa karta z `/` zaczyna z pustą spiżarką i pierwszymi 10 przepisami
+- [x] 3.10 Uszkodzony lub zbyt duży wpis w `sessionStorage` (edycja w DevTools) jest ignorowany i lista ładuje się normalnie
+- [x] 3.11 Z zablokowanym `sessionStorage` strona działa jak dotąd, bez błędów w konsoli
+- [x] 3.12 Pierwsze wejście bez snapshotu i odświeżenie strony nie psują listy (brak migania pustych tagów dłużej niż stan ładowania)

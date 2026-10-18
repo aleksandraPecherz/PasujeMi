@@ -58,3 +58,6 @@ export interface RecipeMatch {
 }
 
 export type MatchedRecipe = Recipe & { match: RecipeMatch };
+
+export type PantrySection = "have" | "staple" | "exclude";
+export type PantryLists = Record<PantrySection, string[]>;

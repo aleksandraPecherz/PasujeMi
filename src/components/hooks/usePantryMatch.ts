@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { clearSnapshot, readSnapshot, writeSnapshot } from "@/lib/list-state";
 import { MAX_TAG_LENGTH, MAX_TAGS, MAX_TOKENS, MAX_URL_LENGTH, countTokens } from "@/lib/matching/limits";
-import type { Recipe, RecipeMatch } from "@/types";
+import type { PantryLists, PantrySection, Recipe, RecipeMatch } from "@/types";
+
+export type { PantryLists, PantrySection };
 
 const PAGE_SIZE = 10;
+// The endpoints accept at most 50 per request; a restore of up to MAX_RESTORE_RECIPES takes one or two such requests.
+const RESTORE_PAGE_SIZE = 50;
 const LIMIT_MESSAGE = `Za dużo produktów naraz (limit ${MAX_TOKENS} słów we wszystkich listach). Usuń któryś produkt.`;
-
-export type PantrySection = "have" | "staple" | "exclude";
-export type PantryLists = Record<PantrySection, string[]>;
 
 export interface ListedRecipe {
   recipe: Recipe;
@@ -20,8 +22,8 @@ function hasFilters(lists: PantryLists): boolean {
   return lists.have.length + lists.staple.length + lists.exclude.length > 0;
 }
 
-function buildUrl(filters: PantryLists, offset: number): string {
-  const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) });
+function buildUrl(filters: PantryLists, offset: number, limit = PAGE_SIZE): string {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
   if (!hasFilters(filters)) {
     return `/api/recipes?${params.toString()}`;
   }
@@ -97,12 +99,17 @@ function exceedsLimits(filters: PantryLists): boolean {
   );
 }
 
-async function requestPage(filters: PantryLists, offset: number, signal: AbortSignal): Promise<PageResult> {
+async function requestPage(
+  filters: PantryLists,
+  offset: number,
+  signal: AbortSignal,
+  limit = PAGE_SIZE,
+): Promise<PageResult> {
   if (exceedsLimits(filters)) {
     return { ok: false, message: LIMIT_MESSAGE };
   }
   try {
-    const res = await fetch(buildUrl(filters, offset), { headers: { Accept: "application/json" }, signal });
+    const res = await fetch(buildUrl(filters, offset, limit), { headers: { Accept: "application/json" }, signal });
     if (!res.ok) {
       return {
         ok: false,
@@ -121,6 +128,23 @@ async function requestPage(filters: PantryLists, offset: number, signal: AbortSi
     // An aborted request lands here too; `commit` drops it, because a newer request has taken its id.
     return { ok: false, message: "Brak połączenia z serwerem. Spróbuj ponownie." };
   }
+}
+
+// Re-fetches the first `loaded` recipes in as few requests as the endpoint limit allows (each one walks the catalog).
+async function requestRestore(filters: PantryLists, loaded: number, signal: AbortSignal): Promise<PageResult> {
+  const items: ListedRecipe[] = [];
+  let hasMore = false;
+  let total: number | null = null;
+  for (let offset = 0; offset < loaded; offset += RESTORE_PAGE_SIZE) {
+    const result = await requestPage(filters, offset, signal, Math.min(RESTORE_PAGE_SIZE, loaded - offset));
+    if (!result.ok) {
+      return result;
+    }
+    items.push(...result.items);
+    hasMore = result.hasMore;
+    total = result.total;
+  }
+  return { ok: true, items, hasMore, total };
 }
 
 export function usePantryMatch() {
@@ -142,25 +166,34 @@ export function usePantryMatch() {
   const requestId = useRef(0);
   // A superseded request is aborted, so the Worker does not finish a full-catalog match nobody will see.
   const inFlight = useRef<AbortController | null>(null);
+  // Scroll position to return to once a restored list has rendered; the view clears it after scrolling.
+  const [restoredScrollY, setRestoredScrollY] = useState<number | null>(null);
+  // Saving is off until the startup read/restore is done, or the empty first render would overwrite the snapshot.
+  const saveEnabled = useRef(false);
+  const latest = useRef({ lists, applied, offset });
 
-  const commit = useCallback((id: number, filters: PantryLists, pageOffset: number, result: PageResult) => {
-    if (id !== requestId.current) {
-      return;
-    }
-    setLoading(false);
-    setReloading(false);
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
-    setError(null);
-    setApplied(filters);
-    setRecipes((prev) => (pageOffset === 0 ? result.items : [...prev, ...result.items]));
-    setHasMore(result.hasMore);
-    setTotal(result.total);
-    // Advance by the page size, not by the rows received: the service may drop a recipe deleted mid-request.
-    setOffset(pageOffset + PAGE_SIZE);
-  }, []);
+  const commit = useCallback(
+    (id: number, filters: PantryLists, pageOffset: number, result: PageResult, count = PAGE_SIZE) => {
+      if (id !== requestId.current) {
+        return;
+      }
+      setLoading(false);
+      setReloading(false);
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
+      setError(null);
+      setApplied(filters);
+      setRecipes((prev) => (pageOffset === 0 ? result.items : [...prev, ...result.items]));
+      setHasMore(result.hasMore);
+      setTotal(result.total);
+      // Advance by the count requested (page size, or the restored amount), not by the rows received: the service may
+      // drop a recipe deleted mid-request.
+      setOffset(pageOffset + count);
+    },
+    [],
+  );
 
   const load = useCallback(
     (filters: PantryLists, pageOffset: number) => {
@@ -177,18 +210,72 @@ export function usePantryMatch() {
     [commit],
   );
 
-  // Initial view: the plain FR-005 list (no filters); `loading` and `reloading` start as true, so no state is set here.
+  // Initial view: a snapshot saved before leaving the list is restored; otherwise the plain FR-005 list (no filters).
+  // `loading` and `reloading` start as true. The snapshot is read here, not in a state initializer, so hydration matches
+  // the server HTML; it is not removed on read, so the second run of this effect in StrictMode finds it again.
   useEffect(() => {
     const id = ++requestId.current;
     const controller = new AbortController();
     inFlight.current = controller;
-    void requestPage(EMPTY_LISTS, 0, controller.signal).then((result) => {
-      commit(id, EMPTY_LISTS, 0, result);
-    });
+    const snapshot = readSnapshot();
+    if (snapshot === null || snapshot.loaded === 0) {
+      void requestPage(EMPTY_LISTS, 0, controller.signal).then((result) => {
+        commit(id, EMPTY_LISTS, 0, result);
+        if (id === requestId.current) {
+          saveEnabled.current = true;
+        }
+      });
+    } else {
+      void requestRestore(snapshot.applied, snapshot.loaded, controller.signal).then((result) => {
+        if (id !== requestId.current) {
+          return;
+        }
+        if (result.ok) {
+          setLists(snapshot.lists);
+          commit(id, snapshot.applied, 0, result, snapshot.loaded);
+          setRestoredScrollY(snapshot.scrollY);
+        } else {
+          // Back to the unfiltered view with the usual error message.
+          clearSnapshot();
+          commit(id, EMPTY_LISTS, 0, result);
+        }
+        saveEnabled.current = true;
+      });
+    }
     return () => {
       controller.abort();
     };
   }, [commit]);
+
+  useEffect(() => {
+    latest.current = { lists, applied, offset };
+  }, [lists, applied, offset]);
+
+  // Leaving the page (link to a recipe, tab switch, reload): remember where the list was.
+  useEffect(() => {
+    const save = () => {
+      const { lists: l, applied: a, offset: loaded } = latest.current;
+      if (!saveEnabled.current || loaded === 0) {
+        return;
+      }
+      writeSnapshot({ lists: l, applied: a, loaded, scrollY: window.scrollY });
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        save();
+      }
+    };
+    window.addEventListener("pagehide", save);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", save);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
+  const consumeRestoredScroll = useCallback(() => {
+    setRestoredScrollY(null);
+  }, []);
 
   /**
    * Returns false when the tag was skipped: empty, too long, a case-insensitive duplicate, the section is full, or the
@@ -245,6 +332,8 @@ export function usePantryMatch() {
     loading,
     reloading,
     error,
+    restoredScrollY,
+    consumeRestoredScroll,
     /** Whether the shown list was requested with any tags. */
     filtered: hasFilters(applied),
   };
