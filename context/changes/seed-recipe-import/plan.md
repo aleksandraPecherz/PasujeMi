@@ -268,13 +268,13 @@ Brak migracji. Produkcyjny import wymaga, by migracja `20261017120000_add_recipe
 
 #### Automated
 
-- [x] 1.1 Testy parsera i marek przechodzą: `npm test`
-- [x] 1.2 Lint bez błędów: `npm run lint`
-- [x] 1.3 Typy bez błędów: `npx astro check`
+- [x] 1.1 Testy parsera i marek przechodzą: `npm test` — b2f52dd
+- [x] 1.2 Lint bez błędów: `npm run lint` — b2f52dd
+- [x] 1.3 Typy bez błędów: `npx astro check` — b2f52dd
 
 #### Manual
 
-- [x] 1.4 Autorka akceptuje nowe brzmienie reguły zamienników w `recipe-data-contract.md`
+- [x] 1.4 Autorka akceptuje nowe brzmienie reguły zamienników w `recipe-data-contract.md` — b2f52dd
 
 ### Phase 2: Skrypt importu
 
