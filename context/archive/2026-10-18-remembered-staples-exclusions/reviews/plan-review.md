@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: S-04: zapamiętane produkty stałe i wykluczenia
 
 - **Plan**: context/changes/remembered-staples-exclusions/plan.md
@@ -9,15 +10,16 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
-| Architectural Fitness | PASS |
-| Blind Spots | WARNING |
-| Plan Completeness | FAIL |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
+| Architectural Fitness | PASS    |
+| Blind Spots           | WARNING |
+| Plan Completeness     | FAIL    |
 
 ## Grounding
+
 13/13 paths ✓, 8/8 symbols ✓, brief↔plan ✓, 1 stale line ref (F6)
 
 ## Findings

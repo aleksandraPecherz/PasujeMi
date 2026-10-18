@@ -57,11 +57,11 @@ Ustalenia wejściowe od użytkownika (decyzje, nie do ponownego badania): logika
 
 Opcje i ich konsekwencje (na podstawie przepływu w `usePantryMatch.ts`):
 
-| Opcja | Plusy | Minusy |
-|---|---|---|
-| A. Po każdej zmianie `staple`/`exclude` (add/remove) | Zgodne z oczekiwaniem „dodałam tag = zapamiętany”; niezależne od wyszukiwania; mały payload | Więcej żądań; trzeba obsłużyć kolejność odpowiedzi i błędy zapisu |
-| B. Przy „Zastosuj filtry” | Jedno żądanie na wyszukiwanie | Tag dodany bez kliknięcia ginie; `apply` może się nie udać (`commit` z błędem nie ustawia `applied`, `usePantryMatch.ts:182-185`), więc nie wiadomo, co zapisać; miesza dwie odpowiedzialności |
-| C. Przy opuszczeniu strony (`pagehide`, `fetch keepalive`) | Jedno żądanie | Zawodne (zamknięcie karty, mobilne przeglądarki); `pagehide` odpala też przy wysyłce formularza „Wyloguj”, ściga się z `POST /api/auth/signout` |
+| Opcja                                                      | Plusy                                                                                       | Minusy                                                                                                                                                                                         |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A. Po każdej zmianie `staple`/`exclude` (add/remove)       | Zgodne z oczekiwaniem „dodałam tag = zapamiętany”; niezależne od wyszukiwania; mały payload | Więcej żądań; trzeba obsłużyć kolejność odpowiedzi i błędy zapisu                                                                                                                              |
+| B. Przy „Zastosuj filtry”                                  | Jedno żądanie na wyszukiwanie                                                               | Tag dodany bez kliknięcia ginie; `apply` może się nie udać (`commit` z błędem nie ustawia `applied`, `usePantryMatch.ts:182-185`), więc nie wiadomo, co zapisać; miesza dwie odpowiedzialności |
+| C. Przy opuszczeniu strony (`pagehide`, `fetch keepalive`) | Jedno żądanie                                                                               | Zawodne (zamknięcie karty, mobilne przeglądarki); `pagehide` odpala też przy wysyłce formularza „Wyloguj”, ściga się z `POST /api/auth/signout`                                                |
 
 Rekomendacja: **A**, z ograniczeniami:
 
