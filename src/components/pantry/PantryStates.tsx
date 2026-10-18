@@ -18,6 +18,20 @@ export function LimitNotice({ message, className }: { message: string | null; cl
   );
 }
 
+/** Why the staples and exclusions are not saved; its own region, so it and LimitNotice can show at once. */
+export function SaveNotice({ message, className }: { message: string | null; className?: string }) {
+  return (
+    <p role="status" className={cn("text-warning flex items-start gap-2 text-sm empty:hidden", className)}>
+      {message !== null && (
+        <>
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <span>{message}</span>
+        </>
+      )}
+    </p>
+  );
+}
+
 /** "Znaleziono N przepisów" above the recipe list; `total` counts every page, not only the loaded ones. */
 export function RecipeCount({ total, className }: { total: number; className?: string }) {
   return <p className={cn("text-muted-foreground text-sm", className)}>{recipeCountLabel(total)}</p>;

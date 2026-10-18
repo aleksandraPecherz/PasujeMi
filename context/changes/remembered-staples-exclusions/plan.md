@@ -288,7 +288,7 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 - [x] 1.1 Migracja stosuje się na czystej bazie: `supabase db reset` — be326ce
 - [x] 1.2 Testy walidatora, serwisu i snapshotu przechodzą: `npm test` — be326ce
 - [x] 1.3 Lint i typy: `npm run lint`, `npx astro check` — be326ce
-- [ ] 1.4 Krok „Check saved pantry permissions” przechodzi w CI
+- [x] 1.4 Krok „Check saved pantry permissions” przechodzi w CI
 
 #### Manual
 
@@ -298,9 +298,9 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 
 #### Automated
 
-- [x] 2.1 Testy, lint, typy i literały UI: `npm test`, `npm run lint`, `npx astro check`, `npm run check:ui`
-- [x] 2.2 Build: `npm run build`
-- [ ] 2.3 Job `smoke` w CI przechodzi z nowymi krokami
+- [x] 2.1 Testy, lint, typy i literały UI: `npm test`, `npm run lint`, `npx astro check`, `npm run check:ui` — 4688af7
+- [x] 2.2 Build: `npm run build` — 4688af7
+- [x] 2.3 Job `smoke` w CI przechodzi z nowymi krokami
 
 #### Manual
 
@@ -311,18 +311,18 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 
 #### Automated
 
-- [ ] 3.1 Testy kolejki i `list-state`: `npm test`
-- [ ] 3.2 Lint, typy, literały UI, build: `npm run lint`, `npx astro check`, `npm run check:ui`, `npm run build`
+- [x] 3.1 Testy kolejki i `list-state`: `npm test`
+- [x] 3.2 Lint, typy, literały UI, build: `npm run lint`, `npx astro check`, `npm run check:ui`, `npm run build`
 - [ ] 3.3 `npm run smoke` w CI przechodzi
 
 #### Manual
 
-- [ ] 3.4 Stałe i wykluczenia wracają po wylogowaniu i zalogowaniu, „Mam w domu” puste, lista od razu dopasowana
-- [ ] 3.12 Start z zapisanym wykluczeniem: jedno żądanie dopasowania, wykluczony przepis nie miga, błąd nie daje listy bez filtrów
-- [ ] 3.5 Szybkie edycje: stan po odświeżeniu zgadza się z ostatnim, nigdy dwa PUT naraz
-- [ ] 3.6 Powrót ze szczegółów: `have` i lista ze snapshotu, stałe z bazy, komunikat przy przekroczeniu limitu
+- [x] 3.4 Stałe i wykluczenia wracają po wylogowaniu i zalogowaniu, „Mam w domu” puste, lista od razu dopasowana
+- [x] 3.12 Start z zapisanym wykluczeniem: jedno żądanie dopasowania, wykluczony przepis nie miga, błąd nie daje listy bez filtrów
+- [x] 3.5 Szybkie edycje: stan po odświeżeniu zgadza się z ostatnim, nigdy dwa PUT naraz
+- [x] 3.6 Powrót ze szczegółów: `have` i lista ze snapshotu, stałe z bazy, komunikat przy przekroczeniu limitu
 - [ ] 3.7 Ponad 60 słów w stałych i wykluczeniach → komunikat limitu, tag nie dodany
 - [ ] 3.8 Nieudany zapis → komunikat bez ponowień, czyszczony przez kolejny udany zapis
-- [ ] 3.9 Przelogowanie w innej karcie → 409 i komunikat, konto B bez zmian
-- [ ] 3.10 `/dev/kitchen-sink` pokazuje nowe stany w obu motywach
+- [x] 3.9 Przelogowanie w innej karcie → 409 i komunikat, konto B bez zmian
+- [x] 3.10 `/dev/kitchen-sink` pokazuje nowe stany w obu motywach
 - [ ] 3.11 Autorka zastosowała migrację na produkcji przed merge

@@ -2,8 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   LIST_STATE_KEY,
   clearSnapshot,
+  missesSavedExclusion,
   parseSnapshot,
   readSnapshot,
+  restoreLists,
   writeSnapshot,
   type ListSnapshot,
 } from "@/lib/list-state";
@@ -155,6 +157,15 @@ describe("sessionStorage access", () => {
     expect(fresh.readSnapshot()).toBeNull();
   });
 
+  it("reports that sign-out has started", async () => {
+    vi.resetModules();
+    stubStorage({});
+    const fresh = await import("@/lib/list-state");
+    expect(fresh.listStateEnded()).toBe(false);
+    fresh.endListState();
+    expect(fresh.listStateEnded()).toBe(true);
+  });
+
   it("does not throw when storage is blocked", () => {
     stubStorage({}, true);
     expect(() => {
@@ -164,5 +175,39 @@ describe("sessionStorage access", () => {
     expect(() => {
       clearSnapshot();
     }).not.toThrow();
+  });
+});
+
+describe("restoreLists", () => {
+  it("takes only have from the snapshot", () => {
+    const current = { have: ["x"], staple: ["pieprz"], exclude: ["jogurt"] };
+    expect(restoreLists(SNAPSHOT.lists, current)).toEqual({
+      have: ["pomidor", "ser żółty"],
+      staple: ["pieprz"],
+      exclude: ["jogurt"],
+    });
+  });
+});
+
+describe("missesSavedExclusion", () => {
+  const applied = { have: [], staple: [], exclude: ["Orzechy"] };
+
+  it("is false without saved lists", () => {
+    expect(missesSavedExclusion(applied, null)).toBe(false);
+  });
+
+  it("is false when the applied exclusions cover the saved ones", () => {
+    expect(missesSavedExclusion(applied, { staple: [], exclude: ["Orzechy"] })).toBe(false);
+    expect(missesSavedExclusion(applied, { staple: ["sól"], exclude: [] })).toBe(false);
+  });
+
+  it("ignores letter case", () => {
+    expect(missesSavedExclusion(applied, { staple: [], exclude: ["orzechy"] })).toBe(false);
+    expect(missesSavedExclusion({ ...applied, exclude: ["Żurek"] }, { staple: [], exclude: ["żurek"] })).toBe(false);
+  });
+
+  it("is true for a saved exclusion that is not applied", () => {
+    expect(missesSavedExclusion(applied, { staple: [], exclude: ["orzechy", "jogurt"] })).toBe(true);
+    expect(missesSavedExclusion(EMPTY, { staple: [], exclude: ["jogurt"] })).toBe(true);
   });
 });

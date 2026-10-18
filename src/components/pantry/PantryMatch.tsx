@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Lightbulb, SlidersHorizontal } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
-import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
+import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton, SaveNotice } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,11 @@ export interface PantryMatchProps {
   saved: SavedPantry | null;
 }
 
-// The props reach the hook in phase 3.
-export default function PantryMatch(_props: PantryMatchProps) {
+export default function PantryMatch({ userId, saved }: PantryMatchProps) {
   const {
     lists,
     limitNotice,
+    saveNotice,
     addTag,
     removeTag,
     apply,
@@ -55,7 +55,7 @@ export default function PantryMatch(_props: PantryMatchProps) {
     filtered,
     restoredScrollY,
     consumeRestoredScroll,
-  } = usePantryMatch();
+  } = usePantryMatch({ userId, saved });
   const hasRecipes = recipes.length > 0;
 
   // After a restore, scroll once to the saved position. Manual restoration keeps the browser's own attempt (made before
@@ -108,6 +108,7 @@ export default function PantryMatch(_props: PantryMatchProps) {
           ))}
         </div>
         <LimitNotice message={limitNotice} className="mt-3" />
+        <SaveNotice message={saveNotice} className="mt-3" />
         <Button type="button" onClick={apply} disabled={loading} className="mt-5 w-full sm:w-auto">
           <SlidersHorizontal aria-hidden="true" />
           Zastosuj filtry

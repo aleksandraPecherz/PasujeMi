@@ -6,6 +6,7 @@ import {
   countTokens,
   exceedsMatchUrl,
 } from "@/lib/matching/limits";
+import type { SavedPantry } from "@/lib/pantry/saved";
 import type { PantryLists, PantrySection } from "@/types";
 
 export const LIST_STATE_KEY = "pasujemi:list-state";
@@ -96,4 +97,24 @@ export function clearSnapshot(): void {
 export function endListState(): void {
   savingStopped = true;
   clearSnapshot();
+}
+
+/** Whether sign-out has started; the saved-pantry queue stops sending then, too. */
+export function listStateEnded(): boolean {
+  return savingStopped;
+}
+
+/** Restoring a snapshot brings back only "have"; staples and exclusions stay as the database and the user have them. */
+export function restoreLists(snapshotLists: PantryLists, current: PantryLists): PantryLists {
+  return { have: snapshotLists.have, staple: current.staple, exclude: current.exclude };
+}
+
+/**
+ * A saved exclusion the snapshot's applied filters lack (added in another tab after the snapshot was written):
+ * restoring that list would show a recipe the user excluded.
+ */
+export function missesSavedExclusion(applied: PantryLists, saved: SavedPantry | null): boolean {
+  if (saved === null) return false;
+  const appliedKeys = new Set(applied.exclude.map((tag) => tag.toLocaleLowerCase("pl")));
+  return saved.exclude.some((tag) => !appliedKeys.has(tag.toLocaleLowerCase("pl")));
 }
