@@ -1,0 +1,17 @@
+---
+import { buttonVariants } from "@/components/ui/button";
+
+interface Props {
+  message?: string;
+}
+
+const { message = "Nie znaleziono strony" } = Astro.props;
+---
+
+<section class="border-border bg-card flex flex-col items-start gap-4 rounded-2xl border p-4 sm:p-6">
+  <h1 class="text-card-foreground text-xl font-semibold sm:text-2xl">{message}</h1>
+  <p class="text-muted-foreground">Adres mógł się zmienić albo ta pozycja została usunięta.</p>
+  <a href="/" class:list={[buttonVariants({ variant: "outline" })]}>
+    Wróć do listy przepisów
+  </a>
+</section>

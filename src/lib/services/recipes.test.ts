@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { MATCH_KEYS_VERSION, computeMatchKeys } from "@/lib/matching";
 import { MAX_RECOMPUTED_RECIPES } from "@/lib/recipes/limits";
-import { listRecipes, matchRecipes } from "@/lib/services/recipes";
+import { getRecipe, listRecipes, matchRecipes } from "@/lib/services/recipes";
 import type { MatchKeys, RecipeIngredient } from "@/types";
 
 /** PostgREST `max_rows` (supabase/config.toml): a request never returns more rows than this. */
@@ -23,7 +23,7 @@ type Result =
 
 /**
  * Minimal stand-in for the PostgREST query builder: `select` (with `{ count }`), `order("name" | "id")` applied in
- * call order, `range`, `or` (`col.is.null`, `col.neq.value`), `in("id", …)` and `overrideTypes`. It caps every
+ * call order, `range`, `or` (`col.is.null`, `col.neq.value`), `eq`, `maybeSingle`, `in("id", …)` and `overrideTypes`. It caps every
  * response at MAX_ROWS like the real server and projects the selected columns, so a query that forgets a column or a
  * page fails the test. `count` is the number of filtered rows before `range`, sent only when the query asks for it
  * and `omitCount` is off (a server that sends no total). With a count, a range that starts past it fails with
@@ -43,6 +43,7 @@ function fakeClient(
     private readonly call: Call;
     private predicates: ((row: Row) => boolean)[] = [];
     private orderBy: string[] = [];
+    private single = false;
 
     constructor(columns: string, options?: { count?: string }) {
       this.call = { select: columns, count: options?.count ?? null, filters: [], range: null };
@@ -69,6 +70,17 @@ function fakeClient(
         throw new Error(`unexpected filter ${condition}`);
       });
       this.predicates.push((row) => conditions.some((condition) => condition(row)));
+      return this;
+    }
+
+    eq(column: string, value: string) {
+      this.call.filters.push(`eq:${column}`);
+      this.predicates.push((row) => row[column] === value);
+      return this;
+    }
+
+    maybeSingle() {
+      this.single = true;
       return this;
     }
 
@@ -104,6 +116,8 @@ function fakeClient(
       result = result.slice(from, Math.min(to + 1, from + MAX_ROWS));
       const columns = this.call.select.split(",").map((column) => column.trim());
       const data = result.map((row) => Object.fromEntries(columns.map((column) => [column, row[column]])) as Row);
+      // `maybeSingle`: one row or null.
+      if (this.single) return { data: (data[0] ?? null) as unknown as Row[], error: null, count };
       return { data, error: null, count };
     }
 
@@ -207,6 +221,56 @@ describe("listRecipes", () => {
     const result = await listRecipes(supabase, { limit: 2, offset: 10 });
 
     expect(result).toEqual({ recipes: [], hasMore: false, total: null });
+  });
+});
+
+describe("getRecipe", () => {
+  const id = "3f2b8c1e-5a4d-4e6f-9b7a-1c2d3e4f5a6b";
+  const rows = [
+    recipeRow(id, ["sól"], { name: "Zupa" }),
+    recipeRow("9a8b7c6d-1e2f-4a3b-8c4d-5e6f7a8b9c0d", ["pieprz"], { name: "Sałatka" }),
+  ];
+
+  it("returns the recipe with the given id", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    const recipe = await getRecipe(supabase, id);
+
+    expect(recipe).toMatchObject({ id, name: "Zupa", steps: ["Krok"], proteinG: 1.5, kcal: null });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].filters).toEqual(["eq:id"]);
+    expect(calls[0].select).toContain("steps");
+  });
+
+  it("returns null when no recipe has the id", async () => {
+    const { supabase } = fakeClient(rows);
+
+    expect(await getRecipe(supabase, "00000000-0000-4000-8000-000000000000")).toBeNull();
+  });
+
+  it("returns null without querying when the id is not a UUID", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    expect(await getRecipe(supabase, "nie-uuid")).toBeNull();
+    expect(await getRecipe(supabase, "")).toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+
+  it("rethrows Supabase errors unchanged", async () => {
+    const failure = { message: "boom", code: "XX000" };
+    const supabase = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            maybeSingle: () => ({
+              overrideTypes: () => Promise.resolve({ data: null, error: failure }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    await expect(getRecipe(supabase, id)).rejects.toBe(failure);
   });
 });
 

@@ -1,0 +1,46 @@
+---
+import NotFoundView from "@/components/NotFoundView.astro";
+import { RecipeDetails } from "@/components/recipes/RecipeDetails";
+import AppLayout from "@/layouts/AppLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getRecipe } from "@/lib/services/recipes";
+import type { Recipe } from "@/types";
+
+let recipe: Recipe | null = null;
+let failure: string | null = null;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase) {
+  Astro.response.status = 503;
+  failure = "Serwis jest chwilowo niedostępny. Spróbuj ponownie za chwilę.";
+} else {
+  try {
+    recipe = await getRecipe(supabase, Astro.params.id ?? "");
+  } catch (error) {
+    // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
+    console.error("getRecipe failed", error);
+    Astro.response.status = 500;
+    failure = "Nie udało się wczytać przepisu. Spróbuj ponownie za chwilę.";
+  }
+}
+
+if (!failure && !recipe) {
+  Astro.response.status = 404;
+}
+---
+
+<AppLayout title={recipe?.name ?? (failure ? "Błąd" : "Nie znaleziono przepisu")}>
+  {recipe ? (
+    <RecipeDetails recipe={recipe} />
+  ) : failure ? (
+    <section class="border-border bg-card flex flex-col items-start gap-4 rounded-2xl border p-4 sm:p-6">
+      <h1 class="text-card-foreground text-xl font-semibold sm:text-2xl">Coś poszło nie tak</h1>
+      <p class="text-muted-foreground">{failure}</p>
+      <a href="/" class="text-primary underline-offset-4 hover:underline">
+        Wróć do listy przepisów
+      </a>
+    </section>
+  ) : (
+    <NotFoundView message="Nie znaleziono przepisu" />
+  )}
+</AppLayout>

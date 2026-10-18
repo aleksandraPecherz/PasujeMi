@@ -5,6 +5,8 @@ const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
 const jar = new Map();
+// A well-formed id that no recipe has; the middleware redirects anonymous requests before routing, so it needs no real id.
+const UNKNOWN_RECIPE_ID = "00000000-0000-4000-8000-000000000000";
 
 function cookieHeader() {
   return [...jar.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
@@ -53,6 +55,11 @@ function newRecipe(overrides = {}) {
 // `check(body, location)` is an optional predicate on the body (parsed JSON, otherwise text) and the `location`.
 const steps = [
   ["anonymous root redirects to signin", () => request("/"), { status: 302, location: "/auth/signin" }],
+  [
+    "anonymous recipe details redirect to signin",
+    () => request(`/recipes/${UNKNOWN_RECIPE_ID}`),
+    { status: 302, location: "/auth/signin" },
+  ],
   ["signin page renders for anonymous user", () => request("/auth/signin"), { status: 200 }],
   [
     "anonymous api request gets 401",
@@ -146,6 +153,38 @@ const steps = [
     "app shell renders for signed-in user",
     () => request("/"),
     { status: 200, check: (body) => typeof body === "string" && body.includes("Wyloguj") },
+  ],
+  [
+    "recipe details render for a signed-in user",
+    // The id comes from the list, so a failed or unexpected list shows up as a failed step.
+    async () => {
+      const list = await request("/api/recipes?limit=1");
+      const id = list.body?.recipes?.[0]?.id;
+      if (list.status !== 200 || typeof id !== "string") return { ...list, status: list.status || 500, body: null };
+      return request(`/recipes/${id}`);
+    },
+    {
+      status: 200,
+      check: (body) => typeof body === "string" && body.includes("<h1") && body.includes(">Kroki<"),
+    },
+  ],
+  [
+    "unknown recipe id gets a Polish 404",
+    () => request(`/recipes/${UNKNOWN_RECIPE_ID}`),
+    { status: 404, check: (body) => typeof body === "string" && body.includes("Nie znaleziono przepisu") },
+  ],
+  [
+    "malformed recipe id gets 404",
+    () => request("/recipes/nie-uuid"),
+    { status: 404, check: (body) => typeof body === "string" && body.includes("Nie znaleziono przepisu") },
+  ],
+  [
+    "unknown address gets a Polish 404 with the signed-in header",
+    () => request("/nie-ma-takiej-strony"),
+    {
+      status: 404,
+      check: (body) => typeof body === "string" && body.includes("Nie znaleziono strony") && body.includes("Wyloguj"),
+    },
   ],
   ["signed-in user is sent away from signin", () => request("/auth/signin"), { status: 302, location: "/" }],
   [
