@@ -1,8 +1,31 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import PantryMatch from "@/components/pantry/PantryMatch";
+import type { SavedPantry } from "@/lib/pantry/saved";
+import { getSavedPantry } from "@/lib/services/pantry";
+import { createClient } from "@/lib/supabase";
+
+/* eslint @typescript-eslint/no-misused-promises: "off" -- the rule crashes on a top-level return in frontmatter */
+// Defence in depth: the middleware already redirects signed-out requests.
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/auth/signin");
+}
+
+// `null` = the read failed or the row was invalid; the island then starts empty and does not save.
+let saved: SavedPantry | null = null;
+try {
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+  if (!supabase) {
+    throw new Error("Supabase is not configured");
+  }
+  saved = await getSavedPantry(supabase, user.id);
+} catch (error) {
+  // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
+  console.error("getSavedPantry failed", error);
+}
 ---
 
 <AppLayout>
-  <PantryMatch client:load />
+  <PantryMatch client:load userId={user.id} saved={saved} />
 </AppLayout>

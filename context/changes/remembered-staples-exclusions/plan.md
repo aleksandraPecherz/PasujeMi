@@ -285,21 +285,21 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie: `supabase db reset`
-- [x] 1.2 Testy walidatora, serwisu i snapshotu przechodzą: `npm test`
-- [x] 1.3 Lint i typy: `npm run lint`, `npx astro check`
+- [x] 1.1 Migracja stosuje się na czystej bazie: `supabase db reset` — be326ce
+- [x] 1.2 Testy walidatora, serwisu i snapshotu przechodzą: `npm test` — be326ce
+- [x] 1.3 Lint i typy: `npm run lint`, `npx astro check` — be326ce
 - [ ] 1.4 Krok „Check saved pantry permissions” przechodzi w CI
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase Studio tabela `saved_pantry` ma RLS włączone, trzy polityki i brak polityki delete
+- [x] 1.5 W lokalnym Supabase Studio tabela `saved_pantry` ma RLS włączone, trzy polityki i brak polityki delete — be326ce
 
 ### Phase 2: Endpoint i odczyt na stronie
 
 #### Automated
 
-- [ ] 2.1 Testy, lint, typy i literały UI: `npm test`, `npm run lint`, `npx astro check`, `npm run check:ui`
-- [ ] 2.2 Build: `npm run build`
+- [x] 2.1 Testy, lint, typy i literały UI: `npm test`, `npm run lint`, `npx astro check`, `npm run check:ui`
+- [x] 2.2 Build: `npm run build`
 - [ ] 2.3 Job `smoke` w CI przechodzi z nowymi krokami
 
 #### Manual

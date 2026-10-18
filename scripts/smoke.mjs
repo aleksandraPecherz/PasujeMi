@@ -40,6 +40,26 @@ async function request(path, { method = "GET", form, json } = {}) {
   return { status: response.status, location: response.headers.get("location") ?? "", body };
 }
 
+// The id of the signed-in user, read from the island props in the HTML of "/" (set by the "reads its own id" step).
+let userId = "";
+const UUID_IN_PROPS = /userId.{0,40}?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/;
+
+// Astro serializes island props into an HTML attribute; decode the entities so a tag with Polish letters is found
+// whether it is written as is or as a numeric reference.
+function decodeEntities(html) {
+  return html
+    .replace(/&#x([0-9a-f]+);/gi, (_m, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(d+);/g, (_m, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&");
+}
+
+// 30 unique two-word staples (digits vanish in tokenize) + 1 exclusion = 61 words, over MAX_SAVED_TOKENS (60).
+const overWordLimitPantry = {
+  staple: Array.from({ length: 30 }, (_v, i) => `ser żółty ${i}`),
+  exclude: ["orzechy"],
+};
+
 // A valid recipe for POST /api/recipes. The ingredient is yogurt on purpose: the step that adds it runs after the
 // pantry-match step and `exclude=jogurt` hides it, so a repeated run on a local database keeps `total === 4`.
 function newRecipe(overrides = {}) {
@@ -69,6 +89,11 @@ const steps = [
   [
     "anonymous recipe post gets 401",
     () => request("/api/recipes", { method: "POST", json: newRecipe() }),
+    { status: 401, check: (body) => body?.error === "unauthorized" },
+  ],
+  [
+    "anonymous pantry save gets 401",
+    () => request("/api/pantry", { method: "PUT", json: { ownerId: UNKNOWN_RECIPE_ID, staple: [], exclude: [] } }),
     { status: 401, check: (body) => body?.error === "unauthorized" },
   ],
   [
@@ -155,6 +180,54 @@ const steps = [
     { status: 200, check: (body) => typeof body === "string" && body.includes("Wyloguj") },
   ],
   [
+    "app shell carries the signed-in user id",
+    async () => {
+      const page = await request("/");
+      const id = typeof page.body === "string" ? UUID_IN_PROPS.exec(page.body)?.[1] : undefined;
+      if (page.status !== 200 || id === undefined)
+        return { ...page, status: page.status === 200 ? 500 : page.status, body: null };
+      userId = id;
+      return page;
+    },
+    { status: 200 },
+  ],
+  [
+    "pantry save with another owner gets 409",
+    () => request("/api/pantry", { method: "PUT", json: { ownerId: UNKNOWN_RECIPE_ID, staple: [], exclude: [] } }),
+    { status: 409, check: (body) => body?.error === "owner_mismatch" },
+  ],
+  [
+    "pantry save over the word limit gets 400",
+    () => request("/api/pantry", { method: "PUT", json: { ownerId: userId, ...overWordLimitPantry } }),
+    { status: 400, check: (body) => body?.error === "invalid_pantry" },
+  ],
+  [
+    "pantry save with text/plain gets 415",
+    async () => {
+      const response = await fetch(BASE_URL + "/api/pantry", {
+        method: "PUT",
+        redirect: "manual",
+        headers: { Cookie: cookieHeader(), Origin: BASE_URL, "Content-Type": "text/plain" },
+        body: JSON.stringify({ ownerId: userId, staple: [], exclude: [] }),
+      });
+      storeCookies(response);
+      const isJson = (response.headers.get("content-type") ?? "").includes("application/json");
+      const body = isJson ? await response.json() : await response.text();
+      return { status: response.status, location: response.headers.get("location") ?? "", body };
+    },
+    { status: 415, check: (body) => body?.error === "unsupported_media_type" },
+  ],
+  [
+    "signed-in user saves staples and exclusions",
+    () =>
+      request("/api/pantry", {
+        method: "PUT",
+        json: { ownerId: userId, staple: ["sól smoke"], exclude: ["orzechy smoke"] },
+      }),
+    // 204 has no body, so the helper returns an empty string.
+    { status: 204, check: (body) => body === "" },
+  ],
+  [
     "recipe details render for a signed-in user",
     // The id comes from the list, so a failed or unexpected list shows up as a failed step.
     async () => {
@@ -189,6 +262,28 @@ const steps = [
   ["signed-in user is sent away from signin", () => request("/auth/signin"), { status: 302, location: "/" }],
   [
     "signout clears session",
+    () => request("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "signin accepts correct password again",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/" },
+  ],
+  [
+    "saved staples come back after signing in again",
+    () => request("/"),
+    {
+      status: 200,
+      check: (body) => {
+        if (typeof body !== "string") return false;
+        const html = decodeEntities(body);
+        return html.includes("sól smoke") && html.includes("orzechy smoke");
+      },
+    },
+  ],
+  [
+    "signout clears session again",
     () => request("/api/auth/signout", { method: "POST" }),
     { status: 302, location: "/auth/signin" },
   ],

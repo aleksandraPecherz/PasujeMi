@@ -5,6 +5,7 @@ import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/comp
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import type { SavedPantry } from "@/lib/pantry/saved";
 import { recipeCountLabel } from "@/lib/recipe-count";
 import { cn } from "@/lib/utils";
 import { usePantryMatch, type PantrySection } from "@/components/hooks/usePantryMatch";
@@ -30,7 +31,14 @@ const SECTIONS: { section: PantrySection; label: string; placeholder: string; ba
   },
 ];
 
-export default function PantryMatch() {
+export interface PantryMatchProps {
+  userId: string;
+  /** Saved staples and exclusions; `null` when the server could not read them. */
+  saved: SavedPantry | null;
+}
+
+// The props reach the hook in phase 3.
+export default function PantryMatch(_props: PantryMatchProps) {
   const {
     lists,
     limitNotice,

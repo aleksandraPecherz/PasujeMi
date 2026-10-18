@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { parseIntParam } from "@/lib/query-params";
+import { readTextWithLimit } from "@/lib/request-body";
 import { MAX_RECIPE_BODY_BYTES } from "@/lib/recipes/limits";
 import { parseRecipeInput } from "@/lib/recipes/validate";
 import { createRecipe, listRecipes } from "@/lib/services/recipes";
@@ -32,29 +33,6 @@ export const GET: APIRoute = async (context) => {
     return Response.json({ error: "database_error" }, { status: 500 });
   }
 };
-
-/** Reads the body as text; returns `null` and stops reading as soon as it exceeds `maxBytes`. */
-async function readTextWithLimit(request: Request, maxBytes: number): Promise<string | null> {
-  if (!request.body) {
-    return "";
-  }
-  const reader = request.body.getReader();
-  const decoder = new TextDecoder();
-  let received = 0;
-  let text = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) {
-      return text + decoder.decode();
-    }
-    received += value.byteLength;
-    if (received > maxBytes) {
-      await reader.cancel();
-      return null;
-    }
-    text += decoder.decode(value, { stream: true });
-  }
-}
 
 export const POST: APIRoute = async (context) => {
   const { request } = context;
