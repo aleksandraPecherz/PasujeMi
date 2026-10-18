@@ -36,6 +36,8 @@ export const CLEAN_FILES = [
   "src/components/ThemeToggle.tsx",
   "src/components/recipes/RecipeDetails.tsx",
   "src/pages/recipes/[id].astro",
+  "src/pages/recipes/[id]/edit.astro",
+  "src/components/recipes/RecipeAuthorActions.tsx",
   "src/components/NotFoundView.astro",
   "src/pages/404.astro",
 ];

@@ -60,6 +60,21 @@ const overWordLimitPantry = {
   exclude: ["orzechy"],
 };
 
+// Set by the "signed-in user adds a recipe" step; the edit and delete steps work on that recipe.
+let addedRecipeId = null;
+const EDITED_NAME = `Smoke edited ${Date.now()}`;
+
+// Runs a step that needs the added recipe's id; fails readably (status 0) when the add step did not produce one.
+function withAddedRecipe(run) {
+  return async () => {
+    if (addedRecipeId === null) {
+      console.log('      no recipe id: the step "signed-in user adds a recipe" did not succeed');
+      return { status: 0, location: "", body: null };
+    }
+    return run(addedRecipeId);
+  };
+}
+
 // A valid recipe for POST /api/recipes. The ingredient is yogurt on purpose: the step that adds it runs after the
 // pantry-match step and `exclude=jogurt` hides it, so a repeated run on a local database keeps `total === 4`.
 function newRecipe(overrides = {}) {
@@ -94,6 +109,16 @@ const steps = [
   [
     "anonymous pantry save gets 401",
     () => request("/api/pantry", { method: "PUT", json: { ownerId: UNKNOWN_RECIPE_ID, staple: [], exclude: [] } }),
+    { status: 401, check: (body) => body?.error === "unauthorized" },
+  ],
+  [
+    "anonymous recipe put gets 401",
+    () => request(`/api/recipes/${UNKNOWN_RECIPE_ID}`, { method: "PUT", json: newRecipe() }),
+    { status: 401, check: (body) => body?.error === "unauthorized" },
+  ],
+  [
+    "anonymous recipe delete gets 401",
+    () => request(`/api/recipes/${UNKNOWN_RECIPE_ID}`, { method: "DELETE" }),
     { status: 401, check: (body) => body?.error === "unauthorized" },
   ],
   [
@@ -162,7 +187,11 @@ const steps = [
   ],
   [
     "signed-in user adds a recipe",
-    () => request("/api/recipes", { method: "POST", json: newRecipe() }),
+    async () => {
+      const result = await request("/api/recipes", { method: "POST", json: newRecipe() });
+      if (result.status === 201 && typeof result.body?.recipe?.id === "string") addedRecipeId = result.body.recipe.id;
+      return result;
+    },
     {
       status: 201,
       check: (body) =>
@@ -173,6 +202,50 @@ const steps = [
     "invalid recipe is rejected",
     () => request("/api/recipes", { method: "POST", json: newRecipe({ ingredients: [] }) }),
     { status: 400, check: (body) => body?.error === "invalid_recipe" && Array.isArray(body?.issues) },
+  ],
+  [
+    "edit page renders for the author",
+    withAddedRecipe((id) => request(`/recipes/${id}/edit`)),
+    { status: 200, check: (body) => typeof body === "string" && body.includes("Edytuj przepis") },
+  ],
+  [
+    "recipe details of the added recipe offer delete",
+    withAddedRecipe((id) => request(`/recipes/${id}`)),
+    { status: 200, check: (body) => typeof body === "string" && body.includes("Usuń") },
+  ],
+  [
+    "author edits the recipe",
+    // The ingredient stays yogurt, so `exclude=jogurt` keeps hiding the recipe.
+    withAddedRecipe((id) => request(`/api/recipes/${id}`, { method: "PUT", json: newRecipe({ name: EDITED_NAME }) })),
+    {
+      status: 200,
+      check: (body) => body?.recipe?.id === addedRecipeId && body.recipe.name === EDITED_NAME,
+    },
+  ],
+  [
+    "invalid recipe edit is rejected",
+    withAddedRecipe((id) => request(`/api/recipes/${id}`, { method: "PUT", json: newRecipe({ ingredients: [] }) })),
+    { status: 400, check: (body) => body?.error === "invalid_recipe" && Array.isArray(body?.issues) },
+  ],
+  [
+    "editing an unknown recipe gets 404",
+    () => request(`/api/recipes/${UNKNOWN_RECIPE_ID}`, { method: "PUT", json: newRecipe() }),
+    { status: 404, check: (body) => body?.error === "not_found" },
+  ],
+  [
+    "author deletes the recipe",
+    withAddedRecipe((id) => request(`/api/recipes/${id}`, { method: "DELETE" })),
+    { status: 204, check: (body) => body === "" },
+  ],
+  [
+    "deleted recipe details get 404",
+    withAddedRecipe((id) => request(`/recipes/${id}`)),
+    { status: 404, check: (body) => typeof body === "string" && body.includes("Nie znaleziono przepisu") },
+  ],
+  [
+    "deleting the recipe again gets 404",
+    withAddedRecipe((id) => request(`/api/recipes/${id}`, { method: "DELETE" })),
+    { status: 404, check: (body) => body?.error === "not_found" },
   ],
   [
     "app shell renders for signed-in user",

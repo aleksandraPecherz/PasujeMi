@@ -30,6 +30,10 @@ interface RecipeRow {
   fat_g: string | number | null;
 }
 
+interface RecipeWithAuthorRow extends RecipeRow {
+  author_id: string | null;
+}
+
 function toNumber(value: string | number | null): number | null {
   return value === null ? null : Number(value);
 }
@@ -79,23 +83,45 @@ export async function listRecipes(
   };
 }
 
-/** One recipe by id; `null` when it does not exist or `id` is not a valid id (no query is made then). */
-export async function getRecipe(supabase: SupabaseClient, id: string): Promise<Recipe | null> {
+/**
+ * One recipe by id with its author; `null` when it does not exist or `id` is not a valid id (no query is made then).
+ * `authorId` is `null` for recipes without an author (the seeded catalog).
+ */
+export async function getRecipe(
+  supabase: SupabaseClient,
+  id: string,
+): Promise<{ recipe: Recipe; authorId: string | null } | null> {
   if (!isRecipeId(id)) {
     return null;
   }
 
   const { data, error } = await supabase
     .from("recipes")
-    .select(RECIPE_COLUMNS)
+    .select(`${RECIPE_COLUMNS}, author_id`)
     .eq("id", id)
     .maybeSingle()
-    .overrideTypes<RecipeRow, { merge: false }>();
+    .overrideTypes<RecipeWithAuthorRow, { merge: false }>();
 
   if (error) {
     throw error;
   }
-  return data === null ? null : toRecipe(data);
+  return data === null ? null : { recipe: toRecipe(data), authorId: data.author_id };
+}
+
+/** The writable columns of a recipe; shared by insert and update. */
+function toRecipeValues(recipe: NewRecipe) {
+  return {
+    name: recipe.name,
+    steps: recipe.steps,
+    ingredients: recipe.ingredients,
+    prep_time_min: recipe.prepTimeMin,
+    servings: recipe.servings,
+    kinds: recipe.kinds,
+    kcal: recipe.kcal,
+    protein_g: recipe.proteinG,
+    carbs_g: recipe.carbsG,
+    fat_g: recipe.fatG,
+  };
 }
 
 /**
@@ -105,19 +131,7 @@ export async function getRecipe(supabase: SupabaseClient, id: string): Promise<R
 export async function createRecipe(supabase: SupabaseClient, authorId: string, recipe: NewRecipe): Promise<Recipe> {
   const { data, error } = await supabase
     .from("recipes")
-    .insert({
-      name: recipe.name,
-      steps: recipe.steps,
-      ingredients: recipe.ingredients,
-      prep_time_min: recipe.prepTimeMin,
-      servings: recipe.servings,
-      kinds: recipe.kinds,
-      kcal: recipe.kcal,
-      protein_g: recipe.proteinG,
-      carbs_g: recipe.carbsG,
-      fat_g: recipe.fatG,
-      author_id: authorId,
-    })
+    .insert({ ...toRecipeValues(recipe), author_id: authorId })
     .select(RECIPE_COLUMNS)
     .single()
     .overrideTypes<RecipeRow, { merge: false }>();
@@ -126,6 +140,49 @@ export async function createRecipe(supabase: SupabaseClient, authorId: string, r
     throw error;
   }
   return toRecipe(data);
+}
+
+/**
+ * Replaces the content of a recipe. `null` when `id` is not a valid id (no query is made) or when RLS leaves no row
+ * to update (not the author, or no such recipe: the two are not told apart). The author stays unchanged. The
+ * match keys are cleared by the trigger from migration `20261018120000`, so this does not send them.
+ */
+export async function updateRecipe(supabase: SupabaseClient, id: string, recipe: NewRecipe): Promise<Recipe | null> {
+  if (!isRecipeId(id)) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("recipes")
+    .update(toRecipeValues(recipe))
+    .eq("id", id)
+    .select(RECIPE_COLUMNS)
+    .maybeSingle()
+    .overrideTypes<RecipeRow, { merge: false }>();
+
+  if (error) {
+    throw error;
+  }
+  return data === null ? null : toRecipe(data);
+}
+
+/** Deletes a recipe; `false` when `id` is not a valid id (no query is made) or when RLS leaves no row to delete. */
+export async function deleteRecipe(supabase: SupabaseClient, id: string): Promise<boolean> {
+  if (!isRecipeId(id)) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("recipes")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .overrideTypes<{ id: string }[], { merge: false }>();
+
+  if (error) {
+    throw error;
+  }
+  return data.length > 0;
 }
 
 /** PostgREST returns at most `max_rows` rows per request (supabase/config.toml), so the catalog is read in pages. */

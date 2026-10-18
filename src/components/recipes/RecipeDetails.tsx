@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,20 +10,21 @@ function Quantity({ option }: { option: Pick<IngredientOption, "amount" | "unit"
   return quantity ? <span className="text-muted-foreground whitespace-nowrap">{quantity}</span> : null;
 }
 
-function BackLink() {
+function BackLink({ actions }: { actions?: ReactNode }) {
   return (
-    <div>
+    <div className="flex flex-wrap items-center gap-3">
       <Button asChild variant="outline">
         <a href="/">
           <ArrowLeft aria-hidden="true" />
           Wróć do listy
         </a>
       </Button>
+      {actions}
     </div>
   );
 }
 
-export function RecipeDetails({ recipe }: { recipe: Recipe }) {
+export function RecipeDetails({ recipe, actions }: { recipe: Recipe; actions?: ReactNode }) {
   const meta = [formatPrepTime(recipe.prepTimeMin), formatServings(recipe.servings)].filter(
     (item): item is string => item !== null,
   );
@@ -30,7 +32,7 @@ export function RecipeDetails({ recipe }: { recipe: Recipe }) {
 
   return (
     <article className="border-border bg-card flex flex-col gap-6 rounded-2xl border p-4 sm:p-6">
-      <BackLink />
+      <BackLink actions={actions} />
       <div className="flex flex-col gap-3">
         <h1 className="text-card-foreground text-xl font-semibold break-words sm:text-2xl">{recipe.name}</h1>
         {(meta.length > 0 || recipe.kinds.length > 0) && (

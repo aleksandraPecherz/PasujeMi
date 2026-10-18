@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
+import { readJsonBody } from "@/lib/http/json-body";
 import { createClient } from "@/lib/supabase";
 import { parseIntParam } from "@/lib/query-params";
-import { readTextWithLimit } from "@/lib/request-body";
 import { MAX_RECIPE_BODY_BYTES } from "@/lib/recipes/limits";
 import { parseRecipeInput } from "@/lib/recipes/validate";
 import { createRecipe, listRecipes } from "@/lib/services/recipes";
@@ -42,31 +42,12 @@ export const POST: APIRoute = async (context) => {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // The media type only, without parameters: `includes` would let "text/plain; x=application/json" through.
-  const mediaType = (request.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
-  if (mediaType !== "application/json") {
-    return Response.json({ error: "unsupported_media_type" }, { status: 415 });
+  const read = await readJsonBody(request, MAX_RECIPE_BODY_BYTES);
+  if (!read.ok) {
+    return read.response;
   }
 
-  // Size is checked before the body is parsed.
-  const declaredLength = Number(request.headers.get("content-length"));
-  if (declaredLength > MAX_RECIPE_BODY_BYTES) {
-    return Response.json({ error: "payload_too_large" }, { status: 413 });
-  }
-  // A chunked request has no Content-Length, so the body is also counted while it is read.
-  const text = await readTextWithLimit(request, MAX_RECIPE_BODY_BYTES);
-  if (text === null) {
-    return Response.json({ error: "payload_too_large" }, { status: 413 });
-  }
-
-  let body: unknown;
-  try {
-    body = JSON.parse(text);
-  } catch {
-    return Response.json({ error: "invalid_json" }, { status: 400 });
-  }
-
-  const parsed = parseRecipeInput(body);
+  const parsed = parseRecipeInput(read.body);
   if (!parsed.ok) {
     return Response.json({ error: "invalid_recipe", issues: parsed.issues }, { status: 400 });
   }
