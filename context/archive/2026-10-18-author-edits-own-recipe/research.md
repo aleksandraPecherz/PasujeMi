@@ -46,7 +46,7 @@ Poza zakresem: admin (S-07). Nowa migracja: znacznik `20261018120000`.
 - `author_id` jest `null default auth.uid()` i `on delete set null` (`:12-14`), z indeksem `recipes_author_id_idx` (`:17`). Z tego wynikają dwa przypadki brzegowe:
   - wiersze z `supabase/seed.sql` nie mają `author_id` (grep `author_id` w `seed.sql` nic nie zwraca), więc mają `null`;
   - przepisy usuniętego konta też mają `null`.
-  Polityka `author_id = auth.uid()` nie przepuści `null` (porównanie z `null` nie jest prawdą), więc takich przepisów nikt nie edytuje aż do S-07. To zgodne z zakresem.
+    Polityka `author_id = auth.uid()` nie przepuści `null` (porównanie z `null` nie jest prawdą), więc takich przepisów nikt nie edytuje aż do S-07. To zgodne z zakresem.
 - Import F-02 zapisuje UUID autorki jawnie (`scripts/import-recipes/sheet.ts:46-60`), więc autorka może edytować swoje zaimportowane przepisy.
 - Wniosek co do kształtu migracji (do potwierdzenia w planie i testem CI):
   - `grant update (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g) on public.recipes to authenticated`, bez `author_id`, żeby autor nie mógł „oddać” przepisu ani go przejąć. Pole `with check` i tak by to łapało przy cudzym id, ale grant zamyka też zmianę na `null`;
@@ -102,7 +102,7 @@ Poza zakresem: admin (S-07). Nowa migracja: znacznik `20261018120000`.
   - `null` na `""`;
   - `productEdited = product !== defaultProduct(name)`, gdzie `defaultProduct` to `name.trim().toLocaleLowerCase("pl")` (`src/lib/recipes/validate.ts:37-39`). Bez tego pole „produkt” przy edycji nazwy nadpisałoby ręcznie ustawiony produkt (`useRecipeForm.ts:175-178`);
   - nowe klucze React przez `nextKey()` (`:58-59`).
-  Ułamki: walidator przyjmuje przecinek przez `toNumberOrText` (`:85-90`), więc `String(0.5)` = `"0.5"` też przejdzie.
+    Ułamki: walidator przyjmuje przecinek przez `toNumberOrText` (`:85-90`), więc `String(0.5)` = `"0.5"` też przejdzie.
 - **Cel zapisu:** `useRecipeForm({ initial?: Recipe })` albo osobny parametr `mode`. Przy edycji `PATCH /api/recipes/[id]` (nowy plik `src/pages/api/recipes/[id].ts`; dziś istnieją tylko `index.ts` i `match.ts`) i sukces `200`. Dodatkowo `404` (nie istnieje albo nie twój, patrz sekcja RLS) i komunikat po polsku.
 - **Po zapisie edycji:** przekierowanie na `/recipes/[id]` zamiast ekranu `RecipeSaved` z „Dodaj kolejny”. Albo wariant `RecipeSaved` bez tej akcji.
 - **Endpoint:** `PATCH` może współdzielić z `POST` odczyt body z limitem (`readTextWithLimit`, `index.ts:36-57`), kontrole 415/413 (`:67-82`) i `parseRecipeInput` (`:91-94`). Te funkcje są dziś lokalne w `index.ts`. Do ponownego użycia trzeba je wynieść do `src/lib/` albo `[id].ts` musi je zduplikować. Walidator zwraca `NewRecipe`, który jest pełnym przepisem, więc edycja jest pełną zamianą pól. Pasuje do tego `PUT`, ale wybór `PUT` vs `PATCH` jest decyzją planu.
