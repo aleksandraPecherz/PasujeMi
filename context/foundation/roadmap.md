@@ -3,7 +3,7 @@ project: PasujeMi
 version: 1
 status: draft
 created: 2026-10-11
-updated: 2026-10-13
+updated: 2026-10-18
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -44,7 +44,7 @@ Osoba gotująca dla siebie i domowników chce szybko zobaczyć, co ugotuje z pro
 | F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                          | FR-004, FR-006, FR-007      | done     |
 | F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel file (author's machine) | FR-004, FR-005, NFR (< 1 s) | proposed |
 | S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                          | FR-001                      | done     |
-| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | proposed |
+| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | in-progress |
 | S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | done     |
 | S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | proposed |
 | S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done     |
@@ -128,7 +128,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Dzieli z S-03 ten sam widok listy — przy równoległej pracy agentów uzgodnić wspólny kafelek przepisu, by nie powstały dwie wersje.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-03: Pierwsze dopasowanie ze spiżarki
 
