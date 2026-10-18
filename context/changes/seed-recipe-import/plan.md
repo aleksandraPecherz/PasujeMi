@@ -280,16 +280,16 @@ Brak migracji. Produkcyjny import wymaga, by migracja `20261017120000_add_recipe
 
 #### Automated
 
-- [ ] 2.1 `exceljs` jest w `devDependencies`, nie w `dependencies`
-- [ ] 2.2 Testy przechodzą: `npm test`
-- [ ] 2.3 Lint bez błędów: `npm run lint`
-- [ ] 2.4 Typy bez błędów: `npx astro check`
-- [ ] 2.5 Build produkcyjny przechodzi (exceljs nie trafia do Workera): `npm run build`
+- [x] 2.1 `exceljs` jest w `devDependencies`, nie w `dependencies`
+- [x] 2.2 Testy przechodzą: `npm test`
+- [x] 2.3 Lint bez błędów: `npm run lint`
+- [x] 2.4 Typy bez błędów: `npx astro check`
+- [x] 2.5 Build produkcyjny przechodzi (exceljs nie trafia do Workera): `npm run build`
 
 #### Manual
 
-- [ ] 2.6 Uruchomienie bez `--author-email` i bez zmiennych środowiskowych kończy się czytelnym błędem i kodem 1
-- [ ] 2.7 Podgląd z nieistniejącym e-mailem kończy się błędem „Nie ma konta …”
+- [x] 2.6 Uruchomienie bez `--author-email` i bez zmiennych środowiskowych kończy się czytelnym błędem i kodem 1
+- [x] 2.7 Podgląd z nieistniejącym e-mailem kończy się błędem „Nie ma konta …”
 
 ### Phase 3: Import lokalny i procedura produkcyjna
 
