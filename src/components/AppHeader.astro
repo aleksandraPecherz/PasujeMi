@@ -31,8 +31,8 @@ const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
 </header>
 
 <script>
-  import { clearSnapshot } from "@/lib/list-state";
+  import { endListState } from "@/lib/list-state";
 
   // The pantry tags are private to the session: don't leave them for whoever signs in next in this tab.
-  document.querySelector("[data-signout]")?.addEventListener("submit", clearSnapshot);
+  document.querySelector("[data-signout]")?.addEventListener("submit", endListState);
 </script>

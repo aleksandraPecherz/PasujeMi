@@ -78,7 +78,11 @@ export function readSnapshot(): ListSnapshot | null {
   }
 }
 
+// Set once sign-out starts: the page is about to be left, and pagehide/visibilitychange must not save the tags again.
+let savingStopped = false;
+
 export function writeSnapshot(snapshot: ListSnapshot): void {
+  if (savingStopped) return;
   try {
     sessionStorage.setItem(LIST_STATE_KEY, JSON.stringify(snapshot));
   } catch {
@@ -92,4 +96,10 @@ export function clearSnapshot(): void {
   } catch {
     // Nothing to clear if storage is blocked.
   }
+}
+
+/** Sign-out: removes the snapshot and blocks every later write from this page. */
+export function endListState(): void {
+  savingStopped = true;
+  clearSnapshot();
 }
