@@ -304,7 +304,7 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 
 #### Manual
 
-- [ ] 2.4 `npm run smoke` przechodzi na lokalnym serwerze podłączonym do lokalnego Supabase z Dockera
+- [x] 2.4 `npm run smoke` przechodzi na lokalnym serwerze podłączonym do lokalnego Supabase z Dockera — CI smoke (bdd8603)
 - [ ] 2.5 Strona `/` renderuje się, gdy tabela nie istnieje: log błędu, puste sekcje, lista przepisów działa
 
 ### Phase 3: Wyspa
@@ -313,7 +313,7 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 
 - [x] 3.1 Testy kolejki i `list-state`: `npm test` — 3a22164
 - [x] 3.2 Lint, typy, literały UI, build: `npm run lint`, `npx astro check`, `npm run check:ui`, `npm run build` — 3a22164
-- [ ] 3.3 `npm run smoke` w CI przechodzi
+- [x] 3.3 `npm run smoke` w CI przechodzi — bdd8603
 
 #### Manual
 
