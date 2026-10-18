@@ -55,8 +55,8 @@ export interface ParsedIngredient extends ParsedOption {
 }
 
 // Private-use characters mark a substitutes block cut out of the text before splitting.
-const BLOCK_START = "";
-const BLOCK_END = "";
+const BLOCK_START = "\uE000";
+const BLOCK_END = "\uE001";
 const MARKER = new RegExp(`${BLOCK_START}(\\d+)${BLOCK_END}`, "gu");
 const SUBSTITUTE_BLOCK = /\[\s*zamienniki?\s*:([^\]]*)\]/giu;
 const UNFINISHED_BLOCK = /\[\s*zamienni/iu;
@@ -73,7 +73,7 @@ const collapseSpaces = (text: string) => text.replace(/\s+/g, " ").trim();
 
 /** Trimmed, lower-cased name with collapsed whitespace; the key for duplicate and existing-recipe checks. */
 export function normalizeRecipeName(name: string): string {
-  return collapseSpaces(name).toLocaleLowerCase("pl");
+  return collapseSpaces(name).normalize("NFC").toLocaleLowerCase("pl");
 }
 
 /** Splits off the quantity: last `(number unit)` or a trailing `- N unit` / `– N unit`; other brackets stay in the name. */
@@ -119,6 +119,16 @@ function splitPieces(text: string): string[] {
   return pieces;
 }
 
+/** False when a `(` is never closed: it would swallow every later separator into one piece. */
+const hasUnclosedParen = (text: string) => {
+  let depth = 0;
+  for (const char of text) {
+    if (char === "(") depth++;
+    else if (char === ")") depth = Math.max(0, depth - 1);
+  }
+  return depth > 0;
+};
+
 function buildOption(text: string, path: string, issues: RecipeIssue[]): ParsedOption | null {
   const { name, amount, unit } = parseQuantity(text);
   if (name === "") {
@@ -142,6 +152,7 @@ export function splitSubstitutes(
 ): { options: ParsedOption[]; issues: RecipeIssue[] } {
   const options: ParsedOption[] = [];
   const issues: RecipeIssue[] = [];
+  if (hasUnclosedParen(text)) issues.push({ path: basePath, message: "niedomknięty nawias" });
   splitPieces(text).forEach((piece, i) => {
     const path = `${basePath}.${offset + i}`;
     if (piece === "") {
@@ -168,8 +179,15 @@ export function splitIngredients(text: string): { ingredients: ParsedIngredient[
   });
   if (UNFINISHED_BLOCK.test(masked)) issues.push({ path: "ingredients", message: "niedomknięty blok zamienników" });
 
+  if (hasUnclosedParen(masked)) issues.push({ path: "ingredients", message: "niedomknięty nawias" });
+
   splitPieces(masked).forEach((piece, i) => {
     const path = `ingredients.${i}`;
+    // Text after a block would detach the quantity from the end of the name.
+    const afterBlock = piece.slice(piece.lastIndexOf(BLOCK_END) + 1).trim();
+    if (piece.includes(BLOCK_END) && afterBlock !== "") {
+      issues.push({ path, message: "tekst po bloku zamienników" });
+    }
     const main = collapseSpaces(piece.replace(MARKER, " "));
     const blockBodies = [...piece.matchAll(MARKER)].map((m) => blocks[Number(m[1])]);
     if (main === "") {
@@ -190,11 +208,26 @@ export function splitIngredients(text: string): { ingredients: ParsedIngredient[
   return { ingredients, issues };
 }
 
+/** Cuts at `1.`, `2.`, … only in sequence, so "do 5. minuty" inside a step is not taken for numbering. */
+function splitNumbered(source: string): string[] {
+  const parts: string[] = [];
+  let expected = 1;
+  let start = 0;
+  for (const match of source.matchAll(/(?:^|\s)(\d{1,2})[.)](?!\d)\s*/g)) {
+    if (Number(match[1]) !== expected) continue;
+    parts.push(source.slice(start, match.index));
+    start = match.index + match[0].length;
+    expected++;
+  }
+  parts.push(source.slice(start));
+  return parts;
+}
+
 /** Steps: numbering (`1.`/`1)`) > new line > `;`. Numbering removed, trimmed, capitalised, empty ones skipped. */
 export function splitSteps(text: string): string[] {
   const source = text.replace(/\r\n?/g, "\n").trim();
   let parts: string[];
-  if (/^\d{1,2}[.)](?!\d)/.test(source)) parts = source.split(/(?:^|\s)\d{1,2}[.)](?!\d)\s*/);
+  if (/^\d{1,2}[.)](?!\d)/.test(source)) parts = splitNumbered(source);
   else if (source.includes("\n")) parts = source.split("\n");
   else parts = source.split(";");
   return parts

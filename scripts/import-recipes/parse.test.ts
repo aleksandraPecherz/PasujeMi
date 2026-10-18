@@ -129,6 +129,16 @@ describe("splitIngredients", () => {
     expect(issues.map((i) => i.path)).toContain("ingredients");
   });
 
+  it("reports text after a substitutes block", () => {
+    const { issues } = splitIngredients("Mąka (100g) [zamienniki: Skrobia (50g)] extra");
+    expect(issues.map((i) => i.path)).toEqual(["ingredients.0"]);
+  });
+
+  it("reports a parenthesis that is never closed", () => {
+    const { issues } = splitIngredients("Pomidory (puszka; 400 g ; Sól (1szczypta)");
+    expect(issues.map((i) => i.path)).toContain("ingredients");
+  });
+
   it("reports an ingredient that is only a brand", () => {
     const { ingredients, issues } = splitIngredients("Lazur (50g)");
     expect(ingredients).toEqual([]);
@@ -177,6 +187,7 @@ describe("splitSteps", () => {
   it.each([
     ["1. Ugotuj makaron. 2. Posól; wymieszaj. 3. Podaj.", ["Ugotuj makaron.", "Posól; wymieszaj.", "Podaj."]],
     ["1) ugotuj\n2) posól", ["Ugotuj", "Posól"]],
+    ["1. Piec do 5. minuty 2. Podaj.", ["Piec do 5. minuty", "Podaj."]],
     ["ugotuj makaron; posól\nwymieszaj; podaj", ["Ugotuj makaron; posól", "Wymieszaj; podaj"]],
     ["ugotuj makaron;posól ; ; podaj;", ["Ugotuj makaron", "Posól", "Podaj"]],
     ["Dodaj 2.5 łyżki cukru; wymieszaj", ["Dodaj 2.5 łyżki cukru", "Wymieszaj"]],

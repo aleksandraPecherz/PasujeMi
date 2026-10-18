@@ -29,6 +29,9 @@ interface Args {
   write: boolean;
 }
 
+// A missing value must not swallow the next flag (`--author-email --write`).
+const optionValue = (value: string | undefined) => (value === undefined || value.startsWith("--") ? "" : value);
+
 function parseArgs(argv: string[]): Args {
   let authorEmail = "";
   let file = DEFAULT_FILE;
@@ -36,8 +39,8 @@ function parseArgs(argv: string[]): Args {
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--write") write = true;
-    else if (arg === "--author-email") authorEmail = argv[++i] ?? "";
-    else if (arg === "--file") file = argv[++i] ?? "";
+    else if (arg === "--author-email") authorEmail = optionValue(argv[++i]);
+    else if (arg === "--file") file = optionValue(argv[++i]);
     else throw new Error(`Nieznany argument: ${arg}`);
   }
   if (authorEmail === "") throw new Error("Brak --author-email <e-mail>.");
@@ -85,22 +88,23 @@ async function findAuthorId(supabase: SupabaseClient, email: string): Promise<st
     if (error) throw error;
     const user = data.users.find((u) => u.email?.toLocaleLowerCase("pl") === wanted);
     if (user) return user.id;
-    if (data.users.length < PAGE_SIZE) throw new Error(`Nie ma konta ${email}.`);
+    // Stop on an empty page, not a short one: the server may cap perPage below PAGE_SIZE.
+    if (data.users.length === 0) throw new Error(`Nie ma konta ${email}.`);
   }
 }
 
 async function fetchExistingNames(supabase: SupabaseClient): Promise<Set<string>> {
   const names = new Set<string>();
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from("recipes")
-      .select("name")
-      .order("id", { ascending: true })
-      .range(from, from + PAGE_SIZE - 1)
-      .overrideTypes<{ name: string }[], { merge: false }>();
+  // Keyset paging by id, ending on an empty page: the server may cap rows below PAGE_SIZE.
+  let lastId: string | null = null;
+  for (;;) {
+    let query = supabase.from("recipes").select("id, name").order("id", { ascending: true }).limit(PAGE_SIZE);
+    if (lastId !== null) query = query.gt("id", lastId);
+    const { data, error } = await query.overrideTypes<{ id: string; name: string }[], { merge: false }>();
     if (error) throw error;
+    if (data.length === 0) return names;
     for (const row of data) names.add(normalizeRecipeName(row.name));
-    if (data.length < PAGE_SIZE) return names;
+    lastId = data[data.length - 1].id;
   }
 }
 
@@ -118,7 +122,7 @@ async function main(): Promise<number> {
   const url = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceRoleKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set");
+    throw new Error("Ustaw zmienne SUPABASE_URL i SUPABASE_SERVICE_ROLE_KEY.");
   }
   const supabase = createClient(url, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -126,6 +130,9 @@ async function main(): Promise<number> {
 
   const results = (await readRows(file)).map(parseRecipeRow);
   const authorId = await findAuthorId(supabase, authorEmail);
+  console.log(
+    `Baza: ${new URL(url).host}\nAutorka: ${authorEmail} (${authorId})\nTryb: ${write ? "zapis" : "podgląd"}`,
+  );
   const existing = await fetchExistingNames(supabase);
 
   const errors: string[] = [];
@@ -181,5 +188,11 @@ try {
   process.exitCode = await main();
 } catch (error) {
   console.error("import-recipes failed:", error instanceof Error ? error.message : error);
+  // Postgrest errors carry the cause (failed check, row) in details/hint, which Error#message omits.
+  if (typeof error === "object" && error !== null) {
+    const { details, hint } = error as { details?: unknown; hint?: unknown };
+    if (details) console.error("details:", details);
+    if (hint) console.error("hint:", hint);
+  }
   process.exitCode = 1;
 }
