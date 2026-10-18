@@ -7,6 +7,7 @@ import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/comp
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
+import { RecipeDetails } from "@/components/recipes/RecipeDetails";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -28,9 +29,9 @@ function ingredient(name: string, product: string, substitutes: string[] = []): 
 }
 
 const RECIPE: Recipe = {
-  id: "kitchen-sink-recipe",
+  id: "6f1d2a4e-3b8c-4c57-9a0e-1d2f3a4b5c6d",
   name: "Owsianka z jabłkiem i cynamonem",
-  steps: [],
+  steps: ["Podgrzej mleko.", "Wsyp płatki i gotuj 5 minut.", "Dodaj pokrojone jabłko i cynamon."],
   ingredients: [
     ingredient("Płatki owsiane", "płatki owsiane"),
     ingredient("Jabłko", "jabłko"),
@@ -40,6 +41,21 @@ const RECIPE: Recipe = {
   prepTimeMin: 10,
   servings: 1,
   kinds: ["na słodko", "na ciepło"],
+  kcal: 320,
+  proteinG: 9,
+  carbsG: 52,
+  fatG: 7,
+};
+
+// A recipe with missing data: no time, servings, kinds or nutrition.
+const SPARSE_RECIPE: Recipe = {
+  id: "0b7e9c1a-5d42-4f86-8a3b-7c6d5e4f3a2b",
+  name: "Jajecznica",
+  steps: ["Wbij jajka na patelnię i smaż, mieszając."],
+  ingredients: [ingredient("Jajka", "jajka"), ingredient("Masło", "masło", ["olej"])],
+  prepTimeMin: null,
+  servings: null,
+  kinds: [],
   kcal: null,
   proteinG: null,
   carbsG: null,
@@ -225,7 +241,7 @@ export default function KitchenSink() {
 
       <StateSection
         title="hover i focus-visible"
-        note="Stany interaktywne: najedź kursorem na kontrolkę / przejdź po nich klawiszem Tab. Kafelki przepisów nie są interaktywne — N/A: brak hover i fokusu na kafelku."
+        note="Stany interaktywne: najedź kursorem na kontrolkę / przejdź po nich klawiszem Tab. Kafelek przepisu jest linkiem do szczegółów: najechanie podświetla cały kafelek, a fokus (Tab) trafia na tytuł i pokazuje pierścień wokół kafelka."
       >
         <Controls suffix="interactive" />
       </StateSection>
@@ -329,6 +345,30 @@ export default function KitchenSink() {
         note="Stan po zapisie: komunikat, kafelek, Dodaj kolejny i Przejdź do listy."
       >
         <RecipeSaved recipe={RECIPE} onAddAnother={NOOP} autoFocus={false} />
+      </StateSection>
+
+      <StateSection
+        title="Kafelek przepisu: link"
+        note="Cały kafelek prowadzi do szczegółów (link na tytule rozciągnięty na kafelek); bez dopasowania i z dopasowaniem. Najedź kursorem i przejdź klawiszem Tab, żeby zobaczyć hover i focus-visible."
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <RecipeTile recipe={RECIPE} />
+          <RecipeTile recipe={RECIPE} match={MATCH} />
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Szczegóły przepisu"
+        note="Pełny przepis: czas, porcje, rodzaje, wartości odżywcze, składniki z zamiennikami i kroki. Linki nie prowadzą do istniejących przepisów."
+      >
+        <RecipeDetails recipe={RECIPE} />
+      </StateSection>
+
+      <StateSection
+        title="Szczegóły przepisu: braki danych"
+        note="Bez czasu, porcji, rodzajów i wartości odżywczych — te fragmenty się nie wyświetlają."
+      >
+        <RecipeDetails recipe={SPARSE_RECIPE} />
       </StateSection>
 
       <StateSection

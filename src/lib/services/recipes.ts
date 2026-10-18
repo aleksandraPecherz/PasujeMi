@@ -8,6 +8,7 @@ import {
   resolveMatch,
   type RankCandidate,
 } from "@/lib/matching";
+import { isRecipeId } from "@/lib/recipes/id";
 import { MAX_RECOMPUTED_RECIPES } from "@/lib/recipes/limits";
 import type { NewRecipe } from "@/lib/recipes/validate";
 import type { MatchKeys, MatchedRecipe, Recipe, RecipeIngredient, RecipeKind } from "@/types";
@@ -76,6 +77,25 @@ export async function listRecipes(
     // `null` when PostgREST sends no count (no Content-Range total), so the client can hide the counter.
     total: count,
   };
+}
+
+/** One recipe by id; `null` when it does not exist or `id` is not a valid id (no query is made then). */
+export async function getRecipe(supabase: SupabaseClient, id: string): Promise<Recipe | null> {
+  if (!isRecipeId(id)) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("recipes")
+    .select(RECIPE_COLUMNS)
+    .eq("id", id)
+    .maybeSingle()
+    .overrideTypes<RecipeRow, { merge: false }>();
+
+  if (error) {
+    throw error;
+  }
+  return data === null ? null : toRecipe(data);
 }
 
 /**
