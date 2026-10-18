@@ -39,17 +39,17 @@ Osoba gotująca dla siebie i domowników chce szybko zobaczyć, co ugotuje z pro
 
 ## At a glance
 
-| ID   | Change ID                     | Outcome (user can …)                                                                   | Prerequisites                              | PRD refs                    | Status      |
-| ---- | ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------- | ----------- |
-| F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                          | FR-004, FR-006, FR-007      | done        |
-| F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel file (author's machine) | FR-004, FR-005, NFR (< 1 s) | in-progress |
-| S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                          | FR-001                      | done        |
-| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | done        |
-| S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | done        |
-| S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | proposed    |
-| S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done        |
-| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | proposed    |
-| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | proposed    |
+| ID   | Change ID                     | Outcome (user can …)                                                                   | Prerequisites                              | PRD refs                    | Status   |
+| ---- | ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------- | -------- |
+| F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                          | FR-004, FR-006, FR-007      | done     |
+| F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel file (author's machine) | FR-004, FR-005, NFR (< 1 s) | done     |
+| S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                          | FR-001                      | done     |
+| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | done     |
+| S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | done     |
+| S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | proposed |
+| S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done     |
+| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | proposed |
+| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | proposed |
 
 ## Streams
 
@@ -102,7 +102,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Jak potraktować pojedyncze składniki zapisane jako nazwy handlowe (np. konkretny serek z marką i gramaturą), by dało się je dopasować do ogólnych tagów? — Owner: autorka. Block: no.
 - **Risk:** Celowo odłączone od gwiazdy przewodniej — brak pliku na tym komputerze nie blokuje S-03; konieczne przed uznaniem MVP za gotowe.
-- **Status:** in-progress
+- **Status:** done
 
 ## Slices
 
@@ -229,3 +229,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-01: (foundation) istnieje minimalna struktura przepisu (nazwa, opis, składniki z jawnymi zamiennikami, opcjonalne dodatki: czas, rodzaj, porcje, makro) z odczytem tylko dla zalogowanych i kilkoma prawdziwymi przepisami testowymi przepisanymi z Excela.** — Archived 2026-10-12 → `context/archive/2026-10-12-recipe-catalog-contract/`. Lesson: —.
 - **S-03: użytkownik wpisuje produkty jako tagi w trzech sekcjach (posiadane, stałe, wykluczenia), stosuje filtry i widzi kafelki przepisów posortowane malejąco po % dopasowania (składniki jako tagi: mam / brak informacji), bez żadnego przepisu z wykluczonym składnikiem.** — Archived 2026-10-13 → `context/archive/2026-10-12-first-pantry-match/`. Lesson: —.
 - **S-02: użytkownik bez wpisanych produktów widzi zachętę do wypełnienia spiżarki i pierwsze 10 przepisów bez wskaźnika dopasowania, doładowuje kolejne i otwiera szczegóły przepisu bez utraty kontekstu listy.** — Archived 2026-10-18 → `context/archive/2026-10-18-browse-recipes-and-details/`. Lesson: —.
+- **F-02: (foundation) 50–100 przepisów autorki jest dostępnych w aplikacji od pierwszego uruchomienia, w strukturze ustalonej w F-01.** — Archived 2026-10-18 → `context/archive/2026-10-18-seed-recipe-import/`. Lesson: —.

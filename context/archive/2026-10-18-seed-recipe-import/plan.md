@@ -77,6 +77,7 @@ Poprawka reguły zamienników w kontrakcie i czysty parser wiersza Excela z list
 **Intent**: Jawna lista marek i linii (decyzja 3) usuwanych z `product` oraz heurystyka ostrzeżeń o nieznanych markach na przyszłe pliki.
 
 **Contract**:
+
 - `KNOWN_BRANDS`: `Lazur`, `Mlekovita`, `Ryki`, `Go Vege`, `Vemondo`, `active protein plus` (dopasowanie bez względu na wielkość liter, całe słowa/frazy).
 - `toProduct(name: string): string` — małe litery (`pl`), usunięte marki, zwinięte spacje, przycięte. „ser żółty active protein plus Ryki” → „ser żółty”, „Mleko 1,5%” → „mleko 1,5%”.
 - `brandWarnings(name: string): string[]` — ostrzeżenie, gdy po usunięciu znanych marek słowo inne niż pierwsze zaczyna się wielką literą i nie jest na liście `KNOWN_PROPER_NAMES` (`Grana`, `Padano`, `Feta`), albo gdy w nazwie została liczba z jednostką (`\d+\s*(g|kg|ml|l|szt)\b`). Ostrzeżenia nie blokują importu.
@@ -88,6 +89,7 @@ Poprawka reguły zamienników w kontrakcie i czysty parser wiersza Excela z list
 **Intent**: Zamienić surowy wiersz arkusza na obiekt w kształcie wejścia `parseRecipeInput` i przepuścić go przez walidator; zwrócić też ostrzeżenia i informację o przeliczeniu kcal do raportu. Bez I/O.
 
 **Contract**:
+
 - `RawRecipeRow` — `{ rowNumber; name; prepTimeMin; kinds; servings; products; kcal; proteinG; carbsG; fatG; steps }`, teksty jako `string`, liczby jako `number | string | null` — `string` to nieliczbowa zawartość komórki i daje issue `<pole> — nieoczekiwana wartość „…”` (np. `kcal`, `servings`); kolumna `waga (g)` pomijana.
 - `parseRecipeRow(row: RawRecipeRow): RowResult`, gdzie `RowResult = { rowNumber; name; recipe: NewRecipe | null; issues: RecipeIssue[]; warnings: string[]; kcalRecalculation: { servings; before: {kcal, proteinG, carbsG, fatG}; after: {…} } | null }`.
 - Funkcje pomocnicze eksportowane do testów: `splitIngredients`, `splitSubstitutes`, `parseQuantity`, `splitSteps`, `parseKinds`, `perServing`, `normalizeRecipeName`.
@@ -141,6 +143,7 @@ exceljs jako devDependency, skrypt z trybem podglądu i osobną komendą zapisu.
 **Intent**: I/O wokół parsera: odczyt xlsx, autorka po e-mailu, istniejące nazwy, raport, zapis wszystko-albo-nic.
 
 **Contract**:
+
 - Nagłówek komentarza jak w `scripts/match-keys.ts:1-4`: użycie, klucz service role tylko z powłoki, idempotencja.
 - Argumenty: `--author-email <e-mail>` (wymagany), `--file <ścieżka>` (domyślnie `data/recipes.xlsx`), `--write`. Brak `--author-email` lub `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` → błąd i kod 1.
 - Odczyt: pierwszy arkusz; sprawdzenie, że nagłówki wiersza 1 to dokładnie kolumny z kontraktu (`recipe-data-contract.md:84`) — inaczej przerwanie. Wiersze od 2, puste pominięte. Tekst przez `cell.text`. Kolumny liczbowe: `cell.value` typu `number` → liczba; formuła z liczbowym `result` → `result`; pusta komórka → `null`; każda inna wartość (tekst „406”, błąd formuły) → jej `cell.text` jako `string`, który parser zamienia na błąd blokujący. Bez tego liczba zapisana jako tekst stałaby się po cichu `null`, a `null` w porcjach wyłączyłoby przeliczenie kcal.
@@ -229,7 +232,7 @@ Wszystkie kroki wymagają maszyny autorki (lokalny `data/recipes.xlsx`, Supabase
 - Kcal: 1704 kcal / 4 porcje → 426 (przeliczone, makro /4 zaokrąglone do 0,1); 406 / 2 → bez zmian; granice 0,75 i 1,25 włącznie; `servings = 1` nigdy nie przeliczane.
 - Walidacja: 5 zamienników przechodzi, 6 daje issue `ingredients.N.substitutes`; liczby `5.0` → 5.
 - Komórki liczbowe: `kcal: "406"` lub `servings: "dwie"` (string) → issue blokujące, rekord `null`, brak przeliczenia kcal; `null` → pole puste bez issue.
-- `normalizeRecipeName`: „domowe  spaghetti ” i „Domowe spaghetti” → równe.
+- `normalizeRecipeName`: „domowe spaghetti ” i „Domowe spaghetti” → równe.
 
 ### Integration Tests:
 
