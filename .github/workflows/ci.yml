@@ -182,6 +182,74 @@ jobs:
           # Back to the 5 seeded rows: the later steps count them.
           count=$(curl -sf "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
           echo "$count" | jq -e 'type == "array" and length == 5'
+      - name: Check saved pantry permissions
+        run: |
+          source supabase.env
+          suffix="$(date +%s)-$RANDOM"
+          signup() {
+            curl -sf "$API_URL/auth/v1/signup" -H "apikey: $ANON_KEY" -H "Content-Type: application/json" \
+              -d "{\"email\":\"pantry-$1-$suffix@example.com\",\"password\":\"Passw0rd-$suffix\"}"
+          }
+          a=$(signup a)
+          b=$(signup b)
+          echo "$a" | jq -e '(.access_token | type == "string") and (.user.id | type == "string")' > /dev/null
+          echo "$b" | jq -e '(.access_token | type == "string") and (.user.id | type == "string")' > /dev/null
+          token_a=$(echo "$a" | jq -r '.access_token')
+          token_b=$(echo "$b" | jq -r '.access_token')
+          id_a=$(echo "$a" | jq -r '.user.id')
+          id_b=$(echo "$b" | jq -r '.user.id')
+          # $1 = label, $2 = bearer token, $3 = method, $4 = URL query, $5 = JSON body ("" for none), $6 = extra Prefer value.
+          # Leaves the HTTP status in $status and the response in pantry.json.
+          request() {
+            local args=(-s -o pantry.json -w '%{http_code}' -X "$3" "$API_URL/rest/v1/saved_pantry$4"
+              -H "apikey: $ANON_KEY" -H "Authorization: Bearer $2" -H "Content-Type: application/json")
+            [ -n "$6" ] && args+=(-H "Prefer: $6")
+            [ -n "$5" ] && args+=(-d "$5")
+            status=$(curl "${args[@]}")
+            echo "$1: $status $(cat pantry.json)"
+          }
+          # Status first, then the type of the body, then its content.
+          expect_ok() {
+            [[ " $1 " == *" $status "* ]]
+          }
+          expect_denied() {
+            [[ " $1 " == *" $status "* ]]
+            jq -e 'type == "object" and .code == "42501"' pantry.json > /dev/null
+          }
+          upsert="return=minimal,resolution=merge-duplicates"
+          row_a="{\"user_id\":\"$id_a\",\"staples\":[\"sol\"],\"exclusions\":[\"orzechy\"],\"updated_at\":\"2026-01-01T00:00:00Z\"}"
+          row_a2="{\"user_id\":\"$id_a\",\"staples\":[\"sol\",\"pieprz\"],\"exclusions\":[],\"updated_at\":\"2026-01-02T00:00:00Z\"}"
+          row_b="{\"user_id\":\"$id_b\",\"staples\":[\"cukier\"],\"exclusions\":[\"jogurt\"],\"updated_at\":\"2026-01-01T00:00:00Z\"}"
+          request "A upserts own row" "$token_a" POST "?on_conflict=user_id" "$row_a" "$upsert"
+          expect_ok "200 201 204"
+          request "A upserts own row again (update)" "$token_a" POST "?on_conflict=user_id" "$row_a2" "$upsert"
+          expect_ok "200 201 204"
+          request "B inserts own row" "$token_b" POST "?on_conflict=user_id" "$row_b" "$upsert"
+          expect_ok "200 201 204"
+          # A sees exactly one row, its own, with the values of the second upsert.
+          request "A reads" "$token_a" GET "?select=user_id,staples,exclusions" "" ""
+          expect_ok 200
+          jq -e 'type == "array"' pantry.json > /dev/null
+          jq -e --arg id "$id_a" 'length == 1 and .[0].user_id == $id and .[0].staples == ["sol","pieprz"] and .[0].exclusions == []' pantry.json > /dev/null
+          # A inserts a row for B (plain insert, no upsert): the policy's with check runs before the unique constraint.
+          request "A inserts a row for B" "$token_a" POST "" "$row_b" ""
+          expect_denied 403
+          # A updates B's row: RLS hides it, so the request matches no rows and changes nothing.
+          request "A patches B" "$token_a" PATCH "?user_id=eq.$id_b" '{"staples":["hacked"]}' "return=representation"
+          expect_ok "200 204"
+          if [ "$status" = 200 ]; then
+            jq -e 'type == "array" and length == 0' pantry.json > /dev/null
+          fi
+          # The service role bypasses RLS: B's row must be untouched.
+          row=$(curl -sf "$API_URL/rest/v1/saved_pantry?select=staples,exclusions&user_id=eq.$id_b" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
+          echo "B's row: $row"
+          echo "$row" | jq -e 'type == "array" and length == 1 and .[0].staples == ["cukier"] and .[0].exclusions == ["jogurt"]' > /dev/null
+          # There is no delete grant, not even for the owner's own row.
+          request "A deletes own row" "$token_a" DELETE "?user_id=eq.$id_a" "" ""
+          expect_denied 403
+          # Anonymous callers get a permission error, not rows.
+          request "anon reads" "$ANON_KEY" GET "?select=user_id" "" ""
+          expect_denied "401 403"
       - name: Compute recipe match keys (idempotent)
         run: |
           source supabase.env

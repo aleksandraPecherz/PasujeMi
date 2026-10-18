@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Lightbulb, SlidersHorizontal } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
-import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
+import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton, SaveNotice } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import { Button } from "@/components/ui/button";
+import type { SavedPantry } from "@/lib/pantry/saved";
 import { recipeCountLabel } from "@/lib/recipe-count";
 import { cn } from "@/lib/utils";
 import { usePantryMatch, type PantrySection } from "@/components/hooks/usePantryMatch";
@@ -30,10 +31,17 @@ const SECTIONS: { section: PantrySection; label: string; placeholder: string; ba
   },
 ];
 
-export default function PantryMatch() {
+export interface PantryMatchProps {
+  userId: string;
+  /** Saved staples and exclusions; `null` when the server could not read them. */
+  saved: SavedPantry | null;
+}
+
+export default function PantryMatch({ userId, saved }: PantryMatchProps) {
   const {
     lists,
     limitNotice,
+    saveNotice,
     addTag,
     removeTag,
     apply,
@@ -47,7 +55,7 @@ export default function PantryMatch() {
     filtered,
     restoredScrollY,
     consumeRestoredScroll,
-  } = usePantryMatch();
+  } = usePantryMatch({ userId, saved });
   const hasRecipes = recipes.length > 0;
 
   // After a restore, scroll once to the saved position. Manual restoration keeps the browser's own attempt (made before
@@ -100,6 +108,7 @@ export default function PantryMatch() {
           ))}
         </div>
         <LimitNotice message={limitNotice} className="mt-3" />
+        <SaveNotice message={saveNotice} className="mt-3" />
         <Button type="button" onClick={apply} disabled={loading} className="mt-5 w-full sm:w-auto">
           <SlidersHorizontal aria-hidden="true" />
           Zastosuj filtry

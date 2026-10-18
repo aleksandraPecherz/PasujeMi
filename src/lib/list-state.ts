@@ -3,9 +3,10 @@ import {
   MAX_TAG_LENGTH,
   MAX_TAGS,
   MAX_TOKENS,
-  MAX_URL_LENGTH,
   countTokens,
+  exceedsMatchUrl,
 } from "@/lib/matching/limits";
+import type { SavedPantry } from "@/lib/pantry/saved";
 import type { PantryLists, PantrySection } from "@/types";
 
 export const LIST_STATE_KEY = "pasujemi:list-state";
@@ -19,8 +20,6 @@ export interface ListSnapshot {
 }
 
 const SECTIONS: PantrySection[] = ["have", "staple", "exclude"];
-// Worst-case prefix of the match request (path plus two numeric params), so the URL check stays in step with the island.
-const URL_PREFIX = "/api/recipes/match?limit=50&offset=100&";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -43,11 +42,7 @@ function parseLists(value: unknown): PantryLists | null {
   }
   const all = [...lists.have, ...lists.staple, ...lists.exclude];
   if (countTokens(all) > MAX_TOKENS) return null;
-  const params = new URLSearchParams();
-  for (const section of SECTIONS) {
-    for (const tag of lists[section]) params.append(section, tag);
-  }
-  if (URL_PREFIX.length + params.toString().length > MAX_URL_LENGTH) return null;
+  if (exceedsMatchUrl(lists)) return null;
   return lists;
 }
 
@@ -102,4 +97,24 @@ export function clearSnapshot(): void {
 export function endListState(): void {
   savingStopped = true;
   clearSnapshot();
+}
+
+/** Whether sign-out has started; the saved-pantry queue stops sending then, too. */
+export function listStateEnded(): boolean {
+  return savingStopped;
+}
+
+/** Restoring a snapshot brings back only "have"; staples and exclusions stay as the database and the user have them. */
+export function restoreLists(snapshotLists: PantryLists, current: PantryLists): PantryLists {
+  return { have: snapshotLists.have, staple: current.staple, exclude: current.exclude };
+}
+
+/**
+ * A saved exclusion the snapshot's applied filters lack (added in another tab after the snapshot was written):
+ * restoring that list would show a recipe the user excluded.
+ */
+export function missesSavedExclusion(applied: PantryLists, saved: SavedPantry | null): boolean {
+  if (saved === null) return false;
+  const appliedKeys = new Set(applied.exclude.map((tag) => tag.toLocaleLowerCase("pl")));
+  return saved.exclude.some((tag) => !appliedKeys.has(tag.toLocaleLowerCase("pl")));
 }

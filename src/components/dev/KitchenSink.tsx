@@ -3,7 +3,7 @@ import { SlidersHorizontal, X } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
 import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignUpForm";
-import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
+import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton, SaveNotice } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
 import { RecipeAuthorActionsView } from "@/components/recipes/RecipeAuthorActions";
@@ -15,6 +15,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
+import { MAX_SAVED_TOKENS } from "@/lib/pantry/limits";
 import type { Recipe, RecipeIngredient, RecipeMatch } from "@/types";
 
 // Sample data only; the page is served in dev mode (src/pages/dev/kitchen-sink.astro).
@@ -157,6 +158,8 @@ function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) 
 const SAMPLE_EMAIL = "ola@przyklad.pl";
 
 const LIMIT_MESSAGE = `Za dużo produktów naraz (limit ${MAX_TOKENS} słów we wszystkich listach). Usuń któryś produkt.`;
+
+const SAVED_LIMIT_MESSAGE = `Za dużo produktów stałych i wykluczeń (limit ${MAX_SAVED_TOKENS} słów razem). Usuń któryś produkt.`;
 
 function AuthorActions(props: Partial<Parameters<typeof RecipeAuthorActionsView>[0]>) {
   return (
@@ -345,6 +348,15 @@ export default function KitchenSink() {
       <StateSection title="loading" note="Szkielet listy przy pierwszym wczytaniu; komunikat limitu słów.">
         <RecipeListSkeleton count={4} />
         <LimitNotice message={LIMIT_MESSAGE} />
+      </StateSection>
+
+      <StateSection
+        title="Komunikaty o zapisie spiżarki"
+        note="SaveNotice: błąd zapisu i błąd odczytu (zapis wyłączony); LimitNotice: limit zapisanych list. Osobne regiony, mogą pojawić się naraz."
+      >
+        <SaveNotice message="Nie udało się zapisać produktów stałych i wykluczeń." />
+        <SaveNotice message="Nie udało się wczytać produktów stałych i wykluczeń — zmiany nie zostaną zapisane." />
+        <LimitNotice message={SAVED_LIMIT_MESSAGE} />
       </StateSection>
 
       <StateSection
