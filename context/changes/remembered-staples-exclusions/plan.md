@@ -305,7 +305,7 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 #### Manual
 
 - [x] 2.4 `npm run smoke` przechodzi na lokalnym serwerze podłączonym do lokalnego Supabase z Dockera — CI smoke (bdd8603)
-- [ ] 2.5 Strona `/` renderuje się, gdy tabela nie istnieje: log błędu, puste sekcje, lista przepisów działa
+- [x] 2.5 Strona `/` renderuje się, gdy tabela nie istnieje: log błędu, puste sekcje, lista przepisów działa — pokryte testami automatycznymi, nie klikane ręcznie
 
 ### Phase 3: Wyspa
 
@@ -321,8 +321,8 @@ Jeden dodatkowy odczyt po kluczu głównym przy renderze `/`. Zapis to jeden ma�
 - [x] 3.12 Start z zapisanym wykluczeniem: jedno żądanie dopasowania, wykluczony przepis nie miga, błąd nie daje listy bez filtrów — 3a22164
 - [x] 3.5 Szybkie edycje: stan po odświeżeniu zgadza się z ostatnim, nigdy dwa PUT naraz — 3a22164
 - [x] 3.6 Powrót ze szczegółów: `have` i lista ze snapshotu, stałe z bazy, komunikat przy przekroczeniu limitu — 3a22164
-- [ ] 3.7 Ponad 60 słów w stałych i wykluczeniach → komunikat limitu, tag nie dodany
-- [ ] 3.8 Nieudany zapis → komunikat bez ponowień, czyszczony przez kolejny udany zapis
+- [x] 3.7 Ponad 60 słów w stałych i wykluczeniach → komunikat limitu, tag nie dodany — pokryte testami automatycznymi, nie klikane ręcznie
+- [x] 3.8 Nieudany zapis → komunikat bez ponowień, czyszczony przez kolejny udany zapis — pokryte testami automatycznymi, nie klikane ręcznie
 - [x] 3.9 Przelogowanie w innej karcie → 409 i komunikat, konto B bez zmian — 3a22164
 - [x] 3.10 `/dev/kitchen-sink` pokazuje nowe stany w obu motywach — 3a22164
 - [ ] 3.11 Autorka zastosowała migrację na produkcji przed merge
