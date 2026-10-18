@@ -17,16 +17,16 @@ Cały kafelek prowadzi do `/recipes/[id]`, gdzie widać sam przepis (czas, porcj
 
 ## Key Decisions Made
 
-| Decision                        | Choice                                                                           | Why (1 sentence)                                                                   | Source   |
-| ------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------- |
-| Gdzie trzymać stan listy        | `sessionStorage`, nie URL                                                        | Spiżarka „posiadane” ma być sesyjna (FR-003), a URL nie rośnie z tagami.           | Plan (user) |
-| Co znaczy „bez utraty kontekstu” | Tagi, filtry, liczba załadowanych przepisów i pozycja przewijania                | Lista ma wrócić do tego samego miejsca.                                            | Plan (user) |
-| Zawartość szczegółów            | Sam przepis, bez statusu składników względem spiżarki                            | Nie trzeba przekazywać filtrów do strony szczegółów.                               | Plan (user) |
-| Render szczegółów               | SSR w `.astro`, komponent React bez `client:*`                                   | Prawdziwy status 404 i ten sam komponent w kitchen-sink.                           | Plan |
-| Odtwarzanie załadowanych stron  | Jedno–dwa żądania z `limit ≤ 50`, nie N po 10; twardy limit 100 przepisów         | Każde `/api/recipes/match` przebiega cały katalog, a limit CPU to 10 ms.          | Plan |
-| Zły format id                   | Walidacja UUID przed zapytaniem → 404                                            | Inaczej Postgres zwraca błąd 22P02, czyli 500.                                     | Research / Plan |
-| Link w kafelku                  | „Stretched link” na tytule we wspólnym `RecipeTile`                              | Jeden element fokusowalny, brak zagnieżdżonych interaktywnych elementów.            | Research |
-| Odczyt snapshotu                | Nieufny: walidacja kształtu i limity z `limits.ts`, odczyt w efekcie po montażu  | Uszkodzony wpis nie może wywołać pracy ponad limit ani rozjechać hydratacji.       | Plan |
+| Decision                         | Choice                                                                          | Why (1 sentence)                                                             | Source          |
+| -------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------- |
+| Gdzie trzymać stan listy         | `sessionStorage`, nie URL                                                       | Spiżarka „posiadane” ma być sesyjna (FR-003), a URL nie rośnie z tagami.     | Plan (user)     |
+| Co znaczy „bez utraty kontekstu” | Tagi, filtry, liczba załadowanych przepisów i pozycja przewijania               | Lista ma wrócić do tego samego miejsca.                                      | Plan (user)     |
+| Zawartość szczegółów             | Sam przepis, bez statusu składników względem spiżarki                           | Nie trzeba przekazywać filtrów do strony szczegółów.                         | Plan (user)     |
+| Render szczegółów                | SSR w `.astro`, komponent React bez `client:*`                                  | Prawdziwy status 404 i ten sam komponent w kitchen-sink.                     | Plan            |
+| Odtwarzanie załadowanych stron   | Jedno–dwa żądania z `limit ≤ 50`, nie N po 10; twardy limit 100 przepisów       | Każde `/api/recipes/match` przebiega cały katalog, a limit CPU to 10 ms.     | Plan            |
+| Zły format id                    | Walidacja UUID przed zapytaniem → 404                                           | Inaczej Postgres zwraca błąd 22P02, czyli 500.                               | Research / Plan |
+| Link w kafelku                   | „Stretched link” na tytule we wspólnym `RecipeTile`                             | Jeden element fokusowalny, brak zagnieżdżonych interaktywnych elementów.     | Research        |
+| Odczyt snapshotu                 | Nieufny: walidacja kształtu i limity z `limits.ts`, odczyt w efekcie po montażu | Uszkodzony wpis nie może wywołać pracy ponad limit ani rozjechać hydratacji. | Plan            |
 
 ## Scope
 
@@ -40,11 +40,11 @@ Szczegóły: `[id].astro` pobiera przepis przez `getRecipe` (SSR, `createClient`
 
 ## Phases at a Glance
 
-| Phase                                 | What it delivers                                                           | Key risk                                                                         |
-| ------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| 1. Szczegóły przepisu i polska 404    | `/recipes/[id]` w SSR, `getRecipe`, `404.astro`, smoke                     | `Astro.locals.user` na `404.astro` (nagłówek) i błąd 22P02 przy złym id          |
-| 2. Kafelek jako link                  | Klikalny kafelek (stretched link) z fokusem klawiaturą, kitchen-sink       | Dostępność: jeden fokus na kafelek, brak zagnieżdżonych interaktywnych elementów |
-| 3. Zachowanie stanu listy             | Snapshot w `sessionStorage`, odtwarzanie listy i przewijania po powrocie   | Wyścigi przy starcie (zapis przed odczytem) i koszt odtwarzania na Workers       |
+| Phase                              | What it delivers                                                         | Key risk                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| 1. Szczegóły przepisu i polska 404 | `/recipes/[id]` w SSR, `getRecipe`, `404.astro`, smoke                   | `Astro.locals.user` na `404.astro` (nagłówek) i błąd 22P02 przy złym id          |
+| 2. Kafelek jako link               | Klikalny kafelek (stretched link) z fokusem klawiaturą, kitchen-sink     | Dostępność: jeden fokus na kafelek, brak zagnieżdżonych interaktywnych elementów |
+| 3. Zachowanie stanu listy          | Snapshot w `sessionStorage`, odtwarzanie listy i przewijania po powrocie | Wyścigi przy starcie (zapis przed odczytem) i koszt odtwarzania na Workers       |
 
 **Prerequisites:** S-03 (kafelek, lista) jest w repo; lokalny Supabase z danymi seed do smoke i testów ręcznych.
 **Estimated effort:** ~2–3 sesje w 3 fazach (faza 3 największa).
