@@ -48,7 +48,7 @@ Osoba gotująca dla siebie i domowników chce szybko zobaczyć, co ugotuje z pro
 | S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | done     |
 | S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | proposed |
 | S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done     |
-| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | proposed |
+| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | in-progress |
 | S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | proposed |
 
 ## Streams
@@ -177,7 +177,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Wymaga autorstwa zapisanego w S-05; reguła „tylko autor” musi być egzekwowana po stronie danych, nie tylko w interfejsie.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-07: Admin zarządza dowolnym przepisem
 

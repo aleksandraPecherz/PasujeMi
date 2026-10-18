@@ -92,6 +92,96 @@ jobs:
           # Nothing may have been inserted: the later steps count the seeded rows.
           count=$(curl -sf "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
           echo "$count" | jq -e 'type == "array" and length == 5'
+      - name: Check recipe update and delete permissions
+        run: |
+          source supabase.env
+          suffix="$(date +%s)-$RANDOM"
+          signup() {
+            curl -sf "$API_URL/auth/v1/signup" -H "apikey: $ANON_KEY" -H "Content-Type: application/json" \
+              -d "{\"email\":\"rls-$1-$suffix@example.com\",\"password\":\"Passw0rd-$suffix\"}"
+          }
+          a=$(signup a)
+          b=$(signup b)
+          echo "$a" | jq -e '(.access_token | type == "string") and (.user.id | type == "string")' > /dev/null
+          echo "$b" | jq -e '(.access_token | type == "string") and (.user.id | type == "string")' > /dev/null
+          token_a=$(echo "$a" | jq -r '.access_token')
+          token_b=$(echo "$b" | jq -r '.access_token')
+          id_b=$(echo "$b" | jq -r '.user.id')
+          # A inserts the row the cases below work on; author_id defaults to A's id.
+          curl -sf "$API_URL/rest/v1/recipes" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $token_a" \
+            -H "Content-Type: application/json" -H "Prefer: return=representation" \
+            -d '{"name":"RLS update check","steps":["Krok"],"ingredients":[{"name":"Mleko","product":"mleko","amount":null,"unit":null,"substitutes":[]}]}' > inserted.json
+          jq -e 'type == "array" and length == 1 and (.[0].id | type == "string")' inserted.json > /dev/null
+          rid=$(jq -r '.[0].id' inserted.json)
+          # Remove the test row with the service role on any exit, so a failed step leaves nothing behind.
+          trap 'curl -s -X DELETE "$API_URL/rest/v1/recipes?id=eq.$rid" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" > /dev/null' EXIT
+          row="$API_URL/rest/v1/recipes?id=eq.$rid"
+          # $1 = label, $2 = method, $3 = URL, $4 = bearer token, $5 = JSON body ("" for none), $6 = accepted statuses.
+          # Leaves the response body in res.json; the status is checked before the body.
+          call() {
+            if [ -n "$5" ]; then
+              status=$(curl -s -o res.json -w '%{http_code}' -X "$2" "$3" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $4" \
+                -H "Content-Type: application/json" -H "Prefer: return=representation" -d "$5")
+            else
+              status=$(curl -s -o res.json -w '%{http_code}' -X "$2" "$3" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $4" \
+                -H "Prefer: return=representation")
+            fi
+            echo "$1: $status $(cat res.json)"
+            [[ " $6 " == *" $status "* ]]
+          }
+          # Body type first, then the row count.
+          expect_rows() {
+            jq -e --argjson n "$1" 'type == "array" and length == $n' res.json > /dev/null
+          }
+          expect_denied() {
+            jq -e 'type == "object" and .code == "42501"' res.json > /dev/null
+          }
+          service_row() {
+            curl -sf "$row&select=name,match_keys,match_keys_version" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY"
+          }
+          # The service role stores keys, as `npm run match-keys` does.
+          call "service role sets keys" PATCH "$row" "$SERVICE_ROLE_KEY" '{"match_keys":{"seed":true},"match_keys_version":2}' 200
+          expect_rows 1
+          # A changes only the name: the keys stay.
+          call "A renames" PATCH "$row" "$token_a" '{"name":"RLS renamed"}' 200
+          expect_rows 1
+          after=$(service_row)
+          echo "$after" | jq -e 'type == "array" and length == 1 and .[0].name == "RLS renamed" and .[0].match_keys != null and .[0].match_keys_version == 2' > /dev/null
+          # A changes the ingredients: the trigger nulls the keys.
+          call "A changes ingredients" PATCH "$row" "$token_a" '{"ingredients":[{"name":"Orzechy","product":"orzechy","amount":null,"unit":null,"substitutes":[]}]}' 200
+          expect_rows 1
+          after=$(service_row)
+          echo "$after" | jq -e 'type == "array" and length == 1 and .[0].match_keys == null and .[0].match_keys_version == null' > /dev/null
+          # B neither updates nor deletes A's row: RLS filters it out, no error.
+          call "B renames" PATCH "$row" "$token_b" '{"name":"Hijacked"}' 200
+          expect_rows 0
+          call "B deletes" DELETE "$row" "$token_b" "" 200
+          expect_rows 0
+          after=$(service_row)
+          echo "$after" | jq -e 'type == "array" and length == 1 and .[0].name == "RLS renamed"' > /dev/null
+          # A on a missing id: empty, not an error.
+          call "A on missing id" PATCH "$API_URL/rest/v1/recipes?id=eq.00000000-0000-0000-0000-000000000002" "$token_a" '{"name":"Nope"}' 200
+          expect_rows 0
+          # Columns without an update grant are rejected with 42501.
+          call "A sets author_id to B" PATCH "$row" "$token_a" "{\"author_id\":\"$id_b\"}" 403
+          expect_denied
+          call "A nulls author_id" PATCH "$row" "$token_a" '{"author_id":null}' 403
+          expect_denied
+          call "A sets match_keys" PATCH "$row" "$token_a" '{"match_keys":{}}' 403
+          expect_denied
+          call "A sets id" PATCH "$row" "$token_a" '{"id":"00000000-0000-0000-0000-000000000001"}' 403
+          expect_denied
+          # PostgREST answers anon with 401 or 403 depending on its version.
+          call "anon updates" PATCH "$row" "$ANON_KEY" '{"name":"Anon"}' "401 403"
+          expect_denied
+          call "anon deletes" DELETE "$row" "$ANON_KEY" "" "401 403"
+          expect_denied
+          # A deletes their own row.
+          call "A deletes" DELETE "$row" "$token_a" "" 200
+          expect_rows 1
+          # Back to the 5 seeded rows: the later steps count them.
+          count=$(curl -sf "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
+          echo "$count" | jq -e 'type == "array" and length == 5'
       - name: Compute recipe match keys (idempotent)
         run: |
           source supabase.env

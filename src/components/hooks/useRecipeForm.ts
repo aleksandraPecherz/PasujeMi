@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { MAX_INGREDIENTS, MAX_STEPS, MAX_SUBSTITUTES } from "@/lib/recipes/limits";
 import { defaultProduct, parseRecipeInput, type RecipeIssue } from "@/lib/recipes/validate";
-import type { Recipe, RecipeKind } from "@/types";
+import type { IngredientOption, Recipe, RecipeKind } from "@/types";
 
 /** One ingredient or substitute as typed in the form; numbers stay text until the form is sent. */
 export interface OptionRow {
@@ -54,12 +54,24 @@ export interface RecipeFormActions {
 const SESSION_EXPIRED = "Sesja wygasła. Zaloguj się ponownie.";
 const SAVE_FAILED = "Nie udało się zapisać przepisu. Spróbuj ponownie.";
 const NO_CONNECTION = "Brak połączenia z serwerem. Spróbuj ponownie.";
+const NOT_FOUND_EDIT = "Nie znaleziono przepisu albo nie możesz go edytować.";
 
 let keyCounter = 0;
 const nextKey = () => String(++keyCounter);
 
 function emptyOption(): OptionRow {
   return { key: nextKey(), name: "", product: "", productEdited: false, amount: "", unit: "" };
+}
+
+function optionRow(option: IngredientOption): OptionRow {
+  return {
+    key: nextKey(),
+    name: option.name,
+    product: option.product,
+    productEdited: option.product !== defaultProduct(option.name),
+    amount: option.amount === null ? "" : String(option.amount),
+    unit: option.unit ?? "",
+  };
 }
 
 function emptyIngredient(): IngredientRow {
@@ -81,6 +93,27 @@ export function emptyRecipeForm(): RecipeFormState {
   };
 }
 
+const numberText = (value: number | null) => (value === null ? "" : String(value));
+
+/** The form state of a saved recipe; the inverse of `toBody`. */
+export function recipeToFormState(recipe: Recipe): RecipeFormState {
+  return {
+    name: recipe.name,
+    ingredients: recipe.ingredients.map((ingredient) => ({
+      ...optionRow(ingredient),
+      substitutes: ingredient.substitutes.map(optionRow),
+    })),
+    steps: recipe.steps.map((text) => ({ key: nextKey(), text })),
+    kinds: [...recipe.kinds],
+    prepTimeMin: numberText(recipe.prepTimeMin),
+    servings: numberText(recipe.servings),
+    kcal: numberText(recipe.kcal),
+    proteinG: numberText(recipe.proteinG),
+    carbsG: numberText(recipe.carbsG),
+    fatG: numberText(recipe.fatG),
+  };
+}
+
 /** Empty text is `null`; a comma is a decimal separator; text that is not a number stays text for the validator to reject. */
 function toNumberOrText(value: string): number | string | null {
   const text = value.trim();
@@ -99,7 +132,7 @@ function optionBody(row: OptionRow) {
 }
 
 /** The request body; its paths match the rows one to one, so validator issues map back to fields. */
-function toBody(form: RecipeFormState) {
+export function toBody(form: RecipeFormState) {
   return {
     name: form.name,
     steps: form.steps.map((step) => step.text),
@@ -145,11 +178,11 @@ type SendResult =
   { ok: true; recipe: Recipe } | { ok: false; serverError: string | null; fieldErrors: Record<string, string> };
 
 // Status first, then body shape (context/foundation/lessons.md).
-async function sendRecipe(body: unknown): Promise<SendResult> {
+async function sendRecipe(body: unknown, editId: string | undefined): Promise<SendResult> {
   const failed = (serverError: string): SendResult => ({ ok: false, serverError, fieldErrors: {} });
   try {
-    const res = await fetch("/api/recipes", {
-      method: "POST",
+    const res = await fetch(editId === undefined ? "/api/recipes" : `/api/recipes/${editId}`, {
+      method: editId === undefined ? "POST" : "PUT",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(body),
     });
@@ -159,7 +192,8 @@ async function sendRecipe(body: unknown): Promise<SendResult> {
       const fieldErrors = toFieldErrors(data.issues.filter(isIssue));
       return Object.keys(fieldErrors).length > 0 ? { ok: false, serverError: null, fieldErrors } : failed(SAVE_FAILED);
     }
-    if (res.status === 201 && isObject(data) && isRecipe(data.recipe)) {
+    if (editId !== undefined && res.status === 404) return failed(NOT_FOUND_EDIT);
+    if (res.status === (editId === undefined ? 201 : 200) && isObject(data) && isRecipe(data.recipe)) {
       return { ok: true, recipe: data.recipe };
     }
     return failed(SAVE_FAILED);
@@ -182,8 +216,8 @@ function withOptionField(row: OptionRow, field: OptionField, value: string): Opt
   return { ...row, [field]: value };
 }
 
-export function useRecipeForm() {
-  const [form, setForm] = useState<RecipeFormState>(emptyRecipeForm);
+export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
+  const [form, setForm] = useState<RecipeFormState>(() => (recipe ? recipeToFormState(recipe) : emptyRecipeForm()));
   const [status, setStatus] = useState<RecipeFormStatus>("idle");
   const submittingRef = useRef(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -307,12 +341,14 @@ export function useRecipeForm() {
     setFieldErrors({});
     setStatus("submitting");
     submittingRef.current = true;
-    let result: Awaited<ReturnType<typeof sendRecipe>>;
-    try {
-      result = await sendRecipe(parsed.value);
-    } finally {
-      submittingRef.current = false;
+    // sendRecipe catches its own errors, so it does not throw.
+    const result = await sendRecipe(parsed.value, recipe?.id);
+    if (result.ok && recipe) {
+      // Stay locked (submittingRef and the "submitting" status stay set) until the browser navigates away.
+      window.location.replace(`/recipes/${recipe.id}`);
+      return;
     }
+    submittingRef.current = false;
     if (result.ok) {
       setSaved(result.recipe);
       setStatus("saved");

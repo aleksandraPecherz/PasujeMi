@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { MATCH_KEYS_VERSION, computeMatchKeys } from "@/lib/matching";
 import { MAX_RECOMPUTED_RECIPES } from "@/lib/recipes/limits";
-import { getRecipe, listRecipes, matchRecipes } from "@/lib/services/recipes";
+import type { NewRecipe } from "@/lib/recipes/validate";
+import { deleteRecipe, getRecipe, listRecipes, matchRecipes, updateRecipe } from "@/lib/services/recipes";
 import type { MatchKeys, RecipeIngredient } from "@/types";
 
 /** PostgREST `max_rows` (supabase/config.toml): a request never returns more rows than this. */
@@ -11,6 +12,9 @@ const MAX_ROWS = 1000;
 type Row = Record<string, unknown> & { id: string };
 
 interface Call {
+  op: "select" | "update" | "delete";
+  /** The values sent by `update`. */
+  payload: Record<string, unknown> | null;
   select: string;
   count: string | null;
   filters: string[];
@@ -23,7 +27,9 @@ type Result =
 
 /**
  * Minimal stand-in for the PostgREST query builder: `select` (with `{ count }`), `order("name" | "id")` applied in
- * call order, `range`, `or` (`col.is.null`, `col.neq.value`), `eq`, `maybeSingle`, `in("id", …)` and `overrideTypes`. It caps every
+ * call order, `range`, `or` (`col.is.null`, `col.neq.value`), `eq`, `maybeSingle`, `in("id", …)`, `update(values)` /
+ * `delete()` followed by `select` (they return the rows matching the filters, as when RLS lets them through) and
+ * `overrideTypes`. It caps every
  * response at MAX_ROWS like the real server and projects the selected columns, so a query that forgets a column or a
  * page fails the test. `count` is the number of filtered rows before `range`, sent only when the query asks for it
  * and `omitCount` is off (a server that sends no total). With a count, a range that starts past it fails with
@@ -45,9 +51,20 @@ function fakeClient(
     private orderBy: string[] = [];
     private single = false;
 
-    constructor(columns: string, options?: { count?: string }) {
-      this.call = { select: columns, count: options?.count ?? null, filters: [], range: null };
+    constructor(
+      columns: string,
+      options?: { count?: string },
+      op: Call["op"] = "select",
+      payload: Record<string, unknown> | null = null,
+    ) {
+      this.call = { op, payload, select: columns, count: options?.count ?? null, filters: [], range: null };
       calls.push(this.call);
+    }
+
+    /** Chosen after `update` / `delete`: the columns to return. */
+    select(columns: string) {
+      this.call.select = columns;
+      return this;
     }
 
     order(column: string) {
@@ -115,7 +132,10 @@ function fakeClient(
       }
       result = result.slice(from, Math.min(to + 1, from + MAX_ROWS));
       const columns = this.call.select.split(",").map((column) => column.trim());
-      const data = result.map((row) => Object.fromEntries(columns.map((column) => [column, row[column]])) as Row);
+      const data = result.map((row) => {
+        const written = this.call.op === "update" ? { ...row, ...this.call.payload } : row;
+        return Object.fromEntries(columns.map((column) => [column, written[column]])) as Row;
+      });
       // `maybeSingle`: one row or null.
       if (this.single) return { data: (data[0] ?? null) as unknown as Row[], error: null, count };
       return { data, error: null, count };
@@ -135,7 +155,11 @@ function fakeClient(
   const client = {
     from(table: string) {
       if (table !== "recipes") throw new Error(`unexpected table ${table}`);
-      return { select: (columns: string, options?: { count?: string }) => new Query(columns, options) };
+      return {
+        select: (columns: string, options?: { count?: string }) => new Query(columns, options),
+        update: (values: Record<string, unknown>) => new Query("", undefined, "update", values),
+        delete: () => new Query("", undefined, "delete"),
+      };
     },
   };
   return { supabase: client as unknown as SupabaseClient, calls };
@@ -226,20 +250,32 @@ describe("listRecipes", () => {
 
 describe("getRecipe", () => {
   const id = "3f2b8c1e-5a4d-4e6f-9b7a-1c2d3e4f5a6b";
+  const author = "0b1c2d3e-4f5a-4b6c-8d7e-9f0a1b2c3d4e";
   const rows = [
-    recipeRow(id, ["sól"], { name: "Zupa" }),
-    recipeRow("9a8b7c6d-1e2f-4a3b-8c4d-5e6f7a8b9c0d", ["pieprz"], { name: "Sałatka" }),
+    { ...recipeRow(id, ["sól"], { name: "Zupa" }), author_id: author },
+    { ...recipeRow("9a8b7c6d-1e2f-4a3b-8c4d-5e6f7a8b9c0d", ["pieprz"], { name: "Sałatka" }), author_id: null },
   ];
 
   it("returns the recipe with the given id", async () => {
     const { supabase, calls } = fakeClient(rows);
 
-    const recipe = await getRecipe(supabase, id);
+    const found = await getRecipe(supabase, id);
 
-    expect(recipe).toMatchObject({ id, name: "Zupa", steps: ["Krok"], proteinG: 1.5, kcal: null });
+    expect(found?.recipe).toMatchObject({ id, name: "Zupa", steps: ["Krok"], proteinG: 1.5, kcal: null });
+    expect(found?.authorId).toBe(author);
     expect(calls).toHaveLength(1);
     expect(calls[0].filters).toEqual(["eq:id"]);
     expect(calls[0].select).toContain("steps");
+    expect(calls[0].select).toContain("author_id");
+  });
+
+  it("returns a null authorId for a recipe without an author", async () => {
+    const { supabase } = fakeClient(rows);
+
+    const found = await getRecipe(supabase, "9a8b7c6d-1e2f-4a3b-8c4d-5e6f7a8b9c0d");
+
+    expect(found?.recipe.name).toBe("Sałatka");
+    expect(found?.authorId).toBeNull();
   });
 
   it("returns null when no recipe has the id", async () => {
@@ -271,6 +307,113 @@ describe("getRecipe", () => {
     } as unknown as SupabaseClient;
 
     await expect(getRecipe(supabase, id)).rejects.toBe(failure);
+  });
+});
+
+const draft: NewRecipe = {
+  name: "Nowa zupa",
+  steps: ["Gotuj"],
+  ingredients: ingredients(["marchew"]),
+  prepTimeMin: 20,
+  servings: 2,
+  kinds: ["na ciepło"],
+  kcal: 150,
+  proteinG: 4,
+  carbsG: 20,
+  fatG: 3,
+};
+
+describe("updateRecipe", () => {
+  const id = "3f2b8c1e-5a4d-4e6f-9b7a-1c2d3e4f5a6b";
+  const rows = [recipeRow(id, ["sól"], { name: "Zupa" })];
+
+  it("returns the updated recipe and sends only the content columns", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    const recipe = await updateRecipe(supabase, id, draft);
+
+    expect(recipe).toMatchObject({ id, name: "Nowa zupa", prepTimeMin: 20, proteinG: 4 });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toMatchObject({ op: "update", filters: ["eq:id"] });
+    expect(calls[0].select).toContain("steps");
+    expect(calls[0].payload).toMatchObject({ name: "Nowa zupa", prep_time_min: 20, protein_g: 4 });
+    for (const column of ["author_id", "match_keys", "match_keys_version", "id"]) {
+      expect(calls[0].payload).not.toHaveProperty(column);
+    }
+  });
+
+  it("returns null when no row is left to update", async () => {
+    const { supabase } = fakeClient(rows);
+
+    expect(await updateRecipe(supabase, "00000000-0000-4000-8000-000000000000", draft)).toBeNull();
+  });
+
+  it("returns null without querying when the id is not a UUID", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    expect(await updateRecipe(supabase, "nie-uuid", draft)).toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+
+  it("rethrows Supabase errors unchanged", async () => {
+    const failure = { message: "boom", code: "XX000" };
+    const supabase = {
+      from: () => ({
+        update: () => ({
+          eq: () => ({
+            select: () => ({
+              maybeSingle: () => ({
+                overrideTypes: () => Promise.resolve({ data: null, error: failure }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    await expect(updateRecipe(supabase, id, draft)).rejects.toBe(failure);
+  });
+});
+
+describe("deleteRecipe", () => {
+  const id = "3f2b8c1e-5a4d-4e6f-9b7a-1c2d3e4f5a6b";
+  const rows = [recipeRow(id, ["sól"], { name: "Zupa" })];
+
+  it("returns true when a row was deleted", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    expect(await deleteRecipe(supabase, id)).toBe(true);
+    expect(calls).toMatchObject([{ op: "delete", filters: ["eq:id"], select: "id" }]);
+  });
+
+  it("returns false when no row is left to delete", async () => {
+    const { supabase } = fakeClient(rows);
+
+    expect(await deleteRecipe(supabase, "00000000-0000-4000-8000-000000000000")).toBe(false);
+  });
+
+  it("returns false without querying when the id is not a UUID", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    expect(await deleteRecipe(supabase, "nie-uuid")).toBe(false);
+    expect(calls).toHaveLength(0);
+  });
+
+  it("rethrows Supabase errors unchanged", async () => {
+    const failure = { message: "boom", code: "XX000" };
+    const supabase = {
+      from: () => ({
+        delete: () => ({
+          eq: () => ({
+            select: () => ({
+              overrideTypes: () => Promise.resolve({ data: null, error: failure }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient;
+
+    await expect(deleteRecipe(supabase, id)).rejects.toBe(failure);
   });
 });
 

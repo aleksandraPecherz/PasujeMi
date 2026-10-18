@@ -6,6 +6,7 @@ import SignUpForm from "@/components/auth/SignUpForm";
 import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
+import { RecipeAuthorActionsView } from "@/components/recipes/RecipeAuthorActions";
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeDetails } from "@/components/recipes/RecipeDetails";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
@@ -156,6 +157,49 @@ function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) 
 const SAMPLE_EMAIL = "ola@przyklad.pl";
 
 const LIMIT_MESSAGE = `Za dużo produktów naraz (limit ${MAX_TOKENS} słów we wszystkich listach). Usuń któryś produkt.`;
+
+function AuthorActions(props: Partial<Parameters<typeof RecipeAuthorActionsView>[0]>) {
+  return (
+    <RecipeAuthorActionsView
+      recipeId={RECIPE.id}
+      recipeName={RECIPE.name}
+      status="idle"
+      error={null}
+      onConfirm={NOOP}
+      {...props}
+    />
+  );
+}
+
+const DIALOG_STATES = [
+  { id: "idle", label: "Bezczynny", props: { status: "idle", error: null } },
+  { id: "deleting", label: "W trakcie", props: { status: "deleting", error: null } },
+  { id: "error", label: "Błąd", props: { status: "error", error: "Nie udało się usunąć przepisu. Spróbuj ponownie." } },
+] as const;
+
+// Radix dialogs are modal, so one state is open at a time; the buttons switch which one.
+function DeleteDialogStates() {
+  const [current, setCurrent] = useState<(typeof DIALOG_STATES)[number]["id"] | null>(null);
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      {DIALOG_STATES.map((state) => (
+        <Button
+          key={state.id}
+          type="button"
+          variant="outline"
+          onClick={() => {
+            setCurrent(state.id);
+          }}
+        >
+          {state.label}
+        </Button>
+      ))}
+      {DIALOG_STATES.map(
+        (state) => current === state.id && <AuthorActions key={state.id} {...state.props} defaultOpen />,
+      )}
+    </div>
+  );
+}
 
 function StateSection({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
@@ -332,6 +376,13 @@ export default function KitchenSink() {
         <SampleRecipeForm fieldErrors={FORM_ERRORS} status="error" />
       </StateSection>
 
+      <StateSection
+        title="Formularz przepisu: edycja"
+        note="Tryb edycji (/recipes/[id]/edit): tytuł „Edytuj przepis”, przycisk „Zapisz zmiany” i link „Anuluj” do szczegółów."
+      >
+        <SampleRecipeForm title="Edytuj przepis" submitLabel="Zapisz zmiany" cancelHref={`/recipes/${RECIPE.id}`} />
+      </StateSection>
+
       <StateSection title="Formularz przepisu: wysyłka" note="Przycisk wyłączony z aria-busy.">
         <SampleRecipeForm status="submitting" />
       </StateSection>
@@ -362,6 +413,20 @@ export default function KitchenSink() {
         note="Pełny przepis: czas, porcje, rodzaje, wartości odżywcze, składniki z zamiennikami i kroki. Linki nie prowadzą do istniejących przepisów."
       >
         <RecipeDetails recipe={RECIPE} />
+      </StateSection>
+
+      <StateSection
+        title="Szczegóły przepisu: akcje autora"
+        note="Autor widzi „Edytuj” i „Usuń” obok „Wróć do listy” (zawijanie na telefonie)."
+      >
+        <RecipeDetails recipe={RECIPE} actions={<AuthorActions />} />
+      </StateSection>
+
+      <StateSection
+        title="Okno usuwania przepisu"
+        note="Okno jest modalne, więc przyciski otwierają po jednym stanie: bezczynny, w trakcie usuwania (oba przyciski wyłączone, okno nie zamyka się — odśwież stronę) i błąd (komunikat w oknie)."
+      >
+        <DeleteDialogStates />
       </StateSection>
 
       <StateSection

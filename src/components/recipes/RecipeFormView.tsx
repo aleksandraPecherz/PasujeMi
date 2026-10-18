@@ -38,9 +38,23 @@ interface RecipeFormViewProps {
   serverError: string | null;
   actions: RecipeFormActions;
   onSubmit: () => void;
+  title?: string;
+  submitLabel?: string;
+  /** Shows a "Anuluj" link next to the submit button (edit mode). */
+  cancelHref?: string;
 }
 
-export function RecipeFormView({ form, fieldErrors, status, serverError, actions, onSubmit }: RecipeFormViewProps) {
+export function RecipeFormView({
+  form,
+  fieldErrors,
+  status,
+  serverError,
+  actions,
+  onSubmit,
+  title = "Dodaj przepis",
+  submitLabel = "Zapisz przepis",
+  cancelHref,
+}: RecipeFormViewProps) {
   const submitting = status === "submitting";
   const nameId = fieldId("name");
 
@@ -57,7 +71,7 @@ export function RecipeFormView({ form, fieldErrors, status, serverError, actions
       <section className="border-border bg-card flex flex-col gap-5 rounded-2xl border p-4 sm:p-6">
         <div>
           <h1 id="recipe-form-heading" className="text-xl font-semibold sm:text-2xl">
-            Dodaj przepis
+            {title}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Pola z gwiazdką <span aria-hidden="true">*</span>
@@ -227,9 +241,16 @@ export function RecipeFormView({ form, fieldErrors, status, serverError, actions
 
       <div className="flex flex-col gap-3">
         <ServerError message={serverError} />
-        <Button type="submit" disabled={submitting} aria-busy={submitting} className="w-full sm:w-auto sm:self-start">
-          {submitting ? "Zapisywanie…" : "Zapisz przepis"}
-        </Button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button type="submit" disabled={submitting} aria-busy={submitting} className="w-full sm:w-auto">
+            {submitting ? "Zapisywanie…" : submitLabel}
+          </Button>
+          {cancelHref && (
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <a href={cancelHref}>Anuluj</a>
+            </Button>
+          )}
+        </div>
       </div>
     </form>
   );
