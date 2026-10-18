@@ -304,5 +304,5 @@ Brak migracji. Produkcyjny import wymaga, by migracja `20261017120000_add_recipe
 - [x] 3.7 W aplikacji licznik pokazuje 76 przepisów, a przepis z wiersza 48 ma kcal na porcję i poprawne makro — fc00be0
 - [x] 3.8 Zamiennik z marką pokazuje markę w szczegółach, a wykluczenie „ryki” nie ukrywa przepisu z wiersza 32 — fc00be0
 - [x] 3.9 Dopasowanie na pełnym katalogu działa; `npm run bench:match` uruchomione po imporcie — b906f45
-- [ ] 3.10 Produkcja: `supabase db push --dry-run` nie wymaga migracji, podgląd przejrzany, zapis wypisał `inserted 76, skipped 0`
-- [ ] 3.11 PR zawiera `Closes #2`
+- [x] 3.10 Produkcja: `supabase db push --dry-run` nie wymaga migracji, podgląd przejrzany, zapis wypisał `inserted 76, skipped 0` — 2889fc7
+- [x] 3.11 PR zawiera `Closes #2` — 2889fc7
