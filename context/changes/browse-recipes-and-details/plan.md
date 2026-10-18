@@ -142,6 +142,14 @@ Cały kafelek prowadzi do `/recipes/[id]`, bez zagnieżdżonych elementów inter
 
 **Contract**: sekcja z `RecipeTile` (z `match` i bez) opisana jako klikalna oraz sekcja z `RecipeDetails` na przykładowym przepisie i na przepisie z brakami danych (bez czasu, porcji, wartości odżywczych).
 
+#### 3. Link „Wróć do listy” na górze i na dole szczegółów
+
+**File**: `src/components/recipes/RecipeDetails.tsx`
+
+**Intent**: Przy długim przepisie link powrotu nie jest widoczny bez przewijania, więc pojawia się na górze strony, a ten pod krokami zostaje (dodane po ręcznych testach fazy 2).
+
+**Contract**: ten sam link `href="/"` renderowany na górze karty (przed nagłówkiem `<h1>`) i pod krokami, jako jeden wspólny element w komponencie; bez zmiany właściwości `RecipeDetails`.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -156,6 +164,7 @@ Cały kafelek prowadzi do `/recipes/[id]`, bez zagnieżdżonych elementów inter
 - Kliknięcie w dowolne miejsce kafelka (także w tag składnika) otwiera szczegóły tego przepisu
 - Klawiatura: Tab zatrzymuje się raz na kafelek, widoczny jest pierścień fokusu, Enter otwiera szczegóły
 - Kafelek w podglądzie po dodaniu przepisu (`RecipeSaved`) prowadzi do szczegółów nowego przepisu
+- Na stronie szczegółów długiego przepisu link „Wróć do listy” jest widoczny na górze i pod krokami
 - `/dev/kitchen-sink` pokazuje kafelki i widok szczegółów w jasnym i ciemnym motywie
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
@@ -262,35 +271,36 @@ Nie dotyczy: brak zmian schematu, RLS ani danych. Wycofanie to usunięcie nowych
 
 #### Automated
 
-- [x] 1.1 Unit tests pass (UUID, `getRecipe`, formatowanie): `npm test`
-- [x] 1.2 Linting passes: `npm run lint`
-- [x] 1.3 Type check passes: `npx astro check`
-- [x] 1.4 UI literal guard passes with the new files in `CLEAN_FILES`: `npm run check:ui`
-- [x] 1.5 Production build passes: `npm run build`
-- [ ] 1.6 Smoke passes against a running server (`BASE_URL`, Supabase z wyłączonym potwierdzeniem e-mail): `npm run smoke`
+- [x] 1.1 Unit tests pass (UUID, `getRecipe`, formatowanie): `npm test` — dbe3433
+- [x] 1.2 Linting passes: `npm run lint` — dbe3433
+- [x] 1.3 Type check passes: `npx astro check` — dbe3433
+- [x] 1.4 UI literal guard passes with the new files in `CLEAN_FILES`: `npm run check:ui` — dbe3433
+- [x] 1.5 Production build passes: `npm run build` — dbe3433
+- [x] 1.6 Smoke passes against a running server (`BASE_URL`, Supabase z wyłączonym potwierdzeniem e-mail): `npm run smoke` — dbe3433
 
 #### Manual
 
-- [x] 1.7 Strona `/recipes/<id>` pokazuje nazwę, czas, porcje, rodzaje, wartości na porcję, składniki z ilościami i zamiennikami oraz kroki; nie ma statusu „mam/brak”
-- [x] 1.8 Przepis bez czasu, porcji lub wartości odżywczych wygląda poprawnie (bez pustych etykiet)
-- [x] 1.9 Nieznany adres jako zalogowany pokazuje polską 404 z nagłówkiem i linkiem do `/`; `/recipes/nie-uuid` i nieistniejące UUID też
-- [x] 1.10 Wygląd poprawny w jasnym i ciemnym motywie oraz przy szerokości 375 px
+- [x] 1.7 Strona `/recipes/<id>` pokazuje nazwę, czas, porcje, rodzaje, wartości na porcję, składniki z ilościami i zamiennikami oraz kroki; nie ma statusu „mam/brak” — dbe3433
+- [x] 1.8 Przepis bez czasu, porcji lub wartości odżywczych wygląda poprawnie (bez pustych etykiet) — dbe3433
+- [x] 1.9 Nieznany adres jako zalogowany pokazuje polską 404 z nagłówkiem i linkiem do `/`; `/recipes/nie-uuid` i nieistniejące UUID też — dbe3433
+- [x] 1.10 Wygląd poprawny w jasnym i ciemnym motywie oraz przy szerokości 375 px — dbe3433
 
 ### Phase 2: Kafelek jako link
 
 #### Automated
 
-- [ ] 2.1 Unit tests still pass: `npm test`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 Type check passes: `npx astro check`
-- [ ] 2.4 UI literal guard passes: `npm run check:ui`
+- [x] 2.1 Unit tests still pass: `npm test`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 Type check passes: `npx astro check`
+- [x] 2.4 UI literal guard passes: `npm run check:ui`
 
 #### Manual
 
-- [ ] 2.5 Kliknięcie w dowolne miejsce kafelka (także w tag składnika) otwiera szczegóły tego przepisu
-- [ ] 2.6 Klawiatura: Tab zatrzymuje się raz na kafelek, widoczny jest pierścień fokusu, Enter otwiera szczegóły
-- [ ] 2.7 Kafelek w podglądzie po dodaniu przepisu (`RecipeSaved`) prowadzi do szczegółów nowego przepisu
-- [ ] 2.8 `/dev/kitchen-sink` pokazuje kafelki i widok szczegółów w jasnym i ciemnym motywie
+- [x] 2.5 Kliknięcie w dowolne miejsce kafelka (także w tag składnika) otwiera szczegóły tego przepisu
+- [x] 2.6 Klawiatura: Tab zatrzymuje się raz na kafelek, widoczny jest pierścień fokusu, Enter otwiera szczegóły
+- [x] 2.7 Kafelek w podglądzie po dodaniu przepisu (`RecipeSaved`) prowadzi do szczegółów nowego przepisu
+- [x] 2.8 `/dev/kitchen-sink` pokazuje kafelki i widok szczegółów w jasnym i ciemnym motywie
+- [x] 2.9 Na stronie szczegółów długiego przepisu link „Wróć do listy” jest widoczny na górze i pod krokami
 
 ### Phase 3: Zachowanie stanu listy
 

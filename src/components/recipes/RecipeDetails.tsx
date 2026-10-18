@@ -9,6 +9,19 @@ function Quantity({ option }: { option: Pick<IngredientOption, "amount" | "unit"
   return quantity ? <span className="text-muted-foreground whitespace-nowrap">{quantity}</span> : null;
 }
 
+function BackLink() {
+  return (
+    <div>
+      <Button asChild variant="outline">
+        <a href="/">
+          <ArrowLeft aria-hidden="true" />
+          Wróć do listy
+        </a>
+      </Button>
+    </div>
+  );
+}
+
 export function RecipeDetails({ recipe }: { recipe: Recipe }) {
   const meta = [formatPrepTime(recipe.prepTimeMin), formatServings(recipe.servings)].filter(
     (item): item is string => item !== null,
@@ -17,6 +30,7 @@ export function RecipeDetails({ recipe }: { recipe: Recipe }) {
 
   return (
     <article className="border-border bg-card flex flex-col gap-6 rounded-2xl border p-4 sm:p-6">
+      <BackLink />
       <div className="flex flex-col gap-3">
         <h1 className="text-card-foreground text-xl font-semibold break-words sm:text-2xl">{recipe.name}</h1>
         {(meta.length > 0 || recipe.kinds.length > 0) && (
@@ -92,14 +106,7 @@ export function RecipeDetails({ recipe }: { recipe: Recipe }) {
         </ol>
       </section>
 
-      <div>
-        <Button asChild variant="outline">
-          <a href="/">
-            <ArrowLeft aria-hidden="true" />
-            Wróć do listy
-          </a>
-        </Button>
-      </div>
+      <BackLink />
     </article>
   );
 }
