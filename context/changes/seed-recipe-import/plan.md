@@ -295,14 +295,14 @@ Brak migracji. Produkcyjny import wymaga, by migracja `20261017120000_add_recipe
 
 #### Manual
 
-- [ ] 3.1 Lokalny podgląd kończy się kodem 0
-- [ ] 3.2 Lokalny zapis wypisuje `inserted 71, skipped 5`
-- [ ] 3.3 Ponowny zapis wypisuje `inserted 0, skipped 76`
-- [ ] 3.4 Wszystkie zaimportowane wiersze mają aktualne klucze
+- [x] 3.1 Lokalny podgląd kończy się kodem 0
+- [x] 3.2 Lokalny zapis wypisuje `inserted 71, skipped 5`
+- [x] 3.3 Ponowny zapis wypisuje `inserted 0, skipped 76`
+- [x] 3.4 Wszystkie zaimportowane wiersze mają aktualne klucze
 - [ ] 3.5 Autorka potwierdza listę 12 przeliczonych kcal z podglądu
 - [ ] 3.6 Ostrzeżenia o markach w podglądzie są puste lub autorka uznała każde
-- [ ] 3.7 W aplikacji licznik pokazuje 76 przepisów, a przepis z wiersza 48 ma kcal na porcję i poprawne makro
-- [ ] 3.8 Zamiennik z marką pokazuje markę w szczegółach, a wykluczenie „ryki” nie ukrywa przepisu z wiersza 32
+- [x] 3.7 W aplikacji licznik pokazuje 76 przepisów, a przepis z wiersza 48 ma kcal na porcję i poprawne makro
+- [x] 3.8 Zamiennik z marką pokazuje markę w szczegółach, a wykluczenie „ryki” nie ukrywa przepisu z wiersza 32
 - [ ] 3.9 Dopasowanie na pełnym katalogu działa; `npm run bench:match` uruchomione po imporcie
 - [ ] 3.10 Produkcja: `supabase db push --dry-run` nie wymaga migracji, podgląd przejrzany, zapis wypisał `inserted 76, skipped 0`
 - [ ] 3.11 PR zawiera `Closes #2`
