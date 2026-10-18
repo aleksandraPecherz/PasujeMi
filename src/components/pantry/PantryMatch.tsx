@@ -56,6 +56,7 @@ export default function PantryMatch() {
     if (restoredScrollY === null || loading || !hasRecipes) {
       return;
     }
+    const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
     const frame = requestAnimationFrame(() => {
       window.scrollTo(0, restoredScrollY);
@@ -63,6 +64,7 @@ export default function PantryMatch() {
     });
     return () => {
       cancelAnimationFrame(frame);
+      history.scrollRestoration = previousRestoration;
     };
   }, [restoredScrollY, loading, hasRecipes, consumeRestoredScroll]);
 

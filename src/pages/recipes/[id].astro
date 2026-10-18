@@ -33,13 +33,7 @@ if (!failure && !recipe) {
   {recipe ? (
     <RecipeDetails recipe={recipe} />
   ) : failure ? (
-    <section class="border-border bg-card flex flex-col items-start gap-4 rounded-2xl border p-4 sm:p-6">
-      <h1 class="text-card-foreground text-xl font-semibold sm:text-2xl">Coś poszło nie tak</h1>
-      <p class="text-muted-foreground">{failure}</p>
-      <a href="/" class="text-primary underline-offset-4 hover:underline">
-        Wróć do listy przepisów
-      </a>
-    </section>
+    <NotFoundView message="Coś poszło nie tak" description={failure} />
   ) : (
     <NotFoundView message="Nie znaleziono przepisu" />
   )}

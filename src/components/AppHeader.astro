@@ -21,7 +21,7 @@ const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
       </a>
       <span class="text-muted-foreground truncate">{user?.email}</span>
       <ThemeToggle client:load />
-      <form method="POST" action="/api/auth/signout" class="shrink-0">
+      <form method="POST" action="/api/auth/signout" class="shrink-0" data-signout>
         <button type="submit" class:list={[buttonVariants({ variant: "outline", size: "sm" })]}>
           Wyloguj
         </button>
@@ -29,3 +29,10 @@ const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
     </div>
   </div>
 </header>
+
+<script>
+  import { clearSnapshot } from "@/lib/list-state";
+
+  // The pantry tags are private to the session: don't leave them for whoever signs in next in this tab.
+  document.querySelector("[data-signout]")?.addEventListener("submit", clearSnapshot);
+</script>
