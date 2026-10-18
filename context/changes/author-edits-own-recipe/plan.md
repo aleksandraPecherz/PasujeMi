@@ -388,11 +388,11 @@ Każda edycja składników wrzuca przepis do puli przeliczanej per żądanie w `
 
 #### Automated
 
-- [ ] 4.1 Job `smoke` w CI przechodzi (lokalny Supabase w Actions)
-- [x] 4.2 `npm run lint` przechodzi
+- [x] 4.1 Job `smoke` w CI przechodzi (lokalny Supabase w Actions) — ab97e50
+- [x] 4.2 `npm run lint` przechodzi — ab97e50
 
 #### Manual
 
-- [x] 4.3 `npm run smoke` przechodzi lokalnie na Supabase z Dockera (`.env` / `.dev.vars` wskazują `supabase start`, nie produkcję)
+- [x] 4.3 `npm run smoke` przechodzi lokalnie na Supabase z Dockera (`.env` / `.dev.vars` wskazują `supabase start`, nie produkcję) — ab97e50
 - [ ] 4.4 Autorka zastosowała migrację `20261018120000` na produkcji przed merge i sprawdziła, że lista i dopasowanie działają
-- [x] 4.5 Opis PR zawiera „Closes #8”
+- [x] 4.5 Opis PR zawiera „Closes #8” — ab97e50
