@@ -34,6 +34,10 @@ export const CLEAN_FILES = [
   "src/components/auth/SignInForm.tsx",
   "src/layouts/Layout.astro",
   "src/components/ThemeToggle.tsx",
+  "src/components/recipes/RecipeDetails.tsx",
+  "src/pages/recipes/[id].astro",
+  "src/components/NotFoundView.astro",
+  "src/pages/404.astro",
 ];
 
 const PALETTE =

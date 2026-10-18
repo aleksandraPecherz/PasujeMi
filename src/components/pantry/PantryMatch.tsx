@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Lightbulb, SlidersHorizontal } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
 import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton } from "@/components/pantry/PantryStates";
@@ -44,7 +45,29 @@ export default function PantryMatch() {
     reloading,
     error,
     filtered,
+    restoredScrollY,
+    consumeRestoredScroll,
   } = usePantryMatch();
+  const hasRecipes = recipes.length > 0;
+
+  // After a restore, scroll once to the saved position. Manual restoration keeps the browser's own attempt (made before
+  // the list exists) from fighting this; the frame delay lets the restored tiles lay out first.
+  useEffect(() => {
+    if (restoredScrollY === null || loading || !hasRecipes) {
+      return;
+    }
+    const previousRestoration = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo(0, restoredScrollY);
+      consumeRestoredScroll();
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      history.scrollRestoration = previousRestoration;
+    };
+  }, [restoredScrollY, loading, hasRecipes, consumeRestoredScroll]);
+
   const showEmptyFiltered = filtered && !loading && error === null && recipes.length === 0;
 
   return (

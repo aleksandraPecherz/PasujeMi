@@ -11,3 +11,6 @@ export const MAX_URL_LENGTH = 8000;
 export function countTokens(tags: string[]): number {
   return tags.reduce((count, tag) => count + tokenize(tag).length, 0);
 }
+
+/** Recipes restored from a list snapshot after returning from a recipe page; bounds the restore work per page view. */
+export const MAX_RESTORE_RECIPES = 100;
