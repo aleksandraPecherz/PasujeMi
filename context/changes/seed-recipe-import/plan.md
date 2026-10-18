@@ -299,7 +299,7 @@ Brak migracji. Produkcyjny import wymaga, by migracja `20261017120000_add_recipe
 - [x] 3.2 Lokalny zapis wypisuje `inserted 71, skipped 5` — fc00be0
 - [x] 3.3 Ponowny zapis wypisuje `inserted 0, skipped 76` — fc00be0
 - [x] 3.4 Wszystkie zaimportowane wiersze mają aktualne klucze — fc00be0
-- [x] 3.5 Autorka potwierdza listę 12 przeliczonych kcal z podglądu
+- [x] 3.5 Autorka potwierdza listę 12 przeliczonych kcal z podglądu — b906f45
 - [x] 3.6 Ostrzeżenia o markach w podglądzie są puste lub autorka uznała każde
 - [x] 3.7 W aplikacji licznik pokazuje 76 przepisów, a przepis z wiersza 48 ma kcal na porcję i poprawne makro — fc00be0
 - [x] 3.8 Zamiennik z marką pokazuje markę w szczegółach, a wykluczenie „ryki” nie ukrywa przepisu z wiersza 32 — fc00be0
