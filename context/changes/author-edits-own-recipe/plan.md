@@ -362,27 +362,27 @@ Każda edycja składników wrzuca przepis do puli przeliczanej per żądanie w `
 
 #### Automated
 
-- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 2.2 `npm run lint` i `npx astro check` przechodzą
-- [x] 2.3 `npm run build` przechodzi
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test` — 1e23ed4
+- [x] 2.2 `npm run lint` i `npx astro check` przechodzą — 1e23ed4
+- [x] 2.3 `npm run build` przechodzi — 1e23ed4
 
 #### Manual
 
-- [ ] 2.4 Na lokalnym Supabase (Docker): `PUT` i `DELETE` cudzego przepisu przez API zwracają 404, a przepis zostaje bez zmian
+- [x] 2.4 Na lokalnym Supabase (Docker): `PUT` i `DELETE` cudzego przepisu przez API zwracają 404, a przepis zostaje bez zmian
 
 ### Phase 3: UI — edycja i usuwanie
 
 #### Automated
 
-- [ ] 3.1 `npm test`, `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` przechodzą
+- [x] 3.1 `npm test`, `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` przechodzą
 
 #### Manual
 
-- [ ] 3.2 Autor widzi „Edytuj” i „Usuń” na swoim przepisie; inny użytkownik ich nie widzi, a `/recipes/[id]/edit` daje mu 404; przepis z seeda (`author_id = null`) nie ma przycisków
-- [ ] 3.3 Edycja: formularz wypełniony danymi (w tym ręczny `product` i zamienniki), zapis przekierowuje na szczegóły z nowymi danymi, błędy walidacji przy polach jak w S-05
-- [ ] 3.4 Zamiana składnika na produkt z wykluczeń ukrywa przepis na liście z tym wykluczeniem
-- [ ] 3.5 Usuwanie: „Anuluj” zamyka dialog bez zmian; potwierdzenie wraca na `/` bez usuniętego przepisu; fokus i klawiatura działają w dialogu; widok poprawny na telefonie i w ciemnym motywie
-- [ ] 3.6 Kitchen sink pokazuje nowe stany
+- [x] 3.2 Autor widzi „Edytuj” i „Usuń” na swoim przepisie; inny użytkownik ich nie widzi, a `/recipes/[id]/edit` daje mu 404; przepis z seeda (`author_id = null`) nie ma przycisków
+- [x] 3.3 Edycja: formularz wypełniony danymi (w tym ręczny `product` i zamienniki), zapis przekierowuje na szczegóły z nowymi danymi, błędy walidacji przy polach jak w S-05
+- [x] 3.4 Zamiana składnika na produkt z wykluczeń ukrywa przepis na liście z tym wykluczeniem
+- [x] 3.5 Usuwanie: „Anuluj” zamyka dialog bez zmian; potwierdzenie wraca na `/` bez usuniętego przepisu; fokus i klawiatura działają w dialogu; widok poprawny na telefonie i w ciemnym motywie
+- [x] 3.6 Kitchen sink pokazuje nowe stany
 
 ### Phase 4: Smoke i dokumentacja
 

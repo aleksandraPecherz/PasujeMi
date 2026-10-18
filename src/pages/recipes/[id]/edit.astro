@@ -1,0 +1,44 @@
+---
+import NotFoundView from "@/components/NotFoundView.astro";
+import RecipeForm from "@/components/recipes/RecipeForm";
+import AppLayout from "@/layouts/AppLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getRecipe } from "@/lib/services/recipes";
+import type { Recipe } from "@/types";
+
+let recipe: Recipe | null = null;
+let failure: string | null = null;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase) {
+  Astro.response.status = 503;
+  failure = "Serwis jest chwilowo niedostępny. Spróbuj ponownie za chwilę.";
+} else {
+  try {
+    const found = await getRecipe(supabase, Astro.params.id ?? "");
+    // UX only: the form is shown to the author. The boundary is RLS (a PUT from anyone else answers 404).
+    if (found && found.authorId !== null && found.authorId === Astro.locals.user?.id) {
+      recipe = found.recipe;
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
+    console.error("getRecipe failed", error);
+    Astro.response.status = 500;
+    failure = "Nie udało się wczytać przepisu. Spróbuj ponownie za chwilę.";
+  }
+}
+
+if (!failure && !recipe) {
+  Astro.response.status = 404;
+}
+---
+
+<AppLayout title={recipe ? "Edytuj przepis" : failure ? "Błąd" : "Nie znaleziono przepisu"}>
+  {recipe ? (
+    <RecipeForm client:load recipe={recipe} />
+  ) : failure ? (
+    <NotFoundView message="Coś poszło nie tak" description={failure} />
+  ) : (
+    <NotFoundView message="Nie znaleziono przepisu" />
+  )}
+</AppLayout>
