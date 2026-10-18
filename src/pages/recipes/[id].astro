@@ -15,7 +15,8 @@ if (!supabase) {
   failure = "Serwis jest chwilowo niedostępny. Spróbuj ponownie za chwilę.";
 } else {
   try {
-    recipe = await getRecipe(supabase, Astro.params.id ?? "");
+    const found = await getRecipe(supabase, Astro.params.id ?? "");
+    recipe = found?.recipe ?? null;
   } catch (error) {
     // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
     console.error("getRecipe failed", error);

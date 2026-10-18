@@ -350,21 +350,21 @@ Każda edycja składników wrzuca przepis do puli przeliczanej per żądanie w `
 
 #### Automated
 
-- [x] 1.1 Migracja aplikuje się na czystej bazie: `npx supabase db reset`
-- [ ] 1.2 Krok CI „Check recipe update and delete permissions” przechodzi, a „Compute recipe match keys” nadal daje `updated 5` / `updated 0`
-- [x] 1.3 `npm run lint` i `npx astro check` przechodzą
+- [x] 1.1 Migracja aplikuje się na czystej bazie: `npx supabase db reset` — 8d86080
+- [x] 1.2 Krok CI „Check recipe update and delete permissions” przechodzi, a „Compute recipe match keys” nadal daje `updated 5` / `updated 0` — 8d86080
+- [x] 1.3 `npm run lint` i `npx astro check` przechodzą — 8d86080
 
 #### Manual
 
-- [x] 1.4 Przegląd migracji: lista kolumn w grancie update nie zawiera `author_id`, `match_keys`, `match_keys_version`, `id`, `created_at`
+- [x] 1.4 Przegląd migracji: lista kolumn w grancie update nie zawiera `author_id`, `match_keys`, `match_keys_version`, `id`, `created_at` — 8d86080
 
 ### Phase 2: Serwis i API
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 `npm run lint` i `npx astro check` przechodzą
-- [ ] 2.3 `npm run build` przechodzi
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 `npm run lint` i `npx astro check` przechodzą
+- [x] 2.3 `npm run build` przechodzi
 
 #### Manual
 
