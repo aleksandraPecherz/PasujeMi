@@ -1,7 +1,7 @@
 ---
 change_id: author-edits-own-recipe
 title: Author edits own recipe
-status: implementing
+status: impl_reviewed
 created: 2026-10-18
 updated: 2026-10-18
 archived_at: null

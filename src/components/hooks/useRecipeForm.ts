@@ -345,7 +345,7 @@ export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
     const result = await sendRecipe(parsed.value, recipe?.id);
     if (result.ok && recipe) {
       // Stay locked (submittingRef and the "submitting" status stay set) until the browser navigates away.
-      window.location.assign(`/recipes/${recipe.id}`);
+      window.location.replace(`/recipes/${recipe.id}`);
       return;
     }
     submittingRef.current = false;
