@@ -368,31 +368,31 @@ Każda edycja składników wrzuca przepis do puli przeliczanej per żądanie w `
 
 #### Manual
 
-- [x] 2.4 Na lokalnym Supabase (Docker): `PUT` i `DELETE` cudzego przepisu przez API zwracają 404, a przepis zostaje bez zmian
+- [x] 2.4 Na lokalnym Supabase (Docker): `PUT` i `DELETE` cudzego przepisu przez API zwracają 404, a przepis zostaje bez zmian — 8ef4021
 
 ### Phase 3: UI — edycja i usuwanie
 
 #### Automated
 
-- [x] 3.1 `npm test`, `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` przechodzą
+- [x] 3.1 `npm test`, `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` przechodzą — 8ef4021
 
 #### Manual
 
-- [x] 3.2 Autor widzi „Edytuj” i „Usuń” na swoim przepisie; inny użytkownik ich nie widzi, a `/recipes/[id]/edit` daje mu 404; przepis z seeda (`author_id = null`) nie ma przycisków
-- [x] 3.3 Edycja: formularz wypełniony danymi (w tym ręczny `product` i zamienniki), zapis przekierowuje na szczegóły z nowymi danymi, błędy walidacji przy polach jak w S-05
-- [x] 3.4 Zamiana składnika na produkt z wykluczeń ukrywa przepis na liście z tym wykluczeniem
-- [x] 3.5 Usuwanie: „Anuluj” zamyka dialog bez zmian; potwierdzenie wraca na `/` bez usuniętego przepisu; fokus i klawiatura działają w dialogu; widok poprawny na telefonie i w ciemnym motywie
-- [x] 3.6 Kitchen sink pokazuje nowe stany
+- [x] 3.2 Autor widzi „Edytuj” i „Usuń” na swoim przepisie; inny użytkownik ich nie widzi, a `/recipes/[id]/edit` daje mu 404; przepis z seeda (`author_id = null`) nie ma przycisków — 8ef4021
+- [x] 3.3 Edycja: formularz wypełniony danymi (w tym ręczny `product` i zamienniki), zapis przekierowuje na szczegóły z nowymi danymi, błędy walidacji przy polach jak w S-05 — 8ef4021
+- [x] 3.4 Zamiana składnika na produkt z wykluczeń ukrywa przepis na liście z tym wykluczeniem — 8ef4021
+- [x] 3.5 Usuwanie: „Anuluj” zamyka dialog bez zmian; potwierdzenie wraca na `/` bez usuniętego przepisu; fokus i klawiatura działają w dialogu; widok poprawny na telefonie i w ciemnym motywie — 8ef4021
+- [x] 3.6 Kitchen sink pokazuje nowe stany — 8ef4021
 
 ### Phase 4: Smoke i dokumentacja
 
 #### Automated
 
 - [ ] 4.1 Job `smoke` w CI przechodzi (lokalny Supabase w Actions)
-- [ ] 4.2 `npm run lint` przechodzi
+- [x] 4.2 `npm run lint` przechodzi
 
 #### Manual
 
-- [ ] 4.3 `npm run smoke` przechodzi lokalnie na Supabase z Dockera (`.env` / `.dev.vars` wskazują `supabase start`, nie produkcję)
+- [x] 4.3 `npm run smoke` przechodzi lokalnie na Supabase z Dockera (`.env` / `.dev.vars` wskazują `supabase start`, nie produkcję)
 - [ ] 4.4 Autorka zastosowała migrację `20261018120000` na produkcji przed merge i sprawdziła, że lista i dopasowanie działają
-- [ ] 4.5 Opis PR zawiera „Closes #8”
+- [x] 4.5 Opis PR zawiera „Closes #8”

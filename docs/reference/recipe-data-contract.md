@@ -27,7 +27,7 @@
 
 `numeric` przychodzi z PostgREST jako tekst — serwis zamienia go na `number` (`null` zostaje `null`).
 
-Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`; edycja i usuwanie dojdą w S-06 i S-07.
+Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`. Aktualizować (`update`) i usuwać (`delete`) przepis może tylko jego autor (`author_id = auth.uid()`), przez `PUT` / `DELETE /api/recipes/[id]`; `PUT` nie przyjmuje `author_id` ani `match_keys`. Zmiana składników zeruje `match_keys`. Przepisy z `author_id = null` (np. seed) nie mają autora, więc nikt ich nie edytuje ani nie usuwa; zmieni to S-07.
 
 ## Kształt składnika
 
