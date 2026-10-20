@@ -433,17 +433,17 @@ Nie dotyczy.
 
 #### Automated
 
-- [x] 4.1 UI literal scan passes: `npm run check:ui`
-- [x] 4.2 Lint passes: `npm run lint`
-- [x] 4.3 Type check passes: `npx astro check`
-- [x] 4.4 Tests pass: `npm test`
-- [x] 4.5 Production build passes: `npm run build`
+- [x] 4.1 UI literal scan passes: `npm run check:ui` — 03ba370
+- [x] 4.2 Lint passes: `npm run lint` — 03ba370
+- [x] 4.3 Type check passes: `npx astro check` — 03ba370
+- [x] 4.4 Tests pass: `npm test` — 03ba370
+- [x] 4.5 Production build passes: `npm run build` — 03ba370
 - [ ] 4.6 Auth smoke test passes against the dev server: `npm run smoke`
 
 #### Manual
 
-- [x] 4.7 `/auth/signin`, `/auth/signup`, `/auth/confirm-email` mają kartę z ramką i cieniem w obu motywach
-- [x] 4.8 Przycisk logowania i rejestracji przesuwa się o 3px i traci cień przy kliknięciu; przy reduced motion bez animacji — reduced motion niesprawdzone ręcznie
-- [x] 4.9 Fokus klawiaturą na przycisku jest widoczny; stan pending i disabled są czytelne
-- [x] 4.10 Pola formularza wyglądają jak przed zmianą
-- [x] 4.11 Kitchen sink pokazuje kartę auth i przycisk wciskany
+- [x] 4.7 `/auth/signin`, `/auth/signup`, `/auth/confirm-email` mają kartę z ramką i cieniem w obu motywach — 03ba370
+- [x] 4.8 Przycisk logowania i rejestracji przesuwa się o 3px i traci cień przy kliknięciu; przy reduced motion bez animacji — reduced motion niesprawdzone ręcznie — 03ba370
+- [x] 4.9 Fokus klawiaturą na przycisku jest widoczny; stan pending i disabled są czytelne — 03ba370
+- [x] 4.10 Pola formularza wyglądają jak przed zmianą — 03ba370
+- [x] 4.11 Kitchen sink pokazuje kartę auth i przycisk wciskany — 03ba370
