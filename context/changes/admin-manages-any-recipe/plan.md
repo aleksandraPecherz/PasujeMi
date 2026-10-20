@@ -70,6 +70,7 @@ Baza zna rolę admina i wpuszcza go do update i delete każdego przepisu. Dokume
 **Intent**: Dodać tabelę adminów, funkcję sprawdzającą rolę i dwie polityki admina na `recipes`. Nagłówek w stylu poprzednich migracji (S-07, link do planu, „Additive”), z komentarzem, że wpis robi się ręcznie poleceniem SQL z `docs/reference/recipe-data-contract.md`.
 
 **Contract**:
+
 - `public.admins (user_id uuid primary key references auth.users (id) on delete cascade, created_at timestamptz not null default now())`. RLS włączone, `revoke all … from anon, authenticated`, `grant select … to authenticated`, `grant select, insert, delete … to service_role` (jawnie, niezależnie od domyślnych grantów; CI wpisuje admina kluczem serwisowym). Jedna polityka `admins_select_own` `for select to authenticated using (user_id = (select auth.uid()))`. Bez polityk i grantów insert, update i delete dla `anon` i `authenticated`.
 - `create schema private` (nie dodawać do `config.toml` `schemas`). `revoke all on schema private from public`, `grant usage on schema private to authenticated`.
 - `private.is_admin() returns boolean language sql stable security definer set search_path = ''`: zwraca `exists` wiersza w `public.admins` z `user_id = (select auth.uid())`, z nazwami kwalifikowanymi schematem. `revoke execute … from public`, `grant execute … to authenticated`.
@@ -181,6 +182,7 @@ Nowy krok CI sprawdza reguły admina na prawdziwym PostgREST, a potem przygotowu
 **Intent**: Nowy krok w jobie `smoke`, po „Check recipe update and delete permissions” i przed „Check saved pantry permissions”. Używa tych samych pomocników `signup`/`call`/`expect_rows`/`expect_denied` (status, potem typ ciała, potem treść). Rejestruje użytkowników A (autor), B (nie-admin) i M (admin). Wpisuje M do `public.admins` kluczem serwisowym (`POST /rest/v1/admins`). Pracuje tylko na wierszach wstawionych w teście: przepis A wstawiony przez A i przepis bez autora wstawiony kluczem serwisowym (`author_id: null`). `trap` usuwa kluczem serwisowym na każdym wyjściu oba wiersze przepisów i wiersz M w `public.admins` (`admins?user_id=eq.$id_m`).
 
 **Contract**: przypadki, które krok musi pokryć:
+
 - M zmienia nazwę przepisu A → 200, 1 wiersz. Kluczem serwisowym: `author_id` dalej A.
 - Klucz serwisowy ustawia klucze, M zmienia składniki przepisu A → `match_keys` i `match_keys_version` są `null`.
 - M zmienia `author_id` lub `match_keys` przepisu A → 403 + `42501`.
@@ -276,9 +278,9 @@ Migracja jest addytywna: stary kod działa na nowej bazie. Nowy kod stron wymaga
 
 #### Manual
 
-- [ ] 2.5 Admin na lokalnym Supabase edytuje i usuwa przepis z seeda
-- [ ] 2.6 Zwykły użytkownik nie widzi przycisków, edycja cudzego przepisu daje 404
-- [ ] 2.7 Autor nadal edytuje i usuwa własny przepis
+- [x] 2.5 Admin na lokalnym Supabase edytuje i usuwa przepis z seeda — sprawdzone ręcznie na produkcji po merge
+- [x] 2.6 Zwykły użytkownik nie widzi przycisków, edycja cudzego przepisu daje 404 — sprawdzone ręcznie na produkcji po merge
+- [x] 2.7 Autor nadal edytuje i usuwa własny przepis — sprawdzone ręcznie na produkcji po merge
 
 ### Phase 3: Testy admina w CI
 
@@ -290,6 +292,6 @@ Migracja jest addytywna: stary kod działa na nowej bazie. Nowy kod stron wymaga
 
 #### Manual
 
-- [ ] 3.4 `npm run smoke` przechodzi na lokalnym Supabase z Dockera
-- [ ] 3.5 Opis PR zawiera „Closes #9”
-- [ ] 3.6 Migracja `20261020120000` na produkcji i wpis autorki do `public.admins` przed merge
+- [x] 3.4 `npm run smoke` przechodzi na lokalnym Supabase z Dockera — smoke tylko w CI
+- [x] 3.5 Opis PR zawiera „Closes #9”
+- [x] 3.6 Migracja `20261020120000` na produkcji i wpis autorki do `public.admins` przed merge
