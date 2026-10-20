@@ -391,14 +391,14 @@ Nie dotyczy.
 
 #### Automated
 
-- [x] 1.1 Type check passes: `npx astro check`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 UI literal scan passes: `npm run check:ui`
-- [x] 1.4 Production build passes: `npm run build`
+- [x] 1.1 Type check passes: `npx astro check` — 821245c
+- [x] 1.2 Lint passes: `npm run lint` — 821245c
+- [x] 1.3 UI literal scan passes: `npm run check:ui` — 821245c
+- [x] 1.4 Production build passes: `npm run build` — 821245c
 
 #### Manual
 
-- [x] 1.5 `src/components/ui/card.tsx`, `button.tsx` i `banner.ts` używają wyłącznie tokenów (bez hex, palety i wartości arbitralnych długości)
+- [x] 1.5 `src/components/ui/card.tsx`, `button.tsx` i `banner.ts` używają wyłącznie tokenów (bez hex, palety i wartości arbitralnych długości) — 821245c
 
 ### Phase 2: Banner na tokenach
 
