@@ -269,10 +269,10 @@ Migracja jest addytywna: stary kod działa na nowej bazie. Nowy kod stron wymaga
 
 #### Automated
 
-- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 2.2 Linting przechodzi: `npm run lint`
-- [x] 2.3 Kontrola typów przechodzi: `npx astro check`
-- [x] 2.4 Kontrola literałów UI przechodzi: `npm run check:ui`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test` — 7dcd938
+- [x] 2.2 Linting przechodzi: `npm run lint` — 7dcd938
+- [x] 2.3 Kontrola typów przechodzi: `npx astro check` — 7dcd938
+- [x] 2.4 Kontrola literałów UI przechodzi: `npm run check:ui` — 7dcd938
 
 #### Manual
 
@@ -284,7 +284,7 @@ Migracja jest addytywna: stary kod działa na nowej bazie. Nowy kod stron wymaga
 
 #### Automated
 
-- [ ] 3.1 Linting przechodzi: `npm run lint`
+- [x] 3.1 Linting przechodzi: `npm run lint`
 - [ ] 3.2 Job `smoke` w CI przechodzi na PR, łącznie z krokiem „Check admin permissions”
 - [ ] 3.3 Job `ci` w CI przechodzi na PR
 

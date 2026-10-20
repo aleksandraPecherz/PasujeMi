@@ -182,6 +182,131 @@ jobs:
           # Back to the 5 seeded rows: the later steps count them.
           count=$(curl -sf "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
           echo "$count" | jq -e 'type == "array" and length == 5'
+      - name: Check admin permissions
+        run: |
+          source supabase.env
+          suffix="$(date +%s)-$RANDOM"
+          signup() {
+            curl -sf "$API_URL/auth/v1/signup" -H "apikey: $ANON_KEY" -H "Content-Type: application/json" \
+              -d "{\"email\":\"rls-$1-$suffix@example.com\",\"password\":\"Passw0rd-$suffix\"}"
+          }
+          a=$(signup a)
+          b=$(signup b)
+          m=$(signup m)
+          for u in "$a" "$b" "$m"; do
+            echo "$u" | jq -e '(.access_token | type == "string") and (.user.id | type == "string")' > /dev/null
+          done
+          token_a=$(echo "$a" | jq -r '.access_token')
+          token_b=$(echo "$b" | jq -r '.access_token')
+          token_m=$(echo "$m" | jq -r '.access_token')
+          id_a=$(echo "$a" | jq -r '.user.id')
+          id_m=$(echo "$m" | jq -r '.user.id')
+          service() {
+            curl -sf "$@" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+              -H "Content-Type: application/json" -H "Prefer: return=representation"
+          }
+          # Remove everything the step creates on any exit, so a failed step leaves nothing behind.
+          rid_a=""
+          rid_n=""
+          cleanup() {
+            [ -z "$rid_a" ] || curl -s -X DELETE "$API_URL/rest/v1/recipes?id=eq.$rid_a" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" > /dev/null
+            [ -z "$rid_n" ] || curl -s -X DELETE "$API_URL/rest/v1/recipes?id=eq.$rid_n" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" > /dev/null
+            curl -s -X DELETE "$API_URL/rest/v1/admins?user_id=eq.$id_m" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" > /dev/null
+          }
+          trap cleanup EXIT
+          # A inserts a recipe (author_id defaults to A); the service role inserts one without an author, like the seed.
+          curl -sf "$API_URL/rest/v1/recipes" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $token_a" \
+            -H "Content-Type: application/json" -H "Prefer: return=representation" \
+            -d '{"name":"Admin check A","steps":["Krok"],"ingredients":[{"name":"Mleko","product":"mleko","amount":null,"unit":null,"substitutes":[]}]}' > inserted.json
+          jq -e 'type == "array" and length == 1 and (.[0].id | type == "string")' inserted.json > /dev/null
+          rid_a=$(jq -r '.[0].id' inserted.json)
+          service "$API_URL/rest/v1/recipes" \
+            -d '{"name":"Admin check no author","steps":["Krok"],"ingredients":[{"name":"Mleko","product":"mleko","amount":null,"unit":null,"substitutes":[]}],"author_id":null}' > inserted.json
+          jq -e 'type == "array" and length == 1 and (.[0].id | type == "string") and .[0].author_id == null' inserted.json > /dev/null
+          rid_n=$(jq -r '.[0].id' inserted.json)
+          # M becomes an admin; only the service role can write public.admins.
+          service "$API_URL/rest/v1/admins" -d "{\"user_id\":\"$id_m\"}" > inserted.json
+          jq -e 'type == "array" and length == 1' inserted.json > /dev/null
+          row_a="$API_URL/rest/v1/recipes?id=eq.$rid_a"
+          row_n="$API_URL/rest/v1/recipes?id=eq.$rid_n"
+          row_m="$API_URL/rest/v1/admins?user_id=eq.$id_m"
+          # $1 = label, $2 = method, $3 = URL, $4 = bearer token, $5 = JSON body ("" for none), $6 = accepted statuses.
+          # Leaves the response body in res.json; the status is checked before the body.
+          call() {
+            if [ -n "$5" ]; then
+              status=$(curl -s -o res.json -w '%{http_code}' -X "$2" "$3" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $4" \
+                -H "Content-Type: application/json" -H "Prefer: return=representation" -d "$5")
+            else
+              status=$(curl -s -o res.json -w '%{http_code}' -X "$2" "$3" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $4" \
+                -H "Prefer: return=representation")
+            fi
+            echo "$1: $status $(cat res.json)"
+            [[ " $6 " == *" $status "* ]]
+          }
+          # Body type first, then the row count.
+          expect_rows() {
+            jq -e --argjson n "$1" 'type == "array" and length == $n' res.json > /dev/null
+          }
+          expect_denied() {
+            jq -e 'type == "object" and .code == "42501"' res.json > /dev/null
+          }
+          # $1 = row URL; the service role reads it back.
+          service_row() {
+            curl -sf "$1&select=name,author_id,match_keys,match_keys_version" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY"
+          }
+          # M renames A's recipe; the author stays A.
+          call "M renames a recipe of A" PATCH "$row_a" "$token_m" '{"name":"Admin renamed"}' 200
+          expect_rows 1
+          service_row "$row_a" | jq -e --arg a "$id_a" 'type == "array" and length == 1 and .[0].name == "Admin renamed" and .[0].author_id == $a' > /dev/null
+          # The service role stores keys; M changes the ingredients: the trigger nulls them.
+          call "service role sets keys" PATCH "$row_a" "$SERVICE_ROLE_KEY" '{"match_keys":{"seed":true},"match_keys_version":2}' 200
+          expect_rows 1
+          call "M changes ingredients" PATCH "$row_a" "$token_m" '{"ingredients":[{"name":"Orzechy","product":"orzechy","amount":null,"unit":null,"substitutes":[]}]}' 200
+          expect_rows 1
+          service_row "$row_a" | jq -e 'type == "array" and length == 1 and .[0].match_keys == null and .[0].match_keys_version == null' > /dev/null
+          # Columns without an update grant stay closed to an admin.
+          call "M sets author_id" PATCH "$row_a" "$token_m" "{\"author_id\":\"$id_m\"}" 403
+          expect_denied
+          call "M sets match_keys" PATCH "$row_a" "$token_m" '{"match_keys":{}}' 403
+          expect_denied
+          # M edits a recipe without an author; it stays without one.
+          call "M renames a recipe without author" PATCH "$row_n" "$token_m" '{"name":"Admin renamed no author"}' 200
+          expect_rows 1
+          service_row "$row_n" | jq -e 'type == "array" and length == 1 and .[0].name == "Admin renamed no author" and .[0].author_id == null' > /dev/null
+          # B is not an admin: RLS filters the recipe without an author out, no error.
+          call "B renames a recipe without author" PATCH "$row_n" "$token_b" '{"name":"Hijacked"}' 200
+          expect_rows 0
+          call "B deletes a recipe without author" DELETE "$row_n" "$token_b" "" 200
+          expect_rows 0
+          service_row "$row_n" | jq -e 'type == "array" and length == 1 and .[0].name == "Admin renamed no author"' > /dev/null
+          # public.admins: B cannot make themselves an admin or touch the row of M.
+          call "B inserts into admins" POST "$API_URL/rest/v1/admins" "$token_b" "{\"user_id\":\"$id_m\"}" "401 403"
+          expect_denied
+          call "B updates the admin row of M" PATCH "$row_m" "$token_b" '{"created_at":"2000-01-01T00:00:00Z"}' 403
+          expect_denied
+          call "B deletes the admin row of M" DELETE "$row_m" "$token_b" "" 403
+          expect_denied
+          curl -sf "$row_m&select=user_id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+            | jq -e 'type == "array" and length == 1' > /dev/null
+          # Each user reads only their own row of public.admins.
+          call "B reads admins" GET "$API_URL/rest/v1/admins?select=user_id" "$token_b" "" 200
+          expect_rows 0
+          call "M reads admins" GET "$API_URL/rest/v1/admins?select=user_id" "$token_m" "" 200
+          expect_rows 1
+          jq -e --arg id "$id_m" '.[0].user_id == $id' res.json > /dev/null
+          call "anon reads admins" GET "$API_URL/rest/v1/admins?select=user_id" "$ANON_KEY" "" "401 403"
+          expect_denied
+          # The role check lives in the private schema: it is not reachable through the API.
+          call "M calls is_admin" POST "$API_URL/rest/v1/rpc/is_admin" "$token_m" '{}' 404
+          jq -e 'type == "object" and .code == "PGRST202"' res.json > /dev/null
+          # M deletes both recipes.
+          call "M deletes a recipe of A" DELETE "$row_a" "$token_m" "" 200
+          expect_rows 1
+          call "M deletes a recipe without author" DELETE "$row_n" "$token_m" "" 200
+          expect_rows 1
+          # Back to the 5 seeded rows: the later steps count them.
+          count=$(curl -sf "$API_URL/rest/v1/recipes?select=id" -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")
+          echo "$count" | jq -e 'type == "array" and length == 5'
       - name: Check saved pantry permissions
         run: |
           source supabase.env
