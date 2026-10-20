@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: S-07 Admin zarządza dowolnym przepisem
 
 - **Plan**: context/changes/admin-manages-any-recipe/plan.md
@@ -9,15 +10,16 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
-| Architectural Fitness | PASS |
-| Blind Spots | WARNING |
-| Plan Completeness | WARNING |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
+| Architectural Fitness | PASS    |
+| Blind Spots           | WARNING |
+| Plan Completeness     | WARNING |
 
 ## Grounding
+
 8/8 paths ✓, 6/6 symbols ✓ (fakeClient, updateRecipe, config.toml:13, ci.yml:51/94/184/259, contract :30), brief↔plan ✓, Progress↔Phase ✓ (3/7/6 items)
 
 ## Findings

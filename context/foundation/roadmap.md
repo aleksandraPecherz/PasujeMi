@@ -39,17 +39,17 @@ Osoba gotująca dla siebie i domowników chce szybko zobaczyć, co ugotuje z pro
 
 ## At a glance
 
-| ID   | Change ID                     | Outcome (user can …)                                                                   | Prerequisites                              | PRD refs                    | Status   |
-| ---- | ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------- | -------- |
-| F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                          | FR-004, FR-006, FR-007      | done     |
-| F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel file (author's machine) | FR-004, FR-005, NFR (< 1 s) | done     |
-| S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                          | FR-001                      | done     |
-| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | done     |
-| S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | done     |
-| S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | done     |
-| S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done     |
-| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | done     |
-| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | in-progress |
+| ID   | Change ID                     | Outcome (user can …)                                                                   | Prerequisites                              | PRD refs                    | Status |
+| ---- | ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------- | ------ |
+| F-01 | recipe-catalog-contract       | (foundation) minimalna struktura przepisu z kilkoma prawdziwymi przepisami testowymi   | —                                          | FR-004, FR-006, FR-007      | done   |
+| F-02 | seed-recipe-import            | (foundation) bazowe 50–100 przepisów zaimportowane w ustalonej strukturze              | F-01, recipe Excel file (author's machine) | FR-004, FR-005, NFR (< 1 s) | done   |
+| S-01 | login-gated-app-shell         | zakłada konto, loguje się i trafia na widok aplikacji; inne ścieżki → logowanie        | —                                          | FR-001                      | done   |
+| S-02 | browse-recipes-and-details    | przegląda pierwsze 10 przepisów, doładowuje kolejne i otwiera szczegóły przepisu       | F-01, S-01                                 | FR-005, FR-006, US-01       | done   |
+| S-03 | first-pantry-match            | wpisuje produkty i wykluczenia, widzi listę z % dopasowania bez wykluczonych przepisów | F-01, S-01                                 | US-01, FR-002, FR-004       | done   |
+| S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | done   |
+| S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done   |
+| S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | done   |
+| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | done   |
 
 ## Streams
 
@@ -190,7 +190,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Jak nadawana jest rola admina (ręcznie przez autorkę w bazie czy inaczej)? — Owner: autorka. Block: no.
 - **Risk:** Rola admina wprowadzana dopiero tutaj, gdy jest potrzebna; rozszerza regułę z S-06 o drugą rolę.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -232,3 +232,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-02: (foundation) 50–100 przepisów autorki jest dostępnych w aplikacji od pierwszego uruchomienia, w strukturze ustalonej w F-01.** — Archived 2026-10-18 → `context/archive/2026-10-18-seed-recipe-import/`. Lesson: —.
 - **S-06: autor edytuje i usuwa wyłącznie przepisy, które sam dodał.** — Archived 2026-10-18 → `context/archive/2026-10-18-author-edits-own-recipe/`. Lesson: —.
 - **S-04: użytkownik wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia (prywatne, widoczne tylko dla niego); produkty posiadane wpisuje od nowa.** — Archived 2026-10-18 → `context/archive/2026-10-18-remembered-staples-exclusions/`. Lesson: —.
+- **S-07: admin edytuje i usuwa dowolny przepis we wspólnej bazie.** — Archived 2026-10-20 → `context/archive/2026-10-20-admin-manages-any-recipe/`. Lesson: —.
