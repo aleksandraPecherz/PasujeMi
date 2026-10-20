@@ -141,7 +141,7 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Zakładanie konta…" icon={<UserPlus className="size-4" />}>
+      <SubmitButton variant="pressable" pendingText="Zakładanie konta…" icon={<UserPlus className="size-4" />}>
         Załóż konto
       </SubmitButton>
     </form>

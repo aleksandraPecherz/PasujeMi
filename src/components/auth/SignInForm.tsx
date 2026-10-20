@@ -87,7 +87,7 @@ export default function SignInForm({ serverError, initialEmail = "", autoFocusPa
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Logowanie…" icon={<LogIn className="size-4" />}>
+      <SubmitButton variant="pressable" pendingText="Logowanie…" icon={<LogIn className="size-4" />}>
         Zaloguj się
       </SubmitButton>
     </form>

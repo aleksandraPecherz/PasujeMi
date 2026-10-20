@@ -13,7 +13,9 @@ import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
+import { cardVariants } from "@/components/ui/card";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { cn } from "@/lib/utils";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
 import { MAX_SAVED_TOKENS } from "@/lib/pantry/limits";
 import type { Recipe, RecipeIngredient, RecipeMatch } from "@/types";
@@ -463,22 +465,42 @@ export default function KitchenSink() {
       >
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-cosmic rounded-2xl p-6">
-            <SignInForm idPrefix="ks-signin-empty-" />
+            <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
+              <SignInForm idPrefix="ks-signin-empty-" />
+            </div>
           </div>
           <div className="bg-cosmic rounded-2xl p-6">
-            <SignInForm
-              idPrefix="ks-signin-error-"
-              initialEmail={SAMPLE_EMAIL}
-              serverError={authErrorMessage("invalid_credentials")}
-            />
+            <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
+              <SignInForm
+                idPrefix="ks-signin-error-"
+                initialEmail={SAMPLE_EMAIL}
+                serverError={authErrorMessage("invalid_credentials")}
+              />
+            </div>
           </div>
           <div className="bg-cosmic rounded-2xl p-6">
-            <SignUpForm
-              idPrefix="ks-signup-error-"
-              initialEmail={SAMPLE_EMAIL}
-              serverError={authErrorMessage("user_already_exists")}
-            />
+            <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
+              <SignUpForm
+                idPrefix="ks-signup-error-"
+                initialEmail={SAMPLE_EMAIL}
+                serverError={authErrorMessage("user_already_exists")}
+              />
+            </div>
           </div>
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Przycisk wciskany"
+        note="Wariant pressable: default i disabled. Najedź kursorem (hover), przytrzymaj (active), przejdź klawiszem Tab (focus-visible). Stan pending widać w formularzach logowania (SubmitButton)."
+      >
+        <div className="flex flex-wrap gap-3">
+          <Button type="button" variant="pressable">
+            Zaloguj się
+          </Button>
+          <Button type="button" variant="pressable" disabled>
+            Zaloguj się
+          </Button>
         </div>
       </StateSection>
     </div>

@@ -38,6 +38,7 @@ PasujeMi is a Polish-language recipe-matching web app built on the 10x Astro Sta
 - Tokens live in `src/styles/global.css`: values in `:root` / `.dark`, published to Tailwind via `@theme inline`. Dark theme comes from `class="dark"` on `<html>` in `src/layouts/Layout.astro`; value sources are recorded in `context/archive/2026-10-17-ui-palette/tokens.md`.
 - Check `src/components/ui/` before creating a component; add a missing one with `npx shadcn@latest add <name>`. A missing look is a new variant in `ui/`, not a color in `className`.
 - No literal colors or arbitrary values (`bg-purple-600`, `#0a0e1a`, `p-[13px]`) in views — use tokens. `npm run check:ui` (also run by lint-staged and CI) guards the files listed in `CLEAN_FILES` in `scripts/check-ui-literals.mjs`; add a file there once you clean it. `src/components/ui/` is not scanned (upstream shadcn keeps literals like `text-white`, `ring-[3px]`), so a new variant there must use tokens only — the scan will not catch it.
+- The neo-brutal look is `cardVariants({ variant: "brutal" })` from `ui/card.tsx` and `Button variant="pressable"`; shadows are the `shadow-brutal` / `shadow-brutal-sm` tokens from `global.css`. Use it only on `RecipeTile` and the auth cards.
 - Kitchen sink: `/dev/kitchen-sink` (dev only) — add each new component state there when you create it.
 
 ## Testing
