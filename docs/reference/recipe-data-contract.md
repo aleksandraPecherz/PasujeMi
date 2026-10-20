@@ -27,7 +27,16 @@
 
 `numeric` przychodzi z PostgREST jako tekst — serwis zamienia go na `number` (`null` zostaje `null`).
 
-Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`. Aktualizować (`update`) i usuwać (`delete`) przepis może tylko jego autor (`author_id = auth.uid()`), przez `PUT` / `DELETE /api/recipes/[id]`; `PUT` nie przyjmuje `author_id` ani `match_keys`. Zmiana składników zeruje `match_keys`. Przepisy z `author_id = null` (np. seed) nie mają autora, więc nikt ich nie edytuje ani nie usuwa; zmieni to S-07.
+Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`. Aktualizować (`update`) i usuwać (`delete`) przepis może jego autor (`author_id = auth.uid()`) albo admin (wiersz w `public.admins`), przez `PUT` / `DELETE /api/recipes/[id]`; `PUT` nie przyjmuje `author_id` ani `match_keys`, także od admina. Zmiana składników zeruje `match_keys`. Admin może zmienić i usunąć też przepisy z `author_id = null` (np. seed); dla pozostałych użytkowników takie przepisy są tylko do odczytu. `authenticated` widzi w `public.admins` tylko swój wiersz i nie może do niej pisać.
+
+Rolę nadaje się ręcznie w panelu Supabase (SQL Editor), bez ekranu w aplikacji:
+
+```sql
+-- nadanie roli
+insert into public.admins (user_id) select id from auth.users where email = '<e-mail>';
+-- odebranie roli
+delete from public.admins where user_id = (select id from auth.users where email = '<e-mail>');
+```
 
 ## Kształt składnika
 
