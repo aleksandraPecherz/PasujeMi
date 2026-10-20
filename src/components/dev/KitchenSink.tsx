@@ -463,7 +463,7 @@ export default function KitchenSink() {
         title="Formularze logowania"
         note="Pusty formularz logowania; logowanie po złym haśle i rejestracja po błędzie — e-mail zostaje, hasła są puste. Na stronie fokus trafia na pole hasła; tutaj jest wyłączony, żeby strona nie przewijała się sama."
       >
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-3">
           <div className="bg-cosmic rounded-2xl p-6">
             <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
               <SignInForm idPrefix="ks-signin-empty-" />

@@ -20,7 +20,7 @@ const buttonVariants = cva(
         "ghost-current": "hover:bg-current/20 focus-visible:ring-current",
         link: "text-primary underline-offset-4 hover:underline",
         pressable:
-          "bg-primary text-primary-foreground hover:bg-primary-hover rounded-lg border-2 border-foreground shadow-brutal-sm active:translate-x-0.75 active:translate-y-0.75 active:shadow-none motion-reduce:transition-none",
+          "bg-primary text-primary-foreground hover:bg-primary-hover rounded-lg border-2 border-foreground shadow-brutal-sm active:translate-x-0.75 active:translate-y-0.75 active:shadow-none motion-reduce:transition-none focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-solid focus-visible:outline-ring",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

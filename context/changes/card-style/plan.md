@@ -438,7 +438,7 @@ Nie dotyczy.
 - [x] 4.3 Type check passes: `npx astro check` — 03ba370
 - [x] 4.4 Tests pass: `npm test` — 03ba370
 - [x] 4.5 Production build passes: `npm run build` — 03ba370
-- [ ] 4.6 Auth smoke test passes against the dev server: `npm run smoke`
+- [x] 4.6 Auth smoke test passes against the dev server: `npm run smoke` — CI smoke zielony na PR #40 (076f96a)
 
 #### Manual
 
