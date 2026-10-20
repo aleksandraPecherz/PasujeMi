@@ -23,7 +23,16 @@ if (!supabase) {
     const userId = Astro.locals.user?.id;
     // UX only: the Edit/Delete buttons for the author or an admin. The boundary is RLS (the API returns 404 to anyone else).
     if (found && userId) {
-      canManage = found.authorId === userId || (await isAdmin(supabase, userId));
+      canManage = found.authorId === userId;
+      if (!canManage) {
+        // The buttons are not worth a 500: when the lookup fails the page stays readable, without them.
+        try {
+          canManage = await isAdmin(supabase, userId);
+        } catch (error) {
+          // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
+          console.error("isAdmin failed", error);
+        }
+      }
     }
   } catch (error) {
     // eslint-disable-next-line no-console -- server-side log, visible in Workers logs

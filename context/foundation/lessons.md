@@ -22,3 +22,10 @@
 - **Problem**: Liczba iteracji rośnie z danymi użytkownika (np. wykładniczo: 12 tagów „maka” dało 4096 odczytań), a na Workers Free limit CPU to 10 ms na zapytanie. Po przekroczeniu Worker kończy się błędem 1102 zamiast czytelnej odpowiedzi.
 - **Rule**: Przed pętlą ogranicz wejście twardym limitem (np. MAX_TOKENS) i przy przekroczeniu zwróć 400 z czytelnym kodem błędu. Unikaj kombinatoryki po każdym wystąpieniu – licz warianty po unikalnych kluczach. Limity trzymaj w jednym pliku współdzielonym przez API i UI.
 - **Applies to**: plan, implement, impl-review (src/pages/api/**, src/lib/matching/**)
+
+## Revoke PUBLIC execute on every new function in the private schema
+
+- **Context**: supabase/migrations/20261020120000_add_admin_manages_any_recipe.sql:35 — `grant usage on schema private to authenticated` for the schema holding `private.is_admin()`.
+- **Problem**: Safe today (one function with execute revoked), but every future function created in `private` gets EXECUTE for PUBLIC by default and becomes callable by `authenticated` in SQL contexts such as policies.
+- **Rule**: Każda nowa funkcja w schemacie `private` musi w tej samej migracji mieć `revoke execute on function ... from public`, a następnie jawny `grant execute` tylko dla ról, które jej potrzebują.
+- **Applies to**: plan, implement, impl-review (supabase/migrations/**)

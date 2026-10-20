@@ -1,7 +1,7 @@
 ---
 change_id: admin-manages-any-recipe
 title: Admin manages any recipe
-status: implementing
+status: impl_reviewed
 created: 2026-10-20
 updated: 2026-10-20
 archived_at: null
