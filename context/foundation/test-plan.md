@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-10-20
+> Last updated: 2026-10-20 (§5 gates corrected)
 
 ## 1. Strategy
 
@@ -72,7 +72,7 @@ orchestrator updates Status as artifacts appear on disk.
 | 1   | Kontrakt dopasowania   | Udowodnić regułę „ten sam składnik", twardy filtr wykluczeń, ranking i limity wejścia na przypadkach z PRD                                                           | #1, #4, #5    | unit                           | change opened | context/changes/testing-matching-contract/ |
 | 2   | Autoryzacja i RLS      | Udowodnić, że obcy nie zmieni ani nie usunie cudzego przepisu, nie zobaczy cudzej spiżarki, a anon nic nie czyta; ocenić, czy kontrole curl w CI przenieść do testów | #2, #3, #6    | integration (lokalny Supabase) | not started   | —                                          |
 | 3   | Krytyczny przepływ e2e | Jeden smoke w przeglądarce: tagi → filtry → kafelki → szczegóły                                                                                                      | #7            | e2e                            | not started   | —                                          |
-| 4   | Quality-gates wiring   | Utrwalić poziom bazowy w CI: testy integracyjne i e2e wymagane na PR                                                                                                 | cross-cutting | gates                          | not started   | —                                          |
+| 4   | Quality-gates wiring   | Utrwalić poziom bazowy w CI: testy integracyjne wymagane w CI, e2e najpierw informacyjne, wymagane po ustabilizowaniu                                                | cross-cutting | gates                          | not started   | —                                          |
 
 **Status vocabulary** (fixed — parser literals): `not started`, `change opened`, `researched`, `planned`, `implementing`, `complete`.
 
@@ -99,14 +99,15 @@ AI-native layer (hook, przegląd wizualny przez model) is deliberately not a rol
 
 ## 5. Quality Gates
 
-| Gate                              | Where              | Required?                 | Catches                                                      |
-| --------------------------------- | ------------------ | ------------------------- | ------------------------------------------------------------ |
-| lint + typecheck + check:ui       | local (husky) + CI | required (wired)          | błędy składni i typów, literały kolorów                      |
-| unit (`npm test`)                 | local + CI         | required (wired)          | regresje logiki                                              |
-| RLS/permission checks (curl w CI) | CI                 | required (wired)          | dostęp anon, uprawnienia zapisu, edycji, usuwania i spiżarki |
-| integration (autoryzacja i RLS)   | local + CI         | required after §3 Phase 2 | obca osoba zmienia dane, anon czyta                          |
-| e2e na krytycznym przepływie      | CI on PR           | required after §3 Phase 3 | zepsuty przepływ tagi → kafelki                              |
-| pre-prod smoke (`npm run smoke`)  | przed deployem     | optional                  | błędy środowiskowe auth                                      |
+| Gate                              | Where                 | Required?                                            | Catches                                                      |
+| --------------------------------- | --------------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| lint + check:ui                   | local (husky) + CI    | required (wired)                                     | błędy składni, literały kolorów                              |
+| typecheck (`npx astro check`)     | CI                    | required (wired)                                     | dryf typów (lokalnie nie jest uruchamiany automatycznie)     |
+| unit (`npm test`)                 | CI (lokalnie ręcznie) | required in CI (wired)                               | regresje logiki                                              |
+| RLS/permission checks (curl w CI) | CI                    | required (wired)                                     | dostęp anon, uprawnienia zapisu, edycji, usuwania i spiżarki |
+| smoke (`npm run smoke`)           | CI (preview)          | required (wired)                                     | błędy środowiskowe i przepływu auth                          |
+| integration (autoryzacja i RLS)   | CI (lokalnie ręcznie) | required after §3 Phase 2                            | obca osoba zmienia dane, anon czyta                          |
+| e2e na krytycznym przepływie      | CI on PR              | informational after §3 Phase 3; required once stable | zepsuty przepływ tagi → kafelki                              |
 
 ## 6. Cookbook Patterns
 
