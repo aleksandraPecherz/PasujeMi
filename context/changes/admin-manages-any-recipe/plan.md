@@ -284,9 +284,9 @@ Migracja jest addytywna: stary kod działa na nowej bazie. Nowy kod stron wymaga
 
 #### Automated
 
-- [x] 3.1 Linting przechodzi: `npm run lint`
-- [ ] 3.2 Job `smoke` w CI przechodzi na PR, łącznie z krokiem „Check admin permissions”
-- [ ] 3.3 Job `ci` w CI przechodzi na PR
+- [x] 3.1 Linting przechodzi: `npm run lint` — 5b56401
+- [x] 3.2 Job `smoke` w CI przechodzi na PR, łącznie z krokiem „Check admin permissions” — 5b56401
+- [x] 3.3 Job `ci` w CI przechodzi na PR — 5b56401
 
 #### Manual
 
