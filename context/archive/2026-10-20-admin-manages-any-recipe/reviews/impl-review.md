@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: S-07 Admin zarządza dowolnym przepisem
 
 - **Plan**: context/changes/admin-manages-any-recipe/plan.md
@@ -10,14 +11,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | PASS |
-| Safety & Quality | WARNING |
-| Architecture | PASS |
-| Pattern Consistency | PASS |
-| Success Criteria | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | PASS    |
+| Safety & Quality    | WARNING |
+| Architecture        | PASS    |
+| Pattern Consistency | PASS    |
+| Success Criteria    | PASS    |
 
 Automatyczne: `npm test` 338 OK, lint OK, `astro check` 0 błędów, `check:ui` OK, CI (`ci`, `smoke`) zielone na PR #41. Ręczne 2.5–2.7, 3.4–3.6 oczekujące (nieodhaczone, zgodnie z Progress).
 
