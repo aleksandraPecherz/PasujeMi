@@ -418,16 +418,16 @@ Nie dotyczy.
 
 #### Automated
 
-- [ ] 3.1 UI literal scan passes: `npm run check:ui`
-- [ ] 3.2 Lint passes: `npm run lint`
-- [ ] 3.3 Type check passes: `npx astro check`
+- [x] 3.1 UI literal scan passes: `npm run check:ui`
+- [x] 3.2 Lint passes: `npm run lint`
+- [x] 3.3 Type check passes: `npx astro check`
 
 #### Manual
 
-- [ ] 3.4 Kafelek w kitchen sink i na `/` ma ramkę 2px i twardy cień w obu motywach; cień nie jest ucięty w siatce
-- [ ] 3.5 Hover zmienia ramkę na `--ring` i tło na `--accent`; kliknięcie nie przesuwa kafelka
-- [ ] 3.6 Pierścień fokusu (Tab) pokrywa rogi kafelka
-- [ ] 3.7 Szkielet listy ma ten sam promień co kafelek; ekran po zapisie przepisu (`RecipeSaved`) wygląda poprawnie
+- [x] 3.4 Kafelek w kitchen sink i na `/` ma ramkę 2px i twardy cień w obu motywach; cień nie jest ucięty w siatce
+- [x] 3.5 Hover zmienia ramkę na `--ring` i tło na `--accent`; kliknięcie nie przesuwa kafelka
+- [x] 3.6 Pierścień fokusu (Tab) pokrywa rogi kafelka
+- [x] 3.7 Szkielet listy ma ten sam promień co kafelek; ekran po zapisie przepisu (`RecipeSaved`) wygląda poprawnie
 
 ### Phase 4: Karty auth
 

@@ -412,7 +412,7 @@ export default function KitchenSink() {
 
       <StateSection
         title="Kafelek przepisu: link"
-        note="Cały kafelek prowadzi do szczegółów (link na tytule rozciągnięty na kafelek); bez dopasowania i z dopasowaniem. Najedź kursorem i przejdź klawiszem Tab, żeby zobaczyć hover i focus-visible."
+        note="Cały kafelek prowadzi do szczegółów (link na tytule rozciągnięty na kafelek); bez dopasowania i z dopasowaniem. Kafelek ma ramkę i cień (wariant brutal karty) i nie wciska się przy kliknięciu. Najedź kursorem i przejdź klawiszem Tab, żeby zobaczyć hover i focus-visible."
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <RecipeTile recipe={RECIPE} />
