@@ -258,21 +258,21 @@ Migracja jest addytywna: stary kod działa na nowej bazie. Nowy kod stron wymaga
 
 #### Automated
 
-- [x] 1.1 Migracja wchodzi na czystą bazę lokalną: `supabase db reset` bez błędów
-- [x] 1.2 Linting przechodzi: `npm run lint`
+- [x] 1.1 Migracja wchodzi na czystą bazę lokalną: `supabase db reset` bez błędów — 26dc513
+- [x] 1.2 Linting przechodzi: `npm run lint` — 26dc513
 
 #### Manual
 
-- [x] 1.3 `private.is_admin()` działa w SQL i nie jest wołalna przez `/rest/v1/rpc`
+- [x] 1.3 `private.is_admin()` działa w SQL i nie jest wołalna przez `/rest/v1/rpc` — 26dc513
 
 ### Phase 2: Strony „autor albo admin”
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 Linting przechodzi: `npm run lint`
-- [ ] 2.3 Kontrola typów przechodzi: `npx astro check`
-- [ ] 2.4 Kontrola literałów UI przechodzi: `npm run check:ui`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 Linting przechodzi: `npm run lint`
+- [x] 2.3 Kontrola typów przechodzi: `npx astro check`
+- [x] 2.4 Kontrola literałów UI przechodzi: `npm run check:ui`
 
 #### Manual
 

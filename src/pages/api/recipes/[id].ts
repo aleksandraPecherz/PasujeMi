@@ -6,7 +6,7 @@ import { parseRecipeInput } from "@/lib/recipes/validate";
 import { createClient } from "@/lib/supabase";
 import { deleteRecipe, updateRecipe } from "@/lib/services/recipes";
 
-// Someone else's recipe and a missing one are indistinguishable: both answer 404.
+// For anyone who is neither the author nor an admin, someone else's recipe and a missing one are indistinguishable: both answer 404.
 export const PUT: APIRoute = async (context) => {
   const { request } = context;
   // Defence in depth: the middleware already answers signed-out /api/* with 401.

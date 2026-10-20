@@ -4,11 +4,12 @@ import { RecipeDetails } from "@/components/recipes/RecipeDetails";
 import RecipeAuthorActions from "@/components/recipes/RecipeAuthorActions";
 import AppLayout from "@/layouts/AppLayout.astro";
 import { createClient } from "@/lib/supabase";
+import { isAdmin } from "@/lib/services/admins";
 import { getRecipe } from "@/lib/services/recipes";
 import type { Recipe } from "@/types";
 
 let recipe: Recipe | null = null;
-let authorId: string | null = null;
+let canManage = false;
 let failure: string | null = null;
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
@@ -19,7 +20,11 @@ if (!supabase) {
   try {
     const found = await getRecipe(supabase, Astro.params.id ?? "");
     recipe = found?.recipe ?? null;
-    authorId = found?.authorId ?? null;
+    const userId = Astro.locals.user?.id;
+    // UX only: the Edit/Delete buttons for the author or an admin. The boundary is RLS (the API returns 404 to anyone else).
+    if (found && userId) {
+      canManage = found.authorId === userId || (await isAdmin(supabase, userId));
+    }
   } catch (error) {
     // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
     console.error("getRecipe failed", error);
@@ -31,15 +36,13 @@ if (!supabase) {
 if (!failure && !recipe) {
   Astro.response.status = 404;
 }
-// UX only: the Edit/Delete buttons. The boundary is RLS (the API returns 404 to anyone else).
-const isAuthor = authorId !== null && authorId === Astro.locals.user?.id;
 ---
 
 <AppLayout title={recipe?.name ?? (failure ? "Błąd" : "Nie znaleziono przepisu")}>
   {recipe ? (
     <RecipeDetails recipe={recipe}>
       <Fragment slot="actions">
-        {isAuthor && <RecipeAuthorActions client:load recipeId={recipe.id} recipeName={recipe.name} />}
+        {canManage && <RecipeAuthorActions client:load recipeId={recipe.id} recipeName={recipe.name} />}
       </Fragment>
     </RecipeDetails>
   ) : failure ? (

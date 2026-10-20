@@ -91,6 +91,7 @@ export function RecipeAuthorActionsView({
   );
 }
 
+/** Edit and Delete for a recipe; shown to its author or an admin. The name dates from S-06 (author only). */
 export default function RecipeAuthorActions({ recipeId, recipeName }: { recipeId: string; recipeName: string }) {
   const { status, error, remove } = useDeleteRecipe(recipeId);
   return (
