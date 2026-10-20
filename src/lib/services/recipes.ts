@@ -144,7 +144,7 @@ export async function createRecipe(supabase: SupabaseClient, authorId: string, r
 
 /**
  * Replaces the content of a recipe. `null` when `id` is not a valid id (no query is made) or when RLS leaves no row
- * to update (not the author, or no such recipe: the two are not told apart). The author stays unchanged. The
+ * to update (not the author nor an admin, or no such recipe: the two are not told apart). The author stays unchanged. The
  * match keys are cleared by the trigger from migration `20261018120000`, so this does not send them.
  */
 export async function updateRecipe(supabase: SupabaseClient, id: string, recipe: NewRecipe): Promise<Recipe | null> {

@@ -3,7 +3,7 @@ project: PasujeMi
 version: 1
 status: draft
 created: 2026-10-11
-updated: 2026-10-18
+updated: 2026-10-20
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -49,7 +49,7 @@ Osoba gotująca dla siebie i domowników chce szybko zobaczyć, co ugotuje z pro
 | S-04 | remembered-staples-exclusions | wraca w kolejnej sesji i zastaje swoje produkty stałe i wykluczenia                    | S-03                                       | FR-003                      | done     |
 | S-05 | add-recipe-manually           | dodaje przepis do wspólnej bazy ręcznie, z zamiennikami składników                     | F-01, S-01                                 | FR-007                      | done     |
 | S-06 | author-edits-own-recipe       | jako autor edytuje i usuwa swój przepis                                                | S-05                                       | FR-009                      | done     |
-| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | proposed |
+| S-07 | admin-manages-any-recipe      | jako admin edytuje i usuwa dowolny przepis                                             | S-06                                       | FR-010                      | in-progress |
 
 ## Streams
 
@@ -190,7 +190,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Jak nadawana jest rola admina (ręcznie przez autorkę w bazie czy inaczej)? — Owner: autorka. Block: no.
 - **Risk:** Rola admina wprowadzana dopiero tutaj, gdy jest potrzebna; rozszerza regułę z S-06 o drugą rolę.
-- **Status:** proposed
+- **Status:** in-progress
 
 ## Backlog Handoff
 

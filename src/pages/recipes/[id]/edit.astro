@@ -3,6 +3,7 @@ import NotFoundView from "@/components/NotFoundView.astro";
 import RecipeForm from "@/components/recipes/RecipeForm";
 import AppLayout from "@/layouts/AppLayout.astro";
 import { createClient } from "@/lib/supabase";
+import { isAdmin } from "@/lib/services/admins";
 import { getRecipe } from "@/lib/services/recipes";
 import type { Recipe } from "@/types";
 
@@ -16,8 +17,9 @@ if (!supabase) {
 } else {
   try {
     const found = await getRecipe(supabase, Astro.params.id ?? "");
-    // UX only: the form is shown to the author. The boundary is RLS (a PUT from anyone else answers 404).
-    if (found && found.authorId !== null && found.authorId === Astro.locals.user?.id) {
+    // UX only: the form is shown to the author or an admin. The boundary is RLS (a PUT from anyone else answers 404).
+    const userId = Astro.locals.user?.id;
+    if (found && userId && (found.authorId === userId || (await isAdmin(supabase, userId)))) {
       recipe = found.recipe;
     }
   } catch (error) {
