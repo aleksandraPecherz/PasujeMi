@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import ThemeToggle from "@/components/ThemeToggle";
+import { cardVariants } from "@/components/ui/card";
 import SignInForm from "@/components/auth/SignInForm";
 import { authErrorMessage, emailFromQuery } from "@/lib/auth-errors";
 
@@ -14,7 +15,7 @@ const email = error ? emailFromQuery(Astro.url.searchParams.get("email")) : "";
     <div class="absolute top-4 right-4">
       <ThemeToggle client:load />
     </div>
-    <div class="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-card-foreground backdrop-blur-xl">
+    <div class:list={[cardVariants({ variant: "brutal" }), "w-full max-w-sm p-8"]}>
       <h1 class="mb-6 bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-center text-2xl font-bold text-transparent">
         Zaloguj się
       </h1>

@@ -1,5 +1,7 @@
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cardVariants } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { IngredientMatch, MatchedRecipe, Recipe, RecipeIngredient } from "@/types";
 
 interface RecipeTileProps {
@@ -45,13 +47,18 @@ function IngredientTag({ ingredient, status }: { ingredient: RecipeIngredient; s
 export function RecipeTile({ recipe, match }: RecipeTileProps) {
   const percent = match?.percent ?? null;
   return (
-    <article className="border-border bg-card hover:border-ring hover:bg-accent relative flex min-w-0 flex-col gap-3 rounded-2xl border p-4 transition-colors sm:p-5">
+    <article
+      className={cn(
+        cardVariants({ variant: "brutal" }),
+        "hover:border-ring hover:bg-accent relative flex min-w-0 flex-col gap-3 p-4 transition-colors sm:p-5",
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         {/* Stretched link: the pseudo-element covers the whole tile, so the title is the only focusable element. */}
         <h3 className="text-card-foreground min-w-0 font-semibold break-words">
           <a
             href={`/recipes/${recipe.id}`}
-            className="after:ring-ring after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-2"
+            className="after:ring-ring after:absolute after:inset-0 after:rounded-md focus-visible:outline-none focus-visible:after:ring-2"
           >
             {recipe.name}
           </a>
