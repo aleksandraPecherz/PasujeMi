@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: card-style (#21): karta neo-brutal i Banner na tokenach
 
 - **Plan**: context/changes/card-style/plan.md
@@ -9,15 +10,16 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
-| Architectural Fitness | PASS |
-| Blind Spots | PASS |
-| Plan Completeness | WARNING |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
+| Architectural Fitness | PASS    |
+| Blind Spots           | PASS    |
+| Plan Completeness     | WARNING |
 
 ## Grounding
+
 12/12 paths ✓ (ui/card.tsx new as planned), 7/8 symbols ✓ (ButtonProps ✗), brief↔plan ✓, Progress↔Phase ✓.
 Tailwind 4.3.3 compile: `translate-x-0.75` → `calc(var(--spacing) * 0.75)` ✓; `shadow-brutal` → `var(--tw-shadow-color, var(--foreground))` and combines with the ring shadow ✓. Banner contrast 4.77 / 5.14 matches tokens.md ✓.
 
