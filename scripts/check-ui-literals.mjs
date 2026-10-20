@@ -40,6 +40,7 @@ export const CLEAN_FILES = [
   "src/components/recipes/RecipeAuthorActions.tsx",
   "src/components/NotFoundView.astro",
   "src/pages/404.astro",
+  "src/components/Banner.astro",
 ];
 
 const PALETTE =

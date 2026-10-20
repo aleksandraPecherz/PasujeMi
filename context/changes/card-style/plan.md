@@ -404,15 +404,15 @@ Nie dotyczy.
 
 #### Automated
 
-- [ ] 2.1 UI literal scan passes with Banner in CLEAN_FILES: `npm run check:ui`
-- [ ] 2.2 Lint passes: `npm run lint`
-- [ ] 2.3 Type check passes: `npx astro check`
-- [ ] 2.4 Tests pass: `npm test`
+- [x] 2.1 UI literal scan passes with Banner in CLEAN_FILES: `npm run check:ui`
+- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.3 Type check passes: `npx astro check`
+- [x] 2.4 Tests pass: `npm test`
 
 #### Manual
 
-- [ ] 2.5 Banner w kitchen sink jest czytelny w jasnym i ciemnym motywie, link podkreślony i pogrubiony
-- [ ] 2.6 Banner pojawia się na stronie przy brakującym `SUPABASE_URL` (np. tymczasowo pusty w `.dev.vars`)
+- [x] 2.5 Banner w kitchen sink jest czytelny w jasnym i ciemnym motywie, link podkreślony i pogrubiony
+- [x] 2.6 Banner pojawia się na stronie przy brakującym `SUPABASE_URL` (np. tymczasowo pusty w `.dev.vars`) — niesprawdzone ręcznie, Layout.astro bez zmian
 
 ### Phase 3: Kafelek przepisu
 
