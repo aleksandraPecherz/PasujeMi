@@ -19,6 +19,8 @@ const buttonVariants = cva(
         "nav-current": "bg-accent text-accent-foreground",
         "ghost-current": "hover:bg-current/20 focus-visible:ring-current",
         link: "text-primary underline-offset-4 hover:underline",
+        pressable:
+          "bg-primary text-primary-foreground hover:bg-primary-hover rounded-lg border-2 border-foreground shadow-brutal-sm active:translate-x-0.75 active:translate-y-0.75 active:shadow-none motion-reduce:transition-none",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -146,6 +146,8 @@
   --color-brand-to: var(--brand-to);
   --color-primary-hover: var(--primary-hover);
   --color-input-hover: var(--input-hover);
+  --shadow-brutal: 6px 6px 0 var(--foreground);
+  --shadow-brutal-sm: 3px 3px 0 var(--foreground);
 }
 
 @utility bg-cosmic {
