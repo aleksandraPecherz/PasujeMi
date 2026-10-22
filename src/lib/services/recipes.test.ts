@@ -598,6 +598,56 @@ describe("matchRecipes", () => {
     expect(next.hasMore).toBe(false);
   });
 
+  describe("staples", () => {
+    const rows = [
+      recipeRow("scrambled", ["jajko", "sól", "pieprz"], { name: "Jajecznica" }),
+      recipeRow("coffee", ["kawa"], { name: "Kawa" }),
+    ];
+    const summary = (result: Awaited<ReturnType<typeof matchRecipes>>) =>
+      result.recipes.map((recipe) => [recipe.id, recipe.match.percent]);
+
+    it("count exactly like owned products: same percent and order", async () => {
+      const { supabase } = fakeClient(rows);
+
+      const withStaples = await matchRecipes(
+        supabase,
+        { have: ["jajko"], staple: ["sól", "pieprz"], exclude: [] },
+        page,
+      );
+      const allOwned = await matchRecipes(
+        supabase,
+        { have: ["jajko", "sól", "pieprz"], staple: [], exclude: [] },
+        page,
+      );
+
+      expect(summary(withStaples)).toEqual([
+        ["scrambled", 100],
+        ["coffee", 0],
+      ]);
+      expect(summary(withStaples)).toEqual(summary(allOwned));
+    });
+
+    it("alone still give a numeric percent, not null", async () => {
+      const { supabase } = fakeClient(rows);
+
+      const result = await matchRecipes(supabase, { have: [], staple: ["sól", "pieprz"], exclude: [] }, page);
+
+      // Two of three scrambled-egg ingredients are staples.
+      expect(summary(result)).toEqual([
+        ["scrambled", 67],
+        ["coffee", 0],
+      ]);
+    });
+
+    it("that are also excluded never count as available, and hide the recipe", async () => {
+      const { supabase } = fakeClient([recipeRow("milk", ["mleko"]), recipeRow("salt", ["sól"])]);
+
+      const result = await matchRecipes(supabase, { have: [], staple: ["mleko"], exclude: ["mleko"] }, page);
+
+      expect(summary(result)).toEqual([["salt", 0]]);
+    });
+  });
+
   it("rethrows Supabase errors unchanged", async () => {
     const failure = { message: "boom", code: "XX000" };
     const supabase = {

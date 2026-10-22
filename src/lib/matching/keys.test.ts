@@ -87,6 +87,16 @@ describe("keysEqual", () => {
     expect(keysEqual("abcd", "abcde")).toBe(true);
     expect(keysEqual("abcd", "abef")).toBe(false);
     expect(keysEqual("abc", "abd")).toBe(false);
+    expect(keysEqual("abc", "abcd")).toBe(false);
+    expect(keysEqual("abcd", "abc")).toBe(false);
+  });
+
+  it.each([
+    ["abcd", "abdx"],
+    ["abcd", "abxc"],
+    ["abcde", "abdcx"],
+  ])("does not tolerate two edits: %s ≠ %s", (a, b) => {
+    expect(keysEqual(a, b)).toBe(false);
   });
 });
 

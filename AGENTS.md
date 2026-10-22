@@ -45,6 +45,14 @@ PasujeMi is a Polish-language recipe-matching web app built on the 10x Astro Sta
 
 Vitest (`npm test`, also run by CI) picks up `src/**/*.test.ts` and `scripts/**/*.test.ts`. `scripts/smoke.mjs` covers the auth flow against a running server.
 
+- Name tests under `src/pages/` `_<name>.test.ts`: Astro routes every `.ts` file in `src/pages`, and the `_` prefix excludes it.
+- Test an endpoint with `vi.mock("@/lib/supabase")` — that module imports `astro:env/server`, which Vitest cannot resolve. Assert the status first, then the body.
+- Patterns and open risks: `context/foundation/test-plan.md` §6.
+
+### Mutation testing
+
+Stryker is a selective, local gate — not part of `npm test` or CI. After a risk phase run `npx stryker run --mutate "<file>"` and open `reports/mutation/mutation.html`. For each surviving mutant ask whether it would harm a user: if so add an assertion that kills it, otherwise ignore it on purpose. Don't chase 100%.
+
 ## Commits & CI
 
 - Short imperative, sentence-case subjects (e.g. `Enforce LF line endings via .gitattributes`); no prefix convention.

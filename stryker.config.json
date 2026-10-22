@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "npx vitest run src/lib/matching src/pages/api/recipes"
+  },
+  "reporters": ["clear-text", "progress", "html"]
+}
