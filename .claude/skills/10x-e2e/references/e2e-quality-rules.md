@@ -72,3 +72,14 @@ each to your tool's idiom:
 
 If you work on a non-Playwright stack, write these mappings into your seed test
 and your E2E prompts so the agent produces idiomatic, stable tests for your tool.
+
+## PasujeMi conventions
+
+- Testy rankingu korzystają ze znanych przepisów z `supabase/seed.sql`. Przy
+  oczekiwanych procentach wyjaśniaj obliczenie na podstawie składników (np.
+  „Domowe spaghetti”: 2 z 11 składników → 18%), nigdy nie przepisuj wyniku z aplikacji.
+- Przed testem dopasowania zapewnij znany stan produktów stałych i wykluczeń
+  konta testowego. Testy, które je zmieniają, używają osobnego konta
+  (`E2E_PANTRY_USERNAME`, `playwright/.auth/pantry-user.json`).
+- Przy sprawdzaniu powrotu ze szczegółów porównuj całą uporządkowaną listę
+  nazw i procentów oraz zachowanie tagów.

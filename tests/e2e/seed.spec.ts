@@ -14,6 +14,10 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   // so this test creates no data and has nothing to clean up.
   await page.goto("/");
   await waitForIslands(page);
+  // Known pantry state: the main account has no saved staples or exclusions (pantry-changing specs use their own
+  // account), so the expected percentages below depend only on the tags this test adds.
+  await expect(page.getByRole("list", { name: "Produkty stałe" })).toHaveCount(0);
+  await expect(page.getByRole("list", { name: "Wykluczam" })).toHaveCount(0);
 
   // Action: add two products they have and apply the filters.
   const have = page.getByRole("textbox", { name: "Mam w domu" });
