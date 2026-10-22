@@ -322,27 +322,27 @@ Nie dotyczy — bez zmian schematu i danych.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm test`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Type check passes: `npx astro check`
+- [x] 1.1 Unit tests pass: `npm test` — a99a6f1
+- [x] 1.2 Lint passes: `npm run lint` — a99a6f1
+- [x] 1.3 Type check passes: `npx astro check` — a99a6f1
 
 #### Manual
 
-- [x] 1.4 Celowe psucie reguły wykluczeń: pada właściwy wiersz, zmiana cofnięta
-- [x] 1.5 Każdy oczekiwany wynik ma źródło w PRD lub Decisions
+- [x] 1.4 Celowe psucie reguły wykluczeń: pada właściwy wiersz, zmiana cofnięta — a99a6f1
+- [x] 1.5 Każdy oczekiwany wynik ma źródło w PRD lub Decisions — a99a6f1
 
 ### Phase 2: Procent i produkty stałe (#4)
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm test`
-- [x] 2.2 Lint passes: `npm run lint`
-- [x] 2.3 Type check passes: `npx astro check`
+- [x] 2.1 Unit tests pass: `npm test` — a99a6f1
+- [x] 2.2 Lint passes: `npm run lint` — a99a6f1
+- [x] 2.3 Type check passes: `npx astro check` — a99a6f1
 
 #### Manual
 
-- [x] 2.4 Celowe psucie scalenia stałych: padają testy stałych, zmiana cofnięta
-- [x] 2.5 Wartości 33 i 100 pochodzą z PRD
+- [x] 2.4 Celowe psucie scalenia stałych: padają testy stałych, zmiana cofnięta — a99a6f1
+- [x] 2.5 Wartości 33 i 100 pochodzą z PRD — a99a6f1
 
 ### Phase 3: Limity wejścia na serwerze (#5)
 
