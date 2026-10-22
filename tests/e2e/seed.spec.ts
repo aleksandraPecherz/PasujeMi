@@ -33,19 +33,32 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   expect(percents).toEqual([...percents].sort((a, b) => b - a));
   expect(percents[0]).toBeGreaterThan(0);
 
+  // Oracle from the PRD rule (available ingredients / all ingredients), not from the app: "Domowe spaghetti"
+  // (supabase/seed.sql) has 11 ingredients and only "Pomidory z puszki" and "Cebula" are owned → 2/11 = 18%.
+  // "Babeczki z jogurtem naturalnym" has neither → 0%, which the PRD puts at the end of the list.
+  const tile = (name: string) => page.getByRole("listitem").filter({ has: page.getByRole("link", { name }) });
+  await expect(tile("Domowe spaghetti").getByLabel(/^Dopasowanie \d+%$/)).toHaveText("18%");
+  await expect(tile("Babeczki z jogurtem naturalnym").getByLabel(/^Dopasowanie \d+%$/)).toHaveText("0%");
+  await expect(matches.last()).toHaveText("0%");
+
+  // Remember the whole ranked list (names and percents) to compare after the round trip.
+  const titles = page.getByRole("heading", { level: 3 });
+  const names = await titles.allTextContents();
+  const percentTexts = await matches.allTextContents();
+
   // Action: open the best tile's details.
-  const bestTile = page.getByRole("heading", { level: 3 }).first().getByRole("link");
+  const bestTile = titles.first().getByRole("link");
   const bestName = await bestTile.innerText();
   await bestTile.click();
   await expect(page.getByRole("heading", { name: bestName, level: 1 })).toBeVisible();
 
-  // Assertion: back on the list, the tags and the ranked tiles are still there.
+  // Assertion: back on the list, the tags and the same ranked list (every name and percent, in order) are there.
   // The details page has the link at the top and at the bottom; either one returns to the list.
   await page.getByRole("link", { name: "Wróć do listy" }).first().click();
   await page.waitForURL((url) => url.pathname === "/");
   await expect(page.getByRole("button", { name: "Usuń pomidor" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Usuń cebula" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Przepisy dopasowane do spiżarki" })).toBeVisible();
-  await expect(matches).toHaveCount(percents.length);
-  await expect(page.getByRole("heading", { level: 3 }).first()).toHaveText(bestName);
+  await expect(titles).toHaveText(names);
+  await expect(matches).toHaveText(percentTexts);
 });
