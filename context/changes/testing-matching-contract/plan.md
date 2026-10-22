@@ -361,25 +361,25 @@ Nie dotyczy — bez zmian schematu i danych.
 
 #### Automated
 
-- [x] 4.1 Stryker runs to completion on the four modules
-- [x] 4.2 Unit tests pass: `npm test`
-- [x] 4.3 Lint passes: `npm run lint`
-- [x] 4.4 No files under `reports/` or `.stryker-tmp/` in `git status`
+- [x] 4.1 Stryker runs to completion on the four modules — 18fdac9
+- [x] 4.2 Unit tests pass: `npm test` — 18fdac9
+- [x] 4.3 Lint passes: `npm run lint` — 18fdac9
+- [x] 4.4 No files under `reports/` or `.stryker-tmp/` in `git status` — 18fdac9
 
 #### Manual
 
-- [x] 4.5 Każdy przetrwały mutant ma decyzję w `mutation-report.md`
-- [x] 4.6 Żaden nowy test nie powiela logiki implementacji
+- [x] 4.5 Każdy przetrwały mutant ma decyzję w `mutation-report.md` — 18fdac9
+- [x] 4.6 Żaden nowy test nie powiela logiki implementacji — 18fdac9
 
 ### Phase 5: Cookbook, AGENTS.md i synchronizacja test-planu
 
 #### Automated
 
-- [ ] 5.1 Unit tests pass: `npm test`
-- [ ] 5.2 Lint passes: `npm run lint`
-- [ ] 5.3 `test-plan.md` §3 row 1 has Status `complete`
+- [x] 5.1 Unit tests pass: `npm test`
+- [x] 5.2 Lint passes: `npm run lint`
+- [x] 5.3 `test-plan.md` §3 row 1 has Status `complete`
 
 #### Manual
 
-- [ ] 5.4 Cookbook §6.1, §6.4, §6.5, §6.6 bez „TBD — see §3 Phase 1”
-- [ ] 5.5 AGENTS.md: konwencja `_*.test.ts` i sekcja „Mutation testing” czytelne
+- [x] 5.4 Cookbook §6.1, §6.4, §6.5, §6.6 bez „TBD — see §3 Phase 1”
+- [x] 5.5 AGENTS.md: konwencja `_*.test.ts` i sekcja „Mutation testing” czytelne

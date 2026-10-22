@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-10-20 (§5 gates corrected)
+> Last updated: 2026-10-22 (Etap 1 complete; §4–§6 filled)
 
 ## 1. Strategy
 
@@ -67,12 +67,12 @@ Each row is a discrete rollout phase that will open its own change folder
 via `/10x-new`. Status moves left-to-right through the values below; the
 orchestrator updates Status as artifacts appear on disk.
 
-| #   | Phase name             | Goal (one line)                                                                                                                                                      | Risks covered | Test types                     | Status        | Change folder                              |
-| --- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | ------------- | ------------------------------------------ |
-| 1   | Kontrakt dopasowania   | Udowodnić regułę „ten sam składnik", twardy filtr wykluczeń, ranking i limity wejścia na przypadkach z PRD                                                           | #1, #4, #5    | unit                           | change opened | context/changes/testing-matching-contract/ |
-| 2   | Autoryzacja i RLS      | Udowodnić, że obcy nie zmieni ani nie usunie cudzego przepisu, nie zobaczy cudzej spiżarki, a anon nic nie czyta; ocenić, czy kontrole curl w CI przenieść do testów | #2, #3, #6    | integration (lokalny Supabase) | not started   | —                                          |
-| 3   | Krytyczny przepływ e2e | Jeden smoke w przeglądarce: tagi → filtry → kafelki → szczegóły                                                                                                      | #7            | e2e                            | not started   | —                                          |
-| 4   | Quality-gates wiring   | Utrwalić poziom bazowy w CI: testy integracyjne wymagane w CI, e2e najpierw informacyjne, wymagane po ustabilizowaniu                                                | cross-cutting | gates                          | not started   | —                                          |
+| #   | Phase name             | Goal (one line)                                                                                                                                                      | Risks covered | Test types                     | Status      | Change folder                              |
+| --- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | ----------- | ------------------------------------------ |
+| 1   | Kontrakt dopasowania   | Udowodnić regułę „ten sam składnik", twardy filtr wykluczeń, ranking i limity wejścia na przypadkach z PRD                                                           | #1, #4, #5    | unit                           | complete    | context/changes/testing-matching-contract/ |
+| 2   | Autoryzacja i RLS      | Udowodnić, że obcy nie zmieni ani nie usunie cudzego przepisu, nie zobaczy cudzej spiżarki, a anon nic nie czyta; ocenić, czy kontrole curl w CI przenieść do testów | #2, #3, #6    | integration (lokalny Supabase) | not started | —                                          |
+| 3   | Krytyczny przepływ e2e | Jeden smoke w przeglądarce: tagi → filtry → kafelki → szczegóły                                                                                                      | #7            | e2e                            | not started | —                                          |
+| 4   | Quality-gates wiring   | Utrwalić poziom bazowy w CI: testy integracyjne wymagane w CI, e2e najpierw informacyjne, wymagane po ustabilizowaniu                                                | cross-cutting | gates                          | not started | —                                          |
 
 **Status vocabulary** (fixed — parser literals): `not started`, `change opened`, `researched`, `planned`, `implementing`, `complete`.
 
@@ -80,15 +80,16 @@ AI-native layer (hook, przegląd wizualny przez model) is deliberately not a rol
 
 ## 4. Stack
 
-| Layer         | Tool                                                   | Version | Notes                                                                                                          |
-| ------------- | ------------------------------------------------------ | ------- | -------------------------------------------------------------------------------------------------------------- |
-| unit          | Vitest                                                 | ^5.0.4  | Środowisko node; picks up `src/**/*.test.ts` i `scripts/**/*.test.ts`; 20 plików testowych w zakresie projektu |
-| integration   | Vitest + lokalny Supabase                              | n/a     | none yet — see Phase 2. CI już startuje lokalny Supabase i sprawdza RLS skryptami curl                         |
-| API mocking   | none                                                   | n/a     | Mockować tylko na granicy sieci; wewnętrznych modułów nie                                                      |
-| e2e           | none yet — see Phase 3                                 | n/a     | Brak Playwrighta; kandydat: `@playwright/test`                                                                 |
-| accessibility | none                                                   | n/a     | Poza zakresem tego rolloutu                                                                                    |
-| smoke         | `npm run smoke`                                        | n/a     | Przepływ auth przeciw działającemu serwerowi                                                                   |
-| static        | ESLint ^10.10.0, `npx astro check`, `npm run check:ui` | n/a     | Lint, typy, brak literałów kolorów; w CI                                                                       |
+| Layer         | Tool                                                       | Version | Notes                                                                                                                                 |
+| ------------- | ---------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| unit          | Vitest                                                     | ^5.0.4  | Środowisko node; picks up `src/**/*.test.ts` i `scripts/**/*.test.ts`; 20 plików testowych w zakresie projektu                        |
+| mutation      | Stryker (`@stryker-mutator/core`, `testRunner: "command"`) | ^10.0.0 | Ad hoc, lokalnie; `stryker.config.json`; runner `vitest` obejściem błędu Vitest 5 (stryker-js#6210), szczegóły w `mutation-report.md` |
+| integration   | Vitest + lokalny Supabase                                  | n/a     | none yet — see Phase 2. CI już startuje lokalny Supabase i sprawdza RLS skryptami curl                                                |
+| API mocking   | none                                                       | n/a     | Mockować tylko na granicy sieci; wewnętrznych modułów nie                                                                             |
+| e2e           | none yet — see Phase 3                                     | n/a     | Brak Playwrighta; kandydat: `@playwright/test`                                                                                        |
+| accessibility | none                                                       | n/a     | Poza zakresem tego rolloutu                                                                                                           |
+| smoke         | `npm run smoke`                                            | n/a     | Przepływ auth przeciw działającemu serwerowi                                                                                          |
+| static        | ESLint ^10.10.0, `npx astro check`, `npm run check:ui`     | n/a     | Lint, typy, brak literałów kolorów; w CI                                                                                              |
 
 **Stack grounding tools (current session):**
 
@@ -99,15 +100,16 @@ AI-native layer (hook, przegląd wizualny przez model) is deliberately not a rol
 
 ## 5. Quality Gates
 
-| Gate                              | Where                 | Required?                                            | Catches                                                      |
-| --------------------------------- | --------------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
-| lint + check:ui                   | local (husky) + CI    | required (wired)                                     | błędy składni, literały kolorów                              |
-| typecheck (`npx astro check`)     | CI                    | required (wired)                                     | dryf typów (lokalnie nie jest uruchamiany automatycznie)     |
-| unit (`npm test`)                 | CI (lokalnie ręcznie) | required in CI (wired)                               | regresje logiki                                              |
-| RLS/permission checks (curl w CI) | CI                    | required (wired)                                     | dostęp anon, uprawnienia zapisu, edycji, usuwania i spiżarki |
-| smoke (`npm run smoke`)           | CI (preview)          | required (wired)                                     | błędy środowiskowe i przepływu auth                          |
-| integration (autoryzacja i RLS)   | CI (lokalnie ręcznie) | required after §3 Phase 2                            | obca osoba zmienia dane, anon czyta                          |
-| e2e na krytycznym przepływie      | CI on PR              | informational after §3 Phase 3; required once stable | zepsuty przepływ tagi → kafelki                              |
+| Gate                              | Where                              | Required?                                            | Catches                                                           |
+| --------------------------------- | ---------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
+| lint + check:ui                   | local (husky) + CI                 | required (wired)                                     | błędy składni, literały kolorów                                   |
+| typecheck (`npx astro check`)     | CI                                 | required (wired)                                     | dryf typów (lokalnie nie jest uruchamiany automatycznie)          |
+| unit (`npm test`)                 | CI (lokalnie ręcznie)              | required in CI (wired)                               | regresje logiki                                                   |
+| RLS/permission checks (curl w CI) | CI                                 | required (wired)                                     | dostęp anon, uprawnienia zapisu, edycji, usuwania i spiżarki      |
+| smoke (`npm run smoke`)           | CI (preview)                       | required (wired)                                     | błędy środowiskowe i przepływu auth                               |
+| mutation (Stryker)                | ad hoc (lokalnie, po fazie ryzyka) | not required, nie w CI                               | testy, które przechodzą mimo zepsutej reguły (przetrwałe mutanty) |
+| integration (autoryzacja i RLS)   | CI (lokalnie ręcznie)              | required after §3 Phase 2                            | obca osoba zmienia dane, anon czyta                               |
+| e2e na krytycznym przepływie      | CI on PR                           | informational after §3 Phase 3; required once stable | zepsuty przepływ tagi → kafelki                                   |
 
 ## 6. Cookbook Patterns
 
@@ -118,7 +120,7 @@ the relevant rollout phase ships; before that, the sub-section reads
 ### 6.1 Adding a unit test
 
 - **Location**: obok testowanego modułu w `src/lib/<area>/` jako `<module>.test.ts`; skrypty w `scripts/`.
-- **Reference test**: TBD — see §3 Phase 1 for the matching-rules pattern (excluded-ingredient, ranking, input-limit).
+- **Reference test**: `src/lib/matching/rank.test.ts` — blok `describe("exclusions")`: tabela `it.each` `[forma wykluczenia, produkt, ukryty]` z helperem `one()`; `src/lib/matching/limits.test.ts` dla `countTokens`.
 - **Run locally**: `npm test`.
 
 ### 6.2 Adding an integration test
@@ -131,15 +133,28 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.4 Adding a test for a new API endpoint
 
-- TBD — see §3 Phase 2.
+- **Location**: test w `src/pages/` nazywaj `_<name>.test.ts` — Astro routuje każdy plik `.ts` w `src/pages`, prefiks `_` go wyklucza z routera i z `dist/`; Vitest łapie go normalnie.
+- **Reference test**: `src/pages/api/recipes/_match.test.ts` — `vi.mock("@/lib/supabase")` (moduł importuje `astro:env/server`, którego Vitest nie rozwiąże) i `vi.mock` serwisu; wywołanie `GET` z kontekstem rzutowanym na `APIContext`.
+- **Asercje**: najpierw status, potem typ i treść body (lessons.md „Assert status and body type”); odrzucenie dowodzi też, że serwis nie został wywołany. Limity importuj (`MAX_TAGS`, `MAX_TAG_LENGTH`, `MAX_TOKENS`), nie duplikuj literałów.
 
 ### 6.5 Adding a test for a new matching rule
 
-- TBD — see §3 Phase 1.
+- **Wyrocznia z PRD** (`prd.md:120-124`) lub z Decisions w `research.md`, nigdy z uruchomienia kodu. Wiersz, który pada na obecnym kodzie, to błąd albo luka do zgłoszenia, nie powód do zmiany oczekiwania.
+- **Jeden `it.each` na właściwość** (np. „przekroczenie → 400”); każdy wiersz łapie inną regresję. Dla każdego ryzyka co najmniej jeden przypadek brzegowy po obu stronach granicy (np. literówka od 4 znaków klucza).
+- **Znana luka słownika** → `it.todo` z informacją, że naprawa wymaga zmiany słownika i podbicia `MATCH_KEYS_VERSION`; bez naprawy w teście.
+- **Scalanie list w serwisie** (stałe = posiadane) testuj hermetycznie na `fakeClient` w `src/lib/services/recipes.test.ts`.
+- Po fazie ryzyka: `npx stryker run --mutate "<plik>"`, przetrwałe mutanty oceniaj pod kątem szkody dla użytkownika.
 
 ### 6.6 Per-rollout-phase notes
 
 (Appended after each phase lands.)
+
+**Etap 1 — Kontrakt dopasowania** (`context/changes/testing-matching-contract/`, ryzyka #1, #4, #5): testy w `rank.test.ts`, `keys.test.ts`, `limits.test.ts`, `recipes.test.ts`, `_match.test.ts`; wynik Strykera 85,26% (szczegóły i decyzje per mutant w `mutation-report.md`). Otwarte ryzyka:
+
+- **R1** — luki słownika: „napój sojowy” nie jest ukrywany przy wykluczeniu „mleko”, „ser” ≠ „serek”, „cukier” ≠ „cukru” (`it.todo` w `rank.test.ts`).
+- **R2** — `MAX_URL_LENGTH` nie jest sprawdzany w endpoincie.
+- **R3** — brak bramki CPU; zostaje ręczne `npm run bench:match`.
+- **R4** — `limit`/`offset` w `GET /api/recipes/match` bez testów (15 przetrwałych mutantów w `match.ts`, psują doładowanie listy; wyrocznia: domyślnie 10, maks. 50 — `context/archive/2026-10-12-first-pantry-match/plan.md:264-266`).
 
 ## 7. What We Deliberately Don't Test
 
