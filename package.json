@@ -72,6 +72,9 @@
       "eslint --fix",
       "node scripts/check-ui-literals.mjs"
     ],
+    "*.{ts,tsx,js,mjs}": [
+      "vitest related --run"
+    ],
     "*.{json,css,md}": [
       "prettier --write"
     ]
