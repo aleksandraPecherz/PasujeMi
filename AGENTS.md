@@ -48,6 +48,7 @@ Vitest (`npm test`, also run by CI) picks up `src/**/*.test.ts` and `scripts/**/
 - Name tests under `src/pages/` `_<name>.test.ts`: Astro routes every `.ts` file in `src/pages`, and the `_` prefix excludes it.
 - Test an endpoint with `vi.mock("@/lib/supabase")` — that module imports `astro:env/server`, which Vitest cannot resolve. Assert the status first, then the body.
 - Patterns and open risks: `context/foundation/test-plan.md` §6.
+- Agent hooks (`.claude/hooks/`, wired in `.claude/settings.json`): after each Write/Edit, ESLint + check:ui and `vitest related` on that file; at Stop, the same on every changed file, then `vitest run` and `npx astro check`, with one retry. They signal through stderr + exit 2. Proof: `scripts/agent-hooks.test.ts`. Restart the session after changing them.
 
 ### Mutation testing
 
