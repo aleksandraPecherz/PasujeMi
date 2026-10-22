@@ -1,5 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { MAX_TAG_LENGTH, exceedsMatchUrl } from "@/lib/matching/limits";
+import { MAX_TAG_LENGTH, countTokens, exceedsMatchUrl } from "@/lib/matching/limits";
+
+describe("countTokens", () => {
+  it("is 0 for an empty list", () => {
+    expect(countTokens([])).toBe(0);
+  });
+
+  it("sums the words of every tag", () => {
+    expect(countTokens(["pomidor", "ser mozzarella kulka", "orzechy włoskie"])).toBe(6);
+  });
+
+  it.each([
+    ["mleko 1,5%", 1],
+    ["200 g mąki", 2],
+    ["mleko z cukrem", 2],
+    ["chleb bez glutenu", 2],
+    ["z", 0],
+  ])("does not count numbers, percentages or stopwords: %s", (tag, words) => {
+    expect(countTokens([tag])).toBe(words);
+  });
+});
 
 describe("exceedsMatchUrl", () => {
   it("accepts empty and small lists, with missing sections counted as empty", () => {

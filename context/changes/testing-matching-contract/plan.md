@@ -348,14 +348,14 @@ Nie dotyczy — bez zmian schematu i danych.
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass (including `_match.test.ts`): `npm test`
-- [ ] 3.2 Lint passes: `npm run lint`
-- [ ] 3.3 Type check passes: `npx astro check`
-- [ ] 3.4 Build does not emit a route for the test file
+- [x] 3.1 Unit tests pass (including `_match.test.ts`): `npm test`
+- [x] 3.2 Lint passes: `npm run lint`
+- [x] 3.3 Type check passes: `npx astro check`
+- [x] 3.4 Build does not emit a route for the test file
 
 #### Manual
 
-- [ ] 3.5 Celowe psucie limitu słów: pada tylko przypadek łącznego limitu, zmiana cofnięta
+- [x] 3.5 Celowe psucie limitu słów: pada tylko przypadek łącznego limitu, zmiana cofnięta
 
 ### Phase 4: Bramka mutacyjna Stryker (ad hoc)
 
