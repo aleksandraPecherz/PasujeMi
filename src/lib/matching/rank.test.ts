@@ -72,6 +72,10 @@ describe("owned products", () => {
     expect(one([product], [tag])?.ingredients[0].status).toBe(status);
   });
 
+  it.todo("tag ser owns serek: dictionary gap R1, the fix needs a dictionary change and a MATCH_KEYS_VERSION bump");
+
+  it.todo("tag cukier owns cukru: dictionary gap R1, the fix needs a dictionary change and a MATCH_KEYS_VERSION bump");
+
   it("a substitute gives 'have' and names itself in via", () => {
     const result = one([["miód", "syrop z agawy"]], ["syrop z agawy"]);
     expect(result?.ingredients[0]).toEqual({ status: "have", mainExcluded: false, via: "syrop z agawy" });
@@ -98,6 +102,26 @@ describe("exclusions", () => {
   });
 
   it.each([
+    ["pomidory", "pomidor", true],
+    ["mleka", "mleko kokosowe", true],
+    ["ORZECHY", "orzechy włoskie", true],
+    ["orzechy wloskie", "orzechy włoskie", true],
+    ["mozarella", "ser mozzarella kulka", true],
+    ["kartofel", "ziemniaki", true],
+    ["ziemniak", "kartofle", true],
+    ["mleko", "mleko owsiane", true],
+    // Deliberate boundary, not a bug: typos are tolerated only for keys of 4+ characters (keys.ts MIN_FUZZY_LENGTH).
+    ["sir", "ser", false],
+  ])("exclusion in another form %s hides %s: %s", (exclusion, product, hidden) => {
+    expect(one([product, "sól"], ["sól"], [exclusion]) === undefined).toBe(hidden);
+  });
+
+  it("an exclusion in another form hides a variant option but not a substitute that is another product", () => {
+    expect(one([["mleko", "mleko kokosowe"]], [], ["mleka"])).toBeUndefined();
+    expect(one([["mleko", "napój sojowy"]], [], ["mleka"])).toBeDefined();
+  });
+
+  it.each([
     ["maka", "mąka pszenna", true],
     ["maka", "mak", true],
     ["maki", "mąka pszenna", true],
@@ -107,6 +131,10 @@ describe("exclusions", () => {
   ])("ambiguous exclusion %s hides %s: %s", (exclusion, product, hidden) => {
     expect(one([product, "sól"], ["sól"], [exclusion]) === undefined).toBe(hidden);
   });
+
+  it.todo(
+    "exclusion mleko hides napój sojowy: dictionary gap R1, the fix needs a dictionary change and a MATCH_KEYS_VERSION bump",
+  );
 
   it("an ambiguous owned word keeps one reading: maka counts as mąka", () => {
     expect(one(["mąka pszenna"], ["maka"])?.ingredients[0].status).toBe("have");
@@ -152,6 +180,14 @@ describe("exclusions", () => {
 describe("percent and order", () => {
   it("counts duplicates separately", () => {
     expect(one(["sól", "sól", "pieprz"], ["sól"])?.percent).toBe(67);
+  });
+
+  it("scrambled eggs with only the egg owned = 33%", () => {
+    expect(one(["jajko", "sól", "pieprz"], ["jajko"])?.percent).toBe(33);
+  });
+
+  it("an ingredient available through a substitute counts as available: 100%", () => {
+    expect(one([["miód", "syrop z agawy"]], ["syrop z agawy"])?.percent).toBe(100);
   });
 
   it("sorts by exact fraction, then more available, then name; keeps 0% at the end", () => {
