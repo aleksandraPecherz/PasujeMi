@@ -348,28 +348,28 @@ Nie dotyczy — bez zmian schematu i danych.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass (including `_match.test.ts`): `npm test`
-- [x] 3.2 Lint passes: `npm run lint`
-- [x] 3.3 Type check passes: `npx astro check`
-- [x] 3.4 Build does not emit a route for the test file
+- [x] 3.1 Unit tests pass (including `_match.test.ts`): `npm test` — 72f0845
+- [x] 3.2 Lint passes: `npm run lint` — 72f0845
+- [x] 3.3 Type check passes: `npx astro check` — 72f0845
+- [x] 3.4 Build does not emit a route for the test file — 72f0845
 
 #### Manual
 
-- [x] 3.5 Celowe psucie limitu słów: pada tylko przypadek łącznego limitu, zmiana cofnięta
+- [x] 3.5 Celowe psucie limitu słów: pada tylko przypadek łącznego limitu, zmiana cofnięta — 72f0845
 
 ### Phase 4: Bramka mutacyjna Stryker (ad hoc)
 
 #### Automated
 
-- [ ] 4.1 Stryker runs to completion on the four modules
-- [ ] 4.2 Unit tests pass: `npm test`
-- [ ] 4.3 Lint passes: `npm run lint`
-- [ ] 4.4 No files under `reports/` or `.stryker-tmp/` in `git status`
+- [x] 4.1 Stryker runs to completion on the four modules
+- [x] 4.2 Unit tests pass: `npm test`
+- [x] 4.3 Lint passes: `npm run lint`
+- [x] 4.4 No files under `reports/` or `.stryker-tmp/` in `git status`
 
 #### Manual
 
-- [ ] 4.5 Każdy przetrwały mutant ma decyzję w `mutation-report.md`
-- [ ] 4.6 Żaden nowy test nie powiela logiki implementacji
+- [x] 4.5 Każdy przetrwały mutant ma decyzję w `mutation-report.md`
+- [x] 4.6 Żaden nowy test nie powiela logiki implementacji
 
 ### Phase 5: Cookbook, AGENTS.md i synchronizacja test-planu
 

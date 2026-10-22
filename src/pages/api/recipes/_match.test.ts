@@ -46,7 +46,9 @@ beforeEach(() => {
 describe("GET /api/recipes/match input limits", () => {
   it.each<[string, Query]>([
     ["more than MAX_TAGS tags in one list", { have: oneWordTags(MAX_TAGS + 1) }],
+    ["more than MAX_TAGS staple tags", { have: ["pomidor"], staple: oneWordTags(MAX_TAGS + 1) }],
     ["a tag longer than MAX_TAG_LENGTH", { have: ["a".repeat(MAX_TAG_LENGTH + 1)] }],
+    ["an exclusion longer than MAX_TAG_LENGTH", { have: ["pomidor"], exclude: ["a".repeat(MAX_TAG_LENGTH + 1)] }],
     ["an empty tag (spaces only)", { have: ["   "] }],
     [
       "more than MAX_TOKENS words spread over two lists",
@@ -65,6 +67,7 @@ describe("GET /api/recipes/match input limits", () => {
     ["exactly MAX_TAGS tags", { have: oneWordTags(MAX_TAGS) }],
     ["a tag of exactly MAX_TAG_LENGTH", { have: ["a".repeat(MAX_TAG_LENGTH)] }],
     ["exactly MAX_TOKENS words over two lists", { have: words(MAX_TOKENS / 2), exclude: words(MAX_TOKENS / 2) }],
+    ["owned and staple tags without exclusions", { have: ["pomidor"], staple: ["sól"] }],
   ])("accepts %s", async (_name, query) => {
     const response = await call(query);
 
@@ -81,5 +84,18 @@ describe("GET /api/recipes/match input limits", () => {
       { have: ["pomidor"], staple: ["sól"], exclude: ["mleko"] },
       expect.anything(),
     );
+  });
+});
+
+describe("GET /api/recipes/match errors", () => {
+  it("answers a failed matchRecipes with 500 database_error", async () => {
+    matchRecipes.mockRejectedValue(new Error("connection lost"));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const response = await call({ have: ["pomidor"] });
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: "database_error" });
+    consoleError.mockRestore();
   });
 });

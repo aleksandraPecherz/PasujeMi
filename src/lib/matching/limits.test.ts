@@ -38,5 +38,6 @@ describe("exceedsMatchUrl", () => {
     const tags = Array.from({ length: 30 }, (_, i) => "ą".repeat(MAX_TAG_LENGTH - i));
     expect(exceedsMatchUrl({ exclude: tags })).toBe(true);
     expect(exceedsMatchUrl({ have: tags })).toBe(true);
+    expect(exceedsMatchUrl({ staple: tags })).toBe(true);
   });
 });

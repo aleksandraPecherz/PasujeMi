@@ -27,5 +27,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# Stryker mutation testing (run ad hoc, never committed)
+reports/
+.stryker-tmp/
+
 # author's local source data (recipes.xlsx) - never committed
 data/
