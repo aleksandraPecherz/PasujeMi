@@ -375,11 +375,11 @@ Nie dotyczy — bez zmian schematu i danych.
 
 #### Automated
 
-- [x] 5.1 Unit tests pass: `npm test`
-- [x] 5.2 Lint passes: `npm run lint`
-- [x] 5.3 `test-plan.md` §3 row 1 has Status `complete`
+- [x] 5.1 Unit tests pass: `npm test` — 9ee7eb6
+- [x] 5.2 Lint passes: `npm run lint` — 9ee7eb6
+- [x] 5.3 `test-plan.md` §3 row 1 has Status `complete` — 9ee7eb6
 
 #### Manual
 
-- [x] 5.4 Cookbook §6.1, §6.4, §6.5, §6.6 bez „TBD — see §3 Phase 1”
-- [x] 5.5 AGENTS.md: konwencja `_*.test.ts` i sekcja „Mutation testing” czytelne
+- [x] 5.4 Cookbook §6.1, §6.4, §6.5, §6.6 bez „TBD — see §3 Phase 1” — 9ee7eb6
+- [x] 5.5 AGENTS.md: konwencja `_*.test.ts` i sekcja „Mutation testing” czytelne — 9ee7eb6
