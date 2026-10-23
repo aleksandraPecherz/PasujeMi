@@ -36,6 +36,7 @@ data/
 
 # copies of 10x skills for other tools (we use .claude/skills)
 .agents/
+.codex/
 
 # Playwright
 playwright/.auth/
