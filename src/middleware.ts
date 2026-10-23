@@ -1,3 +1,4 @@
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
 
@@ -8,11 +9,19 @@ const SIGNED_IN_REDIRECTS = ["/auth/signin", "/auth/signup"];
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createClient(context.request.headers, context.cookies);
 
+  // Auth unreachable (network error or 5xx), as opposed to no session or an expired token.
+  let authUnavailable = false;
   if (supabase) {
     const {
       data: { user },
+      error,
     } = await supabase.auth.getUser();
     context.locals.user = user ?? null;
+    if (isAuthRetryableFetchError(error)) {
+      authUnavailable = true;
+      // eslint-disable-next-line no-console -- server-side log, visible in Workers logs
+      console.error("Supabase Auth unavailable", error);
+    }
   } else {
     context.locals.user = null;
   }
@@ -32,6 +41,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   if (pathname.startsWith("/api/")) {
+    // A 401 would tell the island the session expired; the user is not signed out, the check failed.
+    if (authUnavailable) {
+      return Response.json({ error: "auth_unavailable" }, { status: 503 });
+    }
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
