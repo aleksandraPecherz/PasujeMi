@@ -4,26 +4,26 @@
 
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
-## Zestaw narzędzi AI 10xDevs — Moduł 4, Lekcja 2 (Mapa projektu)
+## Zestaw narzędzi AI 10xDevs — moduł 5, lekcja 1 (wewnętrzni twórcy AI)
 
-Zapoznaj się z nieznanym lub starszym repozytorium na podstawie dowodów, a nie drzew katalogów: **najpierw szerokie skanowanie, później głębokie skupienie.**
+Klasyfikuj powtarzające się tarcia w zespole, zanim cokolwiek dla nich zbudujesz. Domyślną odpowiedzią jest istniejące narzędzie; buduj tylko cienką nakładkę pomocniczą tam, gdzie uzasadnia to lokalny problem obejmujący wiele systemów.
 
 ```
-git history + dependency graph + contributors -> context/map/repo-map.md -> focused /10x-research
+/10x-opportunity-map -> /10x-mom-test -> /10x-shape -> /10x-prd -> /10x-roadmap
 ```
 
 ### Router zadań — od czego zacząć
 
-| Umiejętność / prompt | Użyj, gdy |
+| Umiejętność | Użyj jej, gdy |
 | --- | --- |
-| `/10x-repo-map` | Mapa projektu w jednym przebiegu. Klasyfikuje możliwości biznesowe według krytyczności × rozgłosu, przechowuje dowody w `context/map/evidence/` i zapisuje `context/map/repo-map.md` ze strefami ryzyka, listą lektur na pierwszy dzień oraz wyraźnie wskazanymi niewiadomymi. Użyj `--replace`, aby odświeżyć; poprzedni przebieg zostanie przeniesiony do `context/archive/`. |
-| `m4l2-1-territory-git-history` -> `m4l2-2-structure-dependency-cruiser` -> `m4l2-3-contributors-git` -> `m4l2-repo-map-synthesis` | Ta sama mapa budowana krok po kroku, po jednym artefakcie naraz, aby zobaczyć, co dodaje każde źródło dowodów. |
-| `/10x-research` | Pytanie dotyczące jednej funkcji lub obszaru. Mapa obejmuje szerokość i nie przyjmuje celu; głębia należy do badań. |
+| `/10x-opportunity-map` | Zespół stale napotyka to samo tarcie albo ktoś mówi „zbudujmy dashboard / agenta / automatyzację”. Tworzy mapę build / buy / complement / wait z pierwszą użyteczną wersją i zastrzeżeniem dotyczącym ryzyka danych w `context/team/opportunity-map.md`. |
+| `/10x-mom-test` | Masz kandydata i chcesz wiedzieć, czy problem jest realny. Tworzy nienaprowadzającą krytykę, pytania do wywiadu, ankietę oraz kryteria go/no-go; zapisuje do `context/team/mom-test-validation.md`. |
+| `/10x-shape` -> `/10x-prd` -> `/10x-roadmap` | Zweryfikowany kandydat jest wart zbudowania. Kontynuuj zgodnie ze standardowym 10xWorkflow. |
 
 ### Twarde zasady
 
-- **Pozwól narzędziom zbierać dowody poza oknem kontekstu.** Używaj narzędzi git, forge i grafowych do gromadzenia danych, a następnie interpretuj wyłącznie ich skondensowane wyniki. Nigdy nie czytaj repozytorium plik po pliku.
-- **Wyklucz szum.** Podczas klasyfikowania aktywności pomijaj lockfile'y, wygenerowany kod, commity masowego formatowania, commity botów oraz commity utworzone przez agentów.
-- **Niewiadome są częścią mapy.** Oznaczaj jako niewiadome to, czego dowody nie mogą pokazać, zamiast wypełniać lukę zgadywaniem.
+- **Kupuj, zanim zbudujesz.** Najpierw wskaż istniejącą lub domyślną odpowiedź; nakładka pomocnicza ją uzupełnia, a nie zastępuje.
+- **Dowody pochodzą z przeszłych zachowań.** Pytaj, co ludzie zrobili ostatnim razem, a nie czy korzystaliby z narzędzia.
+- **Określ ryzyko danych.** Każdy kandydat wskazuje, jakie dane odczytuje oraz co może wyciec lub pójść nie tak.
 
 <!-- END @przeprogramowani/10x-cli -->
