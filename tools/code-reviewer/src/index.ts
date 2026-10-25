@@ -5,6 +5,14 @@ import { query } from "@anthropic-ai/claude-agent-sdk";
 import { REVIEW_JSON_SCHEMA, REVIEW_SCHEMA, SYSTEM_PROMPT } from "./review-schema.ts";
 
 const MODEL = "claude-sonnet-5-5";
+const SCORE_FIELDS = [
+  "implementationCorrectness",
+  "idiomaticity",
+  "complexity",
+  "testRiskCoverage",
+  "documentation",
+  "securitySafety",
+] as const;
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
@@ -23,6 +31,7 @@ async function readDiff(path: string | undefined): Promise<string> {
 async function main(): Promise<void> {
   const diff = await readDiff(process.argv[2]);
   if (!diff.trim()) throw new Error("Diff jest pusty.");
+  let receivedResult = false;
 
   for await (const message of query({
     prompt: `Zrecenzuj poniższy diff.\n\n${diff}`,
@@ -37,6 +46,7 @@ async function main(): Promise<void> {
     },
   })) {
     if (message.type !== "result") continue;
+    receivedResult = true;
 
     if (message.subtype !== "success") {
       throw new Error(
@@ -47,6 +57,12 @@ async function main(): Promise<void> {
     const parsed = REVIEW_SCHEMA.safeParse(message.structured_output);
     if (!parsed.success) {
       throw new Error(`Odpowiedź nie pasuje do schematu recenzji: ${parsed.error.message}`);
+    }
+    for (const field of SCORE_FIELDS) {
+      const score = parsed.data[field];
+      if (!Number.isInteger(score) || score < 1 || score > 10) {
+        throw new Error(`Niepoprawna ocena ${field}: ${score}. Oczekiwano liczby całkowitej od 1 do 10.`);
+      }
     }
 
     console.log(JSON.stringify(parsed.data, null, 2));
@@ -63,6 +79,7 @@ async function main(): Promise<void> {
       ),
     );
   }
+  if (!receivedResult) throw new Error("Agent nie zwrócił wyniku");
 }
 
 main().catch((error: unknown) => {
