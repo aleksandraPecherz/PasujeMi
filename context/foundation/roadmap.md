@@ -3,13 +3,13 @@ project: PasujeMi
 version: 1
 status: draft
 created: 2026-10-11
-updated: 2026-10-20
+updated: 2026-10-25
 prd_version: 1
 main_goal: speed
 top_blocker: time
 milestone_id: mvp-pantry-matching
 milestone_seq: 1
-milestone_status: open
+milestone_status: done
 ---
 
 # Roadmap: PasujeMi
@@ -20,7 +20,7 @@ milestone_status: open
 
 ## Milestone
 
-**M-1: MVP — dopasowanie przepisów do spiżarki** — Status: open
+**M-1: MVP — dopasowanie przepisów do spiżarki** — Status: done
 
 - **Intent:** Zalogowana osoba wpisuje swoje produkty i wykluczenia, widzi przepisy ze wspólnej bazy posortowane po % dopasowania bez żadnego przepisu z wykluczonym składnikiem, a baza przepisów jest zasilona i zarządzana przez autorów i admina.
 - **Source materials:** `context/foundation/prd.md` (v1)
@@ -222,6 +222,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Śledzenie błędów aplikacji poza Workers Logs** — Why parked: cel „szybkość dostarczenia”; żadne NFR tego nie wymaga, a Workers Logs już działa.
 
 ## Milestone History
+
+- **M-1: MVP — dopasowanie przepisów do spiżarki** (`mvp-pantry-matching`) — closed 2026-10-25. Zalogowana osoba wpisuje produkty i wykluczenia, widzi przepisy z % dopasowania bez wykluczonych składników; baza przepisów zasilona i zarządzana przez autorów i admina (F-01, F-02, S-01…S-07 ukończone).
 
 ## Done
 
