@@ -86,7 +86,7 @@ const tsScriptsConfig = defineConfig({
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
   // Course tooling (skills, prompts) downloaded by 10x-cli is not app code.
-  globalIgnores([".claude/"]),
+  globalIgnores([".claude/", "tools/code-reviewer/"]),
   // Generated Snowball stemmer copied unchanged from snowball-stemmers-js (see its LICENSE).
   globalIgnores(["src/lib/matching/vendor/"]),
   baseConfig,

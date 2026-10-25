@@ -1,0 +1,10 @@
+{
+  "implementationCorrectness": 3,
+  "idiomaticity": 5,
+  "complexity": 8,
+  "testRiskCoverage": 2,
+  "documentation": 2,
+  "securitySafety": 1,
+  "verdict": "fail",
+  "summary": "## Recenzja\n\n**Werdykt: fail.** `findUser` buduje zapytanie SQL przez konkatenację stringów z `id`, co jest podatne na SQL injection (np. `id = \"' OR '1'='1\"`). Użyj zapytań parametryzowanych (np. `db.query(\"SELECT * FROM users WHERE id = ?\", [id])`) i zmień interfejs `db`, aby je wspierał. Dodatkowo `SELECT *` zwraca wszystkie kolumny, więc lepiej wybrać tylko potrzebne.\n\n**Poprawność:** `buildGreeting` rzuci `TypeError` dla pustej tablicy `items` (`items[0]` jest `undefined`). Obsłuż ten przypadek, np. przez `items[0]?.toUpperCase()` z sensownym komunikatem zastępczym albo jawny błąd. `findUser` nie ma jawnego typu zwracanego, a zwracane `unknown` jest mało użyteczne.\n\n**Testy:** Jest tylko jeden test ścieżki szczęśliwej dla `buildGreeting`. Brakuje testów pustej listy oraz całego `findUser`, w tym próby wstrzyknięcia SQL. To najbardziej ryzykowny kod w diffie.\n\n**Dokumentacja:** Brak komentarzy dotyczących kontraktu funkcji, czyli tego, co się dzieje przy pustej liście albo gdy użytkownik nie istnieje."
+}
