@@ -542,17 +542,19 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 #### Manual
 
 - [x] 2.6 Etykiety `ai-cr:*` utworzone jednorazowo przez autorkę (`gh label list | grep ai-cr` pokazuje 6)
-- [ ] 2.7 PR nie-draft bez sekretu: `ai-cr:error` (kategoria `missing-secret`), czerwony job, jeden sticky komentarz z bezpiecznym opisem, bez surowego stderr, bez modelu
+- [ ] 2.7 PR nie-draft bez sekretu: `ai-cr:error` (kategoria `missing-secret`), czerwony job, jeden sticky komentarz z bezpiecznym opisem, bez surowego stderr, bez modelu — CZĘŚCIOWO: na GitHubie (#58, runy 40387486698, 40387980786, 40390255268) przepływ ai-cr:error, jeden sticky komentarz, czerwony job, brak modelu potwierdzony, ale kategoria to input-too-large; lokalnie CLI (fikcyjny diff, bez tokenu, --require-token): exit 1, result.json category=missing-secret, bezpieczny komentarz bez stderr; test integracyjny missing-secret odłożony do małego PR-a po scaleniu #58; integracyjne missing-secret na małym PR-ze z master (zob. notatka przy fazie 3)
 - [x] 2.8 Dodanie `ai-cr:review`: etykieta zdjęta na starcie, ten sam komentarz zaktualizowany (nie drugi), wynik jak wyżej — wynik input-too-large zamiast missing-secret; ten sam komentarz zaktualizowany, bez duplikatu
 - [x] 2.9 Push commita: etykieta wynikowa zdjęta, `ai-cr:stale` ustawiona, komentarz z banerem i SHA ocenionej wersji, job zielony, bez modelu — run 40388439308 (2ab7cde): ai-cr:stale ustawiona, ai-cr:error zdjęta, baner z SHA 49cb5e0 w tym samym komentarzu, bez sekretu i modelu
-- [ ] 2.10 Wyścig: `ai-cr:review` i natychmiastowy push. Po `synchronize` nie pojawia się `ai-cr:error` ani nowy wynik (run anulowany albo „odrzucony jako nieaktualny” w summary)
-- [ ] 2.11 Ręczne anulowanie trwającego runu review (_Cancel workflow_) nie publikuje komentarza ani etykiety
-- [ ] 2.12 Dodanie niezwiązanej etykiety nie uruchamia review i nie anuluje trwającego przebiegu
-- [ ] 2.13 PR otwarty jako draft nie uruchamia review; `ready_for_review` uruchamia
-- [ ] 2.14 PR zmieniający wyłącznie `package-lock.json`: jawny skip z powodem i listą plików, bez `ai-cr:passed`
-- [ ] 2.15 Logi: token nie pojawia się w żadnym kroku poza maskowanym inputem; uprawnienia joba w logu to `contents: read` i `pull-requests: write`
+- [x] 2.10 Wyścig: `ai-cr:review` i natychmiastowy push. Po `synchronize` nie pojawia się `ai-cr:error` ani nowy wynik (run anulowany albo „odrzucony jako nieaktualny” w summary) — runy 40389045490 (review, 2ab7cde, cancelled) i 40389061247 (synchronize, 3538f55, success) nałożyły się 19:42:03–19:42:17; kontrola SHA: publish=false, publikacja pominięta; stan końcowy: tylko ai-cr:stale, ten sam komentarz z banerem; wpis „odrzucony jako nieaktualny” w summary niezweryfikowany
+- [ ] 2.11 Ręczne anulowanie trwającego runu review (_Cancel workflow_) nie publikuje komentarza ani etykiety — NIEROZSTRZYGNIĘTE (2 próby): anulowanie nie zadziałało w runnerze przed publikacją; run 40389346268: cancel 19:44:11, publikacja 19:44:20; run 40389631353: cancel 19:45:56, publikacja 19:46:14, run oznaczony cancelled dopiero 19:46:19; wymaga dłuższego kroku review (faza 3) albo uznania opóźnienia anulowania po stronie GitHuba
+- [x] 2.12 Dodanie niezwiązanej etykiety nie uruchamia review i nie anuluje trwającego przebiegu — A: run 40389900276 (documentation), job review skipped; B: review 40389967626 (19:48:06–19:48:33) nie anulowany przez niezwiązaną etykietę dodaną 19:48:14 (run 40389991143, job skipped), doszedł do publikacji i bramki (czerwona dla error)
+- [ ] 2.13 PR otwarty jako draft nie uruchamia review; `ready_for_review` uruchamia — ready_for_review: run 40390255268 (19:50:02, bez commita i etykiety, wywołanie wnioskowane) uruchomił review, wynik input-too-large, ten sam komentarz, job czerwony; NIEZWERYFIKOWANE: opened jako draft nie uruchamia review (brak dowodu, bez osobnego PR-a); sprawdzenie „opened jako draft” przeniesione na mały PR z master (zob. notatka przy fazie 3)
+- [ ] 2.14 PR zmieniający wyłącznie `package-lock.json`: jawny skip z powodem i listą plików, bez `ai-cr:passed` — POKRYTE TESTAMI JEDNOSTKOWYMI, NIEZWERYFIKOWANE NA GITHUBIE: input.test.ts (pusty diff z pominiętymi plikami → skip z listą) i golden komentarza skipped; brak przebiegu na PR-ze zmieniającym wyłącznie package-lock.json
+- [ ] 2.15 Logi: token nie pojawia się w żadnym kroku poza maskowanym inputem; uprawnienia joba w logu to `contents: read` i `pull-requests: write` — CZĘŚCIOWO (runy 40387486698, 40390255268): uprawnienia GITHUB_TOKEN w logu = Contents: read, Metadata: read, PullRequests: write; CLAUDE_CODE_OAUTH_TOKEN występuje w logu tylko jako pusta wartość env kroku recenzenta, ANTHROPIC_API_KEY tylko w env -u; sekretu nie ma w repo, więc maskowanie prawdziwego tokenu NIE zostało zweryfikowane (zostaje na fazę 3 lub osobną decyzję)
 
 ### Phase 3: Próba na prawdziwym PR-ze z `CLAUDE_CODE_OAUTH_TOKEN`
+
+> Zmiana kolejności (ustalona 2026-10-26): faza 3 odbędzie się na osobnym małym PR-ze z `master` po scaleniu #58, bo diff #58 przekracza limit wejścia (`input-too-large`, ~241 tys. znaków przy limicie 60 tys.). Na tym PR-ze, przed utworzeniem sekretu, sprawdzamy 2.13 (opened jako draft) i integracyjne 2.7 (`missing-secret`). Punkt 2.14 jest pokryty testami jednostkowymi, niezweryfikowany na GitHubie.
 
 #### Automated
 
