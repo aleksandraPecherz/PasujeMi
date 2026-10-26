@@ -533,7 +533,7 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 
 #### Automated
 
-- [ ] 2.1 Job `ci` przechodzi na PR-ze tej zmiany (typecheck i testy pakietu, `npm ci --ignore-scripts`)
+- [x] 2.1 Job `ci` przechodzi na PR-ze tej zmiany (typecheck i testy pakietu, `npm ci --ignore-scripts`) — 49cb5e0
 - [x] 2.2 `git grep -nE 'uses: [^.].*@v[0-9]' .github/actions .github/workflows/ai-code-review.yml` nie zwraca nic (akcje przypięte do SHA) — 15b8baf
 - [x] 2.3 `git grep -n 'ANTHROPIC_API_KEY' .github/` pokazuje tylko jego jawne usunięcie (`env -u`) — 15b8baf
 - [x] 2.4 `git grep -n 'CLAUDE_CODE_OAUTH_TOKEN' .github/` pokazuje wyłącznie input composite action i `env` kroku z recenzentem — 15b8baf
@@ -541,9 +541,9 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 
 #### Manual
 
-- [ ] 2.6 Etykiety `ai-cr:*` utworzone jednorazowo przez autorkę (`gh label list | grep ai-cr` pokazuje 6)
+- [x] 2.6 Etykiety `ai-cr:*` utworzone jednorazowo przez autorkę (`gh label list | grep ai-cr` pokazuje 6)
 - [ ] 2.7 PR nie-draft bez sekretu: `ai-cr:error` (kategoria `missing-secret`), czerwony job, jeden sticky komentarz z bezpiecznym opisem, bez surowego stderr, bez modelu
-- [ ] 2.8 Dodanie `ai-cr:review`: etykieta zdjęta na starcie, ten sam komentarz zaktualizowany (nie drugi), wynik jak wyżej
+- [x] 2.8 Dodanie `ai-cr:review`: etykieta zdjęta na starcie, ten sam komentarz zaktualizowany (nie drugi), wynik jak wyżej — wynik input-too-large zamiast missing-secret; ten sam komentarz zaktualizowany, bez duplikatu
 - [ ] 2.9 Push commita: etykieta wynikowa zdjęta, `ai-cr:stale` ustawiona, komentarz z banerem i SHA ocenionej wersji, job zielony, bez modelu
 - [ ] 2.10 Wyścig: `ai-cr:review` i natychmiastowy push. Po `synchronize` nie pojawia się `ai-cr:error` ani nowy wynik (run anulowany albo „odrzucony jako nieaktualny” w summary)
 - [ ] 2.11 Ręczne anulowanie trwającego runu review (_Cancel workflow_) nie publikuje komentarza ani etykiety
