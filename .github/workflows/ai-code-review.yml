@@ -1,0 +1,276 @@
+# Doradcze AI code review PR-ów do master. Wynik to sticky komentarz i etykieta ai-cr:*, nie wymagany check.
+#
+# Model zaufania (D7-B, jednoosobowe MVP): przy pull_request z gałęzi tego repo workflow, composite action,
+# kod recenzenta i lockfile pochodzą z merge commitu PR-a, więc kod PR-a może uzyskać dostęp do tokenu
+# subskrypcji. Utwardzenie (akcje po SHA, npm ci --ignore-scripts, minimalne permissions, token tylko w env
+# jednego kroku, persist-credentials: false) ogranicza przypadkowe wycieki, ale nie chroni przed celowo
+# zmienionym kodem. Przed dopuszczeniem innych osób z prawem zapisu do repo trzeba wrócić do modelu zaufania
+# (kierunek C: pull_request_target z kodem z master).
+name: AI code review
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, ready_for_review, labeled, synchronize]
+
+permissions: {}
+
+jobs:
+  review:
+    # Pozostałe zdarzenia (draft, inne etykiety) w ogóle nie uruchamiają joba.
+    if: >-
+      (github.event.action == 'opened' && !github.event.pull_request.draft) ||
+      github.event.action == 'ready_for_review' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'ai-cr:review') ||
+      github.event.action == 'synchronize'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+    # Grupa per PR na poziomie joba, żeby nieistotne zdarzenia nie anulowały trwającego review.
+    # To porządek, nie gwarancja: o publikacji decyduje kontrola SHA.
+    concurrency:
+      group: ai-code-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    env:
+      REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Route the event
+        id: route
+        env:
+          ACTION: ${{ github.event.action }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          mode=review
+          if [ "$HEAD_REPO" != "$REPO" ] || [ "$PR_AUTHOR" = "dependabot[bot]" ]; then
+            mode=skip-fork
+          elif [ "$ACTION" = synchronize ]; then
+            mode=invalidate
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+
+      - name: Skip fork and Dependabot PRs
+        if: ${{ steps.route.outputs.mode == 'skip-fork' }}
+        run: |
+          echo "Review pominięte: PR z forka albo od Dependabota (brak dostępu do sekretów, bez modelu i bez etykiet)." >> "$GITHUB_STEP_SUMMARY"
+
+      # Etykieta wyzwalająca jest zdejmowana na początku, żeby anulowany run jej nie zostawiał.
+      - name: Remove the trigger label
+        if: ${{ steps.route.outputs.mode == 'review' && github.event.action == 'labeled' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! out=$(gh api -X DELETE "repos/$REPO/issues/$PR_NUMBER/labels/ai-cr%3Areview" 2>&1); then
+            case "$out" in
+              *"HTTP 404"*) echo "Etykieta ai-cr:review już zdjęta." ;;
+              *) echo "$out" >&2; exit 1 ;;
+            esac
+          fi
+
+      # Tryb invalidate: sprawdzenie, czy jest co unieważniać. Bez wcześniejszego wyniku nic się nie dzieje.
+      - name: Look for a previous result
+        id: prior
+        if: ${{ steps.route.outputs.mode == 'invalidate' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/ai-cr"
+          labels=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/labels" --jq '.[].name')
+          has_label=false
+          if grep -qxE 'ai-cr:(passed|failed|incomplete|error)' <<< "$labels"; then has_label=true; fi
+          ids=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and ((.body // "") | contains("<!-- ai-cr:sticky -->"))) | .id')
+          comment_id=$(printf '%s\n' "$ids" | sed -n 1p)
+          if [ -n "$comment_id" ] && ! [[ "$comment_id" =~ ^[0-9]+$ ]]; then
+            echo "Nieoczekiwany id komentarza: $comment_id" >&2
+            exit 1
+          fi
+          if [ -n "$comment_id" ]; then
+            gh api "repos/$REPO/issues/comments/$comment_id" > "$RUNNER_TEMP/ai-cr/comment.json"
+            jq -e 'type == "object" and (.body | type == "string")' "$RUNNER_TEMP/ai-cr/comment.json" > /dev/null
+            jq -r '.body' "$RUNNER_TEMP/ai-cr/comment.json" > "$RUNNER_TEMP/ai-cr/comment-in.md"
+          fi
+          proceed=false
+          if [ "$has_label" = true ] || [ -n "$comment_id" ]; then proceed=true; fi
+          {
+            echo "comment-id=$comment_id"
+            echo "proceed=$proceed"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        if: ${{ steps.route.outputs.mode == 'review' || steps.prior.outputs.proceed == 'true' }}
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Review the diff
+        id: review
+        if: ${{ steps.route.outputs.mode == 'review' }}
+        uses: ./.github/actions/code-review
+        with:
+          oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          base-sha: ${{ github.event.pull_request.base.sha }}
+          head-sha: ${{ github.event.pull_request.head.sha }}
+          pr-title: ${{ github.event.pull_request.title }}
+          pr-body: ${{ github.event.pull_request.body }}
+          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # Kontrola SHA działa także po nieudanej composite action, żeby dało się opublikować wynik error.
+      # Publikację otwiera wyłącznie publish=true; każdy inny stan (różnica, błąd API, krok pominięty) ją zamyka.
+      - name: Check that the reviewed commit is still the PR head
+        id: head-check
+        if: ${{ !cancelled() && steps.route.outputs.mode == 'review' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          current=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq .head.sha)
+          if ! [[ "$current" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Nieoczekiwana odpowiedź API zamiast SHA: $current" >&2
+            exit 1
+          fi
+          if [ "$current" = "$REVIEWED_SHA" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Wynik dla \`$REVIEWED_SHA\` odrzucony jako nieaktualny (bieżący head: \`$current\`)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publish comment and labels
+        id: publish
+        if: ${{ !cancelled() && steps.head-check.outputs.publish == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEW_OUTCOME: ${{ steps.review.outputs.outcome }}
+          COMMENT_FILE: ${{ steps.review.outputs.comment-file }}
+          REVIEWED_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          dir="$RUNNER_TEMP/ai-cr"
+          mkdir -p "$dir"
+          outcome="$REVIEW_OUTCOME"
+          case "$outcome" in
+            passed | failed | incomplete | error | skipped) ;;
+            *) outcome="" ;;
+          esac
+          # Brak wyniku albo komentarza oznacza, że composite action się nie powiodła: błąd infrastruktury.
+          if [ -z "$outcome" ] || [ ! -s "$COMMENT_FILE" ]; then
+            outcome=error
+            COMMENT_FILE="$dir/infra-comment.md"
+            {
+              echo "<!-- ai-cr:sticky -->"
+              echo "<!-- ai-cr:sha=$REVIEWED_SHA -->"
+              echo
+              echo "## Wynik AI code review: błąd wykonania (error)"
+              echo
+              echo "Oceniony commit: \`$REVIEWED_SHA\` · [przebieg Actions]($RUN_URL)"
+              echo
+              echo "Błąd infrastruktury: nie udało się uruchomić recenzenta. Szczegóły w logu przebiegu."
+            } > "$COMMENT_FILE"
+          fi
+          echo "outcome=$outcome" >> "$GITHUB_OUTPUT"
+
+          # Sticky komentarz: po znaczniku i autorze github-actions[bot]; aktualizacja albo nowy.
+          ids=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and ((.body // "") | contains("<!-- ai-cr:sticky -->"))) | .id')
+          comment_id=$(printf '%s\n' "$ids" | sed -n 1p)
+          if [ -n "$comment_id" ]; then
+            [[ "$comment_id" =~ ^[0-9]+$ ]] || { echo "Nieoczekiwany id komentarza: $comment_id" >&2; exit 1; }
+            gh api -X PATCH "repos/$REPO/issues/comments/$comment_id" -F "body=@$COMMENT_FILE" > /dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -F "body=@$COMMENT_FILE" > /dev/null
+          fi
+
+          # Etykiety: jedna etykieta wyniku (nie dla skipped), reszta wyników i stale zdjęte; 404 tolerowane.
+          remove_label() {
+            local out
+            if ! out=$(gh api -X DELETE "repos/$REPO/issues/$PR_NUMBER/labels/${1//:/%3A}" 2>&1); then
+              case "$out" in
+                *"HTTP 404"*) ;;
+                *) echo "$out" >&2; return 1 ;;
+              esac
+            fi
+          }
+          if [ "$outcome" != skipped ]; then
+            gh api -X POST "repos/$REPO/issues/$PR_NUMBER/labels" -f "labels[]=ai-cr:$outcome" > /dev/null
+          fi
+          for name in passed failed incomplete error; do
+            if [ "$name" != "$outcome" ]; then remove_label "ai-cr:$name"; fi
+          done
+          remove_label "ai-cr:stale"
+
+      - name: Summarize the result
+        if: ${{ !cancelled() && steps.head-check.outputs.publish == 'true' }}
+        env:
+          OUTCOME: ${{ steps.publish.outputs.outcome }}
+          REVIEWED_SHA: ${{ github.event.pull_request.head.sha }}
+          METRICS_FILE: ${{ steps.review.outputs.metrics-file }}
+        run: |
+          {
+            echo "## AI code review"
+            echo
+            echo "- Wynik: \`${OUTCOME:-nieznany}\`"
+            echo "- Oceniony commit: \`$REVIEWED_SHA\`"
+            if [ -n "$METRICS_FILE" ] && [ -f "$METRICS_FILE" ] \
+              && jq -e 'type == "object" and (.total_cost_usd_estimate | type == "number")' "$METRICS_FILE" > /dev/null 2>&1; then
+              jq -r '"- Koszt: $\(.total_cost_usd_estimate) (szacunek SDK, nie rachunek), tury: \(.num_turns)"' "$METRICS_FILE"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Tryb invalidate: bez modelu i bez sekretu. Kod z PR-a (npm run stale) działa bez tokenu GitHub.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        if: ${{ steps.prior.outputs.proceed == 'true' }}
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: tools/code-reviewer/package-lock.json
+
+      - name: Install code-reviewer without install scripts
+        if: ${{ steps.prior.outputs.proceed == 'true' }}
+        working-directory: tools/code-reviewer
+        run: npm ci --ignore-scripts
+
+      - name: Mark the comment as stale
+        if: ${{ steps.prior.outputs.proceed == 'true' && steps.prior.outputs.comment-id != '' }}
+        working-directory: tools/code-reviewer
+        env:
+          NEW_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: npm run stale -- --in "$RUNNER_TEMP/ai-cr/comment-in.md" --head-sha "$NEW_HEAD_SHA" --out "$RUNNER_TEMP/ai-cr/comment-out.md"
+
+      - name: Apply stale labels and comment
+        if: ${{ steps.prior.outputs.proceed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_ID: ${{ steps.prior.outputs.comment-id }}
+        run: |
+          remove_label() {
+            local out
+            if ! out=$(gh api -X DELETE "repos/$REPO/issues/$PR_NUMBER/labels/${1//:/%3A}" 2>&1); then
+              case "$out" in
+                *"HTTP 404"*) ;;
+                *) echo "$out" >&2; return 1 ;;
+              esac
+            fi
+          }
+          for name in passed failed incomplete error; do remove_label "ai-cr:$name"; done
+          gh api -X POST "repos/$REPO/issues/$PR_NUMBER/labels" -f "labels[]=ai-cr:stale" > /dev/null
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$COMMENT_ID" -F "body=@$RUNNER_TEMP/ai-cr/comment-out.md" > /dev/null
+          fi
+          echo "Wynik unieważniony po nowych commitach (ai-cr:stale)." >> "$GITHUB_STEP_SUMMARY"
+
+      # Bramka na końcu: failed i error robią job czerwonym dopiero po publikacji.
+      - name: Gate on the review outcome
+        if: ${{ !cancelled() && steps.head-check.outputs.publish == 'true' }}
+        env:
+          OUTCOME: ${{ steps.publish.outputs.outcome }}
+        run: |
+          case "$OUTCOME" in
+            failed | error)
+              echo "AI code review: wynik $OUTCOME" >&2
+              exit 1
+              ;;
+          esac
