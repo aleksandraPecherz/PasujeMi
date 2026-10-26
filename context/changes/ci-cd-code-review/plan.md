@@ -534,9 +534,9 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 #### Automated
 
 - [ ] 2.1 Job `ci` przechodzi na PR-ze tej zmiany (typecheck i testy pakietu, `npm ci --ignore-scripts`)
-- [x] 2.2 `git grep -nE 'uses: [^.].*@v[0-9]' .github/actions .github/workflows/ai-code-review.yml` nie zwraca nic (akcje przypięte do SHA)
-- [x] 2.3 `git grep -n 'ANTHROPIC_API_KEY' .github/` pokazuje tylko jego jawne usunięcie (`env -u`)
-- [x] 2.4 `git grep -n 'CLAUDE_CODE_OAUTH_TOKEN' .github/` pokazuje wyłącznie input composite action i `env` kroku z recenzentem
+- [x] 2.2 `git grep -nE 'uses: [^.].*@v[0-9]' .github/actions .github/workflows/ai-code-review.yml` nie zwraca nic (akcje przypięte do SHA) — 15b8baf
+- [x] 2.3 `git grep -n 'ANTHROPIC_API_KEY' .github/` pokazuje tylko jego jawne usunięcie (`env -u`) — 15b8baf
+- [x] 2.4 `git grep -n 'CLAUDE_CODE_OAUTH_TOKEN' .github/` pokazuje wyłącznie input composite action i `env` kroku z recenzentem — 15b8baf
 - [ ] 2.5 `git grep -nE "always\(\)|publish != " .github/workflows/ai-code-review.yml` nie zwraca nic, a kroki publikacji i bramki mają warunek `steps.head-check.outputs.publish == 'true'`
 
 #### Manual
