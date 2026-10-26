@@ -81,10 +81,10 @@ Obowiązkowo trafiają do instrukcji agenta CI.
 - Ocena 10 dotyczy zakresu możliwego do sprawdzenia z przekazanego kontekstu. Nie jest dowodem doskonałości całego repozytorium.
 - To samo naruszenie nie obniża dwóch ocen.
 - Pojedyncze drobne odstępstwo nie oznacza oceny 1. Ocena uwzględnia skalę naruszenia i wagę ryzyka.
-- Agent rozróżnia dwa przypadki i opisuje je wprost w podsumowaniu:
+- Agent rozróżnia dwa przypadki i zgłasza je w polu `notAssessed` (kryterium, powód `no-data` / `not-applicable`, niepusty `note`); `summary` ma 2–3 zdania łącznie i ich nie powtarza:
   - brak danych do oceny: kryterium dotyczy zmiany, ale przekazany kontekst nie pozwala go ocenić,
   - kryterium nie dotyczy zmiany: diff nie zawiera niczego, co to kryterium obejmuje.
-- Agent nie wymyśla w żadnym z tych przypadków liczby neutralnej. Do czasu decyzji o kontrakcie ocenia tylko to, co widać w diffie, a gdy kryterium nie ma czego ocenić, mówi to wprost w podsumowaniu.
+- Agent nie wymyśla w żadnym z tych przypadków liczby neutralnej. Kryterium bez czego ocenić dostaje `null` z dokładnie jednym wpisem w `notAssessed` (decyzja z `plan.md`).
 
 ### 1. Poprawność implementacji (`implementationCorrectness`)
 
@@ -189,6 +189,8 @@ Agent CI nie czyta `AGENTS.md` (w `tools/code-reviewer/src/index.ts` jest `setti
 6. **Zasady wspólne** z początku tej sekcji.
 
 ### Otwarte kwestie kontraktu i bramki
+
+> Rozstrzygnięte w `plan.md` i zaimplementowane w fazie 1: oceny `number | null`, pole `notAssessed` (`no-data` / `not-applicable`), `summary` 2–3 zdania łącznie, bramka `deriveOutcome` z progiem 5 (tymczasowym). Poniższa lista jest zapisem stanu sprzed planowania i zostaje jako kontekst historyczny.
 
 Do rozstrzygnięcia podczas planowania. Tu nie ma decyzji ani zadania implementacyjnego.
 
