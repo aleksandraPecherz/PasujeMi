@@ -28,10 +28,19 @@ function call({ user = { id: USER_ID }, body, raw, contentType = "application/js
   const request = new Request("http://localhost/api/pantry", {
     method: "PUT",
     headers,
-    body: raw ?? JSON.stringify(body),
+    // Bytes, not a string: a string body makes Request add "text/plain" itself, so there would be no missing header.
+    body: new TextEncoder().encode(raw ?? JSON.stringify(body)),
   });
   const context = { request, cookies: {}, locals: { user } } as unknown as APIContext;
   return PUT(context) as Promise<Response>;
+}
+
+/** `count` distinct one-word, letter-only tags (digits vanish in tokenize), each far below MAX_TAG_LENGTH. */
+function oneWordTags(count: number): string[] {
+  return Array.from(
+    { length: count },
+    (_, i) => `a${String.fromCharCode(97 + (i % 26))}${String.fromCharCode(97 + Math.floor(i / 26))}`,
+  );
 }
 
 const valid = { ownerId: USER_ID, staple: ["sól", "pieprz"], exclude: ["orzechy"] };
@@ -94,10 +103,7 @@ describe("PUT /api/pantry", () => {
     ["a non-string tag", { ownerId: USER_ID, staple: [1], exclude: [] }],
     ["an empty tag", { ownerId: USER_ID, staple: ["  "], exclude: [] }],
     ["a duplicate tag", { ownerId: USER_ID, staple: ["Sól", "sól"], exclude: [] }],
-    [
-      "more than MAX_TAGS tags",
-      { ownerId: USER_ID, staple: Array.from({ length: MAX_TAGS + 1 }, (_, i) => `t${"a".repeat(i)}`), exclude: [] },
-    ],
+    ["more than MAX_TAGS tags", { ownerId: USER_ID, staple: oneWordTags(MAX_TAGS + 1), exclude: [] }],
     ["a tag longer than MAX_TAG_LENGTH", { ownerId: USER_ID, staple: ["a".repeat(MAX_TAG_LENGTH + 1)], exclude: [] }],
   ])("rejects %s with 400 invalid_pantry", async (_name, body) => {
     const response = await call({ body });
