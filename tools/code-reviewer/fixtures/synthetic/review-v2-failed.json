@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "note": "Ręcznie napisany przykład nowego kontraktu, nie wynik modelu",
+  "review": {
+    "implementationCorrectness": 3,
+    "idiomaticity": 6,
+    "complexity": 7,
+    "testRiskCoverage": 2,
+    "documentation": 5,
+    "securitySafety": 1,
+    "notAssessed": [],
+    "verdict": "fail",
+    "summary": "`findUser` składa zapytanie SQL z konkatenacji stringów (SQL injection). Użyj zapytań parametryzowanych."
+  }
+}

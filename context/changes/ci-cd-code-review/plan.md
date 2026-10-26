@@ -516,18 +516,18 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 
 #### Automated
 
-- [ ] 1.1 Typecheck pakietu przechodzi: `cd tools/code-reviewer && npm run typecheck`
-- [ ] 1.2 Testy pakietu przechodzą: `cd tools/code-reviewer && npm test`
-- [ ] 1.3 Czysta instalacja bez skryptów i testy na niej przechodzą: `cd tools/code-reviewer && rm -rf node_modules && npm ci --ignore-scripts && npm test`
-- [ ] 1.4 Test JSON Schema potwierdza `anyOf` z `null` dla 6 ocen, `additionalProperties: false` w każdym obiekcie oraz brak `minimum`/`maximum`/`multipleOf`/`minLength`/`maxLength` i `minItems` > 1
-- [ ] 1.5 Root lint i typecheck nadal przechodzą: `npm run lint` oraz `npx astro check`
-- [ ] 1.6 Root testy nadal przechodzą: `npm test`
-- [ ] 1.7 Historyczne fixture'y nietknięte: `git diff --exit-code master -- tools/code-reviewer/fixtures/sample.review.json tools/code-reviewer/fixtures/sample.review.metrics.json`
+- [x] 1.1 Typecheck pakietu przechodzi: `cd tools/code-reviewer && npm run typecheck`
+- [x] 1.2 Testy pakietu przechodzą: `cd tools/code-reviewer && npm test`
+- [x] 1.3 Czysta instalacja bez skryptów i testy na niej przechodzą: `cd tools/code-reviewer && rm -rf node_modules && npm ci --ignore-scripts && npm test`
+- [x] 1.4 Test JSON Schema potwierdza `anyOf` z `null` dla 6 ocen, `additionalProperties: false` w każdym obiekcie oraz brak `minimum`/`maximum`/`multipleOf`/`minLength`/`maxLength` i `minItems` > 1
+- [x] 1.5 Root lint i typecheck nadal przechodzą: `npm run lint` oraz `npx astro check`
+- [x] 1.6 Root testy nadal przechodzą: `npm test`
+- [x] 1.7 Historyczne fixture'y nietknięte: `git diff --exit-code master -- tools/code-reviewer/fixtures/sample.review.json tools/code-reviewer/fixtures/sample.review.metrics.json`
 
 #### Manual
 
-- [ ] 1.8 Przegląd `SYSTEM_PROMPT` względem `requirements.md` → „Code Review Criteria”: zasady wspólne, 6 kryteriów i reguły 1–5 są obecne i wierne
-- [ ] 1.9 Render komentarza dla każdego wyniku (passed, failed, incomplete, error, skipped, stale) obejrzany na fixture'ach i czytelny, bez surowego stderr
+- [x] 1.8 Przegląd `SYSTEM_PROMPT` względem `requirements.md` → „Code Review Criteria”: zasady wspólne, 6 kryteriów i reguły 1–5 są obecne i wierne
+- [x] 1.9 Render komentarza dla każdego wyniku (passed, failed, incomplete, error, skipped, stale) obejrzany na fixture'ach i czytelny, bez surowego stderr
 
 ### Phase 2: Composite action i workflow `ai-code-review.yml`
 
