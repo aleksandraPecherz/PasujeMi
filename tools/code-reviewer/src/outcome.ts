@@ -20,6 +20,7 @@ export const ERROR_CATEGORIES = [
   "max-turns",
   "structured-output-retries",
   "invalid-output",
+  "timeout",
   "no-result",
   "unexpected",
 ] as const;

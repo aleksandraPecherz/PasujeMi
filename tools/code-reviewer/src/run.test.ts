@@ -38,6 +38,32 @@ function fakeQuery(messages: QueryMessage[], thrown?: Error) {
   return { queryFn, calls };
 }
 
+describe("runReview timeout", () => {
+  it("ends with the timeout error after one query() and aborts it, even if the stream never ends", async () => {
+    const calls: QueryParams[] = [];
+    const hanging: QueryFn = (params) => {
+      calls.push(params);
+      return (async function* () {
+        yield { type: "system" } satisfies QueryMessage;
+        await new Promise<never>(() => {});
+      })();
+    };
+    const out = await runReview(input, hanging, 20);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].options.abortController.signal.aborted, true);
+    assert.deepEqual(out.result, { status: "error", outcome: "error", category: "timeout" });
+    assert.equal(out.metrics, null);
+    assert.ok(out.logs.some((line) => line.includes("limit czasu")));
+  });
+
+  it("does not time out a run that finishes in time", async () => {
+    const { queryFn, calls } = fakeQuery([success(BASE_REVIEW)]);
+    const out = await runReview(input, queryFn, 5_000);
+    assert.equal(out.result.status, "reviewed");
+    assert.equal(calls[0].options.abortController.signal.aborted, false);
+  });
+});
+
 describe("runReview", () => {
   it("calls query exactly once on success and derives the outcome", async () => {
     const { queryFn, calls } = fakeQuery([success(BASE_REVIEW)]);

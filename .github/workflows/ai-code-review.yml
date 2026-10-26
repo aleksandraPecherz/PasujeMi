@@ -24,6 +24,7 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == 'ai-cr:review') ||
       github.event.action == 'synchronize'
     runs-on: ubuntu-latest
+    # Dłuższy niż limit query() (REVIEW_TIMEOUT_MS = 10 min), żeby timeout recenzenta kończył się komentarzem error.
     timeout-minutes: 15
     permissions:
       contents: read

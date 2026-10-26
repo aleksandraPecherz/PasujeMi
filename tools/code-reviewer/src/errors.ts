@@ -31,6 +31,8 @@ export function safeMessage(category: ErrorCategory, chars?: number): string {
       return "Agent nie zwrócił odpowiedzi zgodnej ze schematem mimo ponowień wewnątrz SDK.";
     case "invalid-output":
       return "Odpowiedź agenta nie spełnia kontraktu recenzji (schemat lub zakres ocen).";
+    case "timeout":
+      return "Review przekroczyło limit czasu pojedynczego uruchomienia i zostało przerwane.";
     case "no-result":
       return "Agent nie zwrócił wyniku.";
     case "sdk-error":

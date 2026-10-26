@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it } from "node:test";
+import { pathToFileURL } from "node:url";
 import { markStale, renderComment, type RenderInput } from "./comment.ts";
 import { deriveOutcome, type ResultFile } from "./outcome.ts";
 import type { Metrics } from "./run.ts";
@@ -42,12 +45,13 @@ const CASES: Record<string, RenderInput> = {
 
 const goldenUrl = (name: string) => new URL(`../fixtures/synthetic/comments/${name}.md.golden`, import.meta.url);
 
-function checkGolden(name: string, actual: string): void {
-  const url = goldenUrl(name);
-  if (process.env.UPDATE_GOLDEN === "1" || !existsSync(url)) {
+// Goldens are written only in the explicit UPDATE_GOLDEN=1 mode; a missing golden fails the test.
+function checkGolden(name: string, actual: string, url: URL = goldenUrl(name)): void {
+  if (process.env.UPDATE_GOLDEN === "1") {
     mkdirSync(new URL("./", url), { recursive: true });
     writeFileSync(url, actual);
   }
+  assert.ok(existsSync(url), `${name}.md.golden is missing; run with UPDATE_GOLDEN=1 to create it`);
   assert.equal(actual, readFileSync(url, "utf8"), `${name}.md.golden differs; run with UPDATE_GOLDEN=1 to refresh`);
 }
 
@@ -62,6 +66,12 @@ describe("renderComment", () => {
 
   it("matches the golden comments (passed, failed, incomplete, error, skipped)", () => {
     for (const [name, input] of Object.entries(CASES)) checkGolden(name, renderComment(input));
+  });
+
+  it("fails instead of creating a golden file that does not exist", { skip: process.env.UPDATE_GOLDEN === "1" }, () => {
+    const missing = pathToFileURL(join(tmpdir(), `ai-cr-no-such-golden-${process.pid}.md.golden`));
+    assert.throws(() => checkGolden("missing", "x", missing), /missing.md.golden is missing/);
+    assert.ok(!existsSync(missing));
   });
 
   it("shows a dash for null scores and lists notAssessed", () => {

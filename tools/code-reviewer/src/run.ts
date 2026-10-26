@@ -7,6 +7,9 @@ import { REVIEW_JSON_SCHEMA, SYSTEM_PROMPT } from "./review-schema.ts";
 import { validateReview } from "./validate.ts";
 
 export const MODEL = "claude-sonnet-5-5";
+// Hard wall-clock limit for the single query(); must stay below the job timeout-minutes (15) in
+// ai-code-review.yml, which leaves time for install and for publishing the error comment.
+export const REVIEW_TIMEOUT_MS = 10 * 60_000;
 
 export type QueryParams = {
   prompt: string;
@@ -18,6 +21,7 @@ export type QueryParams = {
     maxTurns: number;
     maxBudgetUsd: number;
     outputFormat: { type: "json_schema"; schema: Record<string, unknown> };
+    abortController: AbortController;
   };
 };
 
@@ -65,7 +69,11 @@ const errorResult = (category: ErrorCategory, chars?: number): ResultFile =>
     ? { status: "error", outcome: "error", category }
     : { status: "error", outcome: "error", category, chars };
 
-export async function runReview(input: RunInput, queryFn: QueryFn): Promise<RunOutput> {
+export async function runReview(
+  input: RunInput,
+  queryFn: QueryFn,
+  timeoutMs: number = REVIEW_TIMEOUT_MS,
+): Promise<RunOutput> {
   const logs: string[] = [];
 
   // Order: nothing to review -> too large -> missing token -> SDK. Skip and limit need no secret.
@@ -84,7 +92,18 @@ export async function runReview(input: RunInput, queryFn: QueryFn): Promise<RunO
   // Exactly one query() per run, no retries: the category comes from the last result before any throw.
   let lastResult: QueryMessage | undefined;
   let thrown: unknown;
-  try {
+  const abortController = new AbortController();
+  let timedOut = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  // The deadline races the stream, so a query() that ignores the abort signal still ends the run.
+  const deadline = new Promise<void>((resolve) => {
+    timer = setTimeout(() => {
+      timedOut = true;
+      abortController.abort();
+      resolve();
+    }, timeoutMs);
+  });
+  const consume = async (): Promise<void> => {
     for await (const message of queryFn({
       prompt: prepared.prompt,
       options: {
@@ -95,13 +114,24 @@ export async function runReview(input: RunInput, queryFn: QueryFn): Promise<RunO
         maxTurns: 2,
         maxBudgetUsd: 0.5,
         outputFormat: { type: "json_schema", schema: REVIEW_JSON_SCHEMA },
+        abortController,
       },
     })) {
       if (message.type === "result") lastResult = message;
     }
+  };
+  try {
+    await Promise.race([consume(), deadline]);
   } catch (error) {
     thrown = error;
     logs.push(`Wyjątek z query(): ${error instanceof Error ? error.message : String(error)}`);
+  } finally {
+    clearTimeout(timer);
+  }
+
+  if (timedOut) {
+    logs.push(`Przekroczono limit czasu query(): ${timeoutMs} ms.`);
+    return { result: errorResult("timeout"), metrics: null, logs };
   }
 
   if (!lastResult) {
