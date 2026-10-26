@@ -9,6 +9,8 @@
   },
   "scripts": {
     "review": "tsx src/index.ts",
+    "stale": "tsx src/stale.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

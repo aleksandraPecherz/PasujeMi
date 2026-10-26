@@ -15,12 +15,27 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            tools/code-reviewer/package-lock.json
       - run: npm ci
       - run: npx astro sync
       - run: npm run lint
       - run: npm run check:ui
       - run: npx astro check
       - run: npm test
+      - name: Install code-reviewer without install scripts
+        working-directory: tools/code-reviewer
+        run: npm ci --ignore-scripts
+      - name: Check that the SDK native binary for linux-x64 is installed
+        working-directory: tools/code-reviewer
+        run: npm ls @anthropic-ai/claude-agent-sdk-linux-x64
+      - name: Typecheck code-reviewer
+        working-directory: tools/code-reviewer
+        run: npm run typecheck
+      - name: Test code-reviewer
+        working-directory: tools/code-reviewer
+        run: npm test
       - run: npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

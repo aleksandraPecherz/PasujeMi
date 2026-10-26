@@ -1,0 +1,21 @@
+{
+  "synthetic": true,
+  "note": "Ręcznie napisany przykład nowego kontraktu, nie wynik modelu",
+  "review": {
+    "implementationCorrectness": 8,
+    "idiomaticity": 9,
+    "complexity": 8,
+    "testRiskCoverage": null,
+    "documentation": 7,
+    "securitySafety": 9,
+    "notAssessed": [
+      {
+        "criterion": "testRiskCoverage",
+        "reason": "not-applicable",
+        "note": "Diff zmienia wyłącznie dokumentację, nie ma logiki do testowania."
+      }
+    ],
+    "verdict": "pass",
+    "summary": "Zmiana jest spójna z opisem. @autor czy `docs/` wymaga jeszcze przykładu użycia?"
+  }
+}

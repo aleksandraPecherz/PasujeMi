@@ -1,0 +1,21 @@
+{
+  "synthetic": true,
+  "note": "Ręcznie napisany przykład nowego kontraktu, nie wynik modelu",
+  "review": {
+    "implementationCorrectness": 8,
+    "idiomaticity": 8,
+    "complexity": 7,
+    "testRiskCoverage": null,
+    "documentation": 6,
+    "securitySafety": 8,
+    "notAssessed": [
+      {
+        "criterion": "testRiskCoverage",
+        "reason": "no-data",
+        "note": "Nowa logika w `src/lib/matching.ts` nie ma testów w diffie. Czy istnieją testy poza tą zmianą?"
+      }
+    ],
+    "verdict": "pass",
+    "summary": "Kod jest czytelny i spójny z opisem."
+  }
+}

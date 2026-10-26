@@ -1,0 +1,122 @@
+name: AI code review
+description: Uruchamia recenzenta z tools/code-reviewer na diffie PR-a i zwraca wynik. Nie ma efektów ubocznych w PR-ze i nie kończy się błędem z powodu wyniku recenzji.
+
+inputs:
+  oauth-token:
+    description: Token subskrypcji Claude Code. Niewymagany, żeby brak tokenu dał wynik error (missing-secret), a nie błąd składni.
+    required: false
+    default: ""
+  base-sha:
+    description: SHA bazy PR-a.
+    required: true
+  head-sha:
+    description: SHA ocenianego commita (head PR-a).
+    required: true
+  pr-title:
+    description: Tytuł PR-a (niezaufany).
+    required: false
+    default: ""
+  pr-body:
+    description: Opis PR-a (niezaufany).
+    required: false
+    default: ""
+  run-url:
+    description: Link do przebiegu Actions, pokazywany w komentarzu.
+    required: false
+    default: ""
+
+outputs:
+  outcome:
+    description: passed | failed | incomplete | error | skipped
+    value: ${{ steps.result.outputs.outcome }}
+  result-file:
+    description: Ścieżka do result.json.
+    value: ${{ steps.result.outputs.result-file }}
+  comment-file:
+    description: Ścieżka do treści sticky komentarza (Markdown).
+    value: ${{ steps.result.outputs.comment-file }}
+  metrics-file:
+    description: Ścieżka do metrics.json (może nie istnieć).
+    value: ${{ steps.result.outputs.metrics-file }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version-file: .nvmrc
+        cache: npm
+        cache-dependency-path: tools/code-reviewer/package-lock.json
+
+    - name: Install code-reviewer without install scripts
+      shell: bash
+      working-directory: tools/code-reviewer
+      run: npm ci --ignore-scripts
+
+    - name: Prepare review input
+      shell: bash
+      env:
+        PR_TITLE: ${{ inputs.pr-title }}
+        PR_BODY: ${{ inputs.pr-body }}
+        BASE_SHA: ${{ inputs.base-sha }}
+        HEAD_SHA: ${{ inputs.head-sha }}
+      run: |
+        for sha in "$BASE_SHA" "$HEAD_SHA"; do
+          [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Zły format SHA: $sha" >&2; exit 1; }
+        done
+        dir="$RUNNER_TEMP/ai-cr"
+        mkdir -p "$dir"
+        # Tytuł i opis są niezaufane: trafiają do plików z env, nigdy przez interpolację w skrypcie.
+        printf '%s' "$PR_TITLE" > "$dir/title.txt"
+        printf '%s' "$PR_BODY" > "$dir/body.txt"
+        # package-lock.json w dowolnym katalogu nie wchodzi do diffu; lista trafia do komentarza.
+        git diff --name-only "$BASE_SHA...$HEAD_SHA" | { grep -E '(^|/)package-lock\.json$' || true; } > "$dir/excluded.txt"
+        git diff --no-color --no-ext-diff "$BASE_SHA...$HEAD_SHA" -- . ':(exclude,glob)**/package-lock.json' > "$dir/diff.patch"
+
+    - name: Run reviewer
+      shell: bash
+      working-directory: tools/code-reviewer
+      env:
+        # Jedyne miejsce, w którym token trafia do środowiska procesu.
+        CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.oauth-token }}
+        HEAD_SHA: ${{ inputs.head-sha }}
+        RUN_URL: ${{ inputs.run-url }}
+      run: |
+        dir="$RUNNER_TEMP/ai-cr"
+        # Klucz API miałby pierwszeństwo przed tokenem subskrypcji i zmieniłby rozliczanie, więc jest usuwany ze środowiska.
+        # Wynik review nie może wywrócić kroku: kod wyjścia tylko logujemy, a wynik czytamy z pliku.
+        set +e
+        env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN npm run review -- \
+          --title-file "$dir/title.txt" \
+          --body-file "$dir/body.txt" \
+          --diff-file "$dir/diff.patch" \
+          --excluded-file "$dir/excluded.txt" \
+          --out "$dir/result.json" \
+          --metrics "$dir/metrics.json" \
+          --comment-out "$dir/comment.md" \
+          --sha "$HEAD_SHA" \
+          --run-url "$RUN_URL" \
+          --require-token
+        code=$?
+        echo "Recenzent zakończył się kodem $code"
+        exit 0
+
+    - name: Read result
+      id: result
+      shell: bash
+      run: |
+        dir="$RUNNER_TEMP/ai-cr"
+        outcome=error
+        # Najpierw plik i typ obiektu, dopiero potem pole outcome.
+        if [ -f "$dir/result.json" ] && jq -e 'type == "object"' "$dir/result.json" > /dev/null 2>&1; then
+          value=$(jq -r '.outcome // empty' "$dir/result.json")
+          case "$value" in
+            passed | failed | incomplete | error | skipped) outcome="$value" ;;
+          esac
+        fi
+        {
+          echo "outcome=$outcome"
+          echo "result-file=$dir/result.json"
+          echo "comment-file=$dir/comment.md"
+          echo "metrics-file=$dir/metrics.json"
+        } >> "$GITHUB_OUTPUT"

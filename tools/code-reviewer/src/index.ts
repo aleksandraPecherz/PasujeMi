@@ -1,23 +1,20 @@
-// Local code-review agent: diff in (file argument or stdin), structured JSON verdict out.
-// Auth comes from the Claude Code login; ANTHROPIC_API_KEY is deliberately never set here.
+// Code-review agent: diff (plus optional PR title/description) in, structured JSON verdict out.
+// Auth comes from the Claude Code login locally and from CLAUDE_CODE_OAUTH_TOKEN in CI;
+// ANTHROPIC_API_KEY is deliberately never set here.
 import { readFile } from "node:fs/promises";
+import { parseArgs } from "node:util";
 import { query } from "@anthropic-ai/claude-agent-sdk";
-import { REVIEW_JSON_SCHEMA, REVIEW_SCHEMA, SYSTEM_PROMPT } from "./review-schema.ts";
-
-const MODEL = "claude-sonnet-5-5";
-const SCORE_FIELDS = [
-  "implementationCorrectness",
-  "idiomaticity",
-  "complexity",
-  "testRiskCoverage",
-  "documentation",
-  "securitySafety",
-] as const;
+import { emitAndExit } from "./output.ts";
+import { runReview, type QueryFn } from "./run.ts";
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) chunks.push(Buffer.from(chunk as Uint8Array));
   return Buffer.concat(chunks).toString("utf8");
+}
+
+async function readOptional(path: string | undefined): Promise<string> {
+  return path ? readFile(path, "utf8") : "";
 }
 
 async function readDiff(path: string | undefined): Promise<string> {
@@ -29,57 +26,54 @@ async function readDiff(path: string | undefined): Promise<string> {
 }
 
 async function main(): Promise<void> {
-  const diff = await readDiff(process.argv[2]);
-  if (!diff.trim()) throw new Error("Diff jest pusty.");
-  let receivedResult = false;
-
-  for await (const message of query({
-    prompt: `Zrecenzuj poniższy diff.\n\n${diff}`,
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
     options: {
-      model: MODEL,
-      systemPrompt: SYSTEM_PROMPT,
-      tools: [],
-      settingSources: [],
-      maxTurns: 2,
-      maxBudgetUsd: 0.5,
-      outputFormat: { type: "json_schema", schema: REVIEW_JSON_SCHEMA },
+      "title-file": { type: "string" },
+      "body-file": { type: "string" },
+      "diff-file": { type: "string" },
+      "excluded-file": { type: "string" },
+      out: { type: "string" },
+      metrics: { type: "string" },
+      "comment-out": { type: "string" },
+      sha: { type: "string" },
+      "run-url": { type: "string" },
+      "require-token": { type: "boolean", default: false },
     },
-  })) {
-    if (message.type !== "result") continue;
-    receivedResult = true;
+  });
 
-    if (message.subtype !== "success") {
-      throw new Error(
-        `Przegląd nie powiódł się (${message.subtype}): ${message.errors.join("; ") || "brak szczegółów"}`,
-      );
-    }
+  const diff = await readDiff(values["diff-file"] ?? positionals[0]);
+  const excludedFiles = (await readOptional(values["excluded-file"])).split("\n").filter((line) => line.trim() !== "");
 
-    const parsed = REVIEW_SCHEMA.safeParse(message.structured_output);
-    if (!parsed.success) {
-      throw new Error(`Odpowiedź nie pasuje do schematu recenzji: ${parsed.error.message}`);
-    }
-    for (const field of SCORE_FIELDS) {
-      const score = parsed.data[field];
-      if (!Number.isInteger(score) || score < 1 || score > 10) {
-        throw new Error(`Niepoprawna ocena ${field}: ${score}. Oczekiwano liczby całkowitej od 1 do 10.`);
-      }
-    }
+  const { result, metrics, logs } = await runReview(
+    {
+      title: await readOptional(values["title-file"]),
+      body: await readOptional(values["body-file"]),
+      diff,
+      excludedFiles,
+      requireToken: values["require-token"],
+      hasToken: Boolean(process.env.CLAUDE_CODE_OAUTH_TOKEN),
+    },
+    query as QueryFn,
+  );
 
-    console.log(JSON.stringify(parsed.data, null, 2));
-    console.error(
-      JSON.stringify(
-        {
-          total_cost_usd: message.total_cost_usd,
-          num_turns: message.num_turns,
-          duration_ms: message.duration_ms,
-          usage: message.usage,
-        },
-        null,
-        2,
-      ),
-    );
-  }
-  if (!receivedResult) throw new Error("Agent nie zwrócił wyniku");
+  // Raw details go to stderr only; the result file and the comment carry safe content.
+  for (const line of logs) console.error(line);
+  if (result.status === "skipped") console.error(`Pominięto: ${result.reason}`);
+
+  await emitAndExit(
+    {
+      result,
+      metrics,
+      excludedFiles,
+      out: values.out,
+      metricsOut: values.metrics,
+      commentOut: values["comment-out"],
+      sha: values.sha,
+      runUrl: values["run-url"],
+    },
+    { setExitCode: (code) => (process.exitCode = code), exit: (code) => process.exit(code) },
+  );
 }
 
 main().catch((error: unknown) => {
