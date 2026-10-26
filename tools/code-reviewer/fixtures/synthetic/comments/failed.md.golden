@@ -5,19 +5,18 @@
 
 Oceniony commit: `0123456789abcdef0123456789abcdef01234567` · [przebieg Actions](https://github.com/example/repo/actions/runs/1)
 
-| Kryterium                        | Ocena |
-| -------------------------------- | ----- |
-| Poprawność implementacji         | 3     |
-| Idiomatyczność                   | 6     |
-| Złożoność                        | 7     |
-| Pokrycie testami względem ryzyka | 2     |
-| Dokumentacja                     | 5     |
-| Bezpieczeństwo                   | 1     |
+| Kryterium | Ocena |
+| --- | --- |
+| Poprawność implementacji | 3 |
+| Idiomatyczność | 6 |
+| Złożoność | 7 |
+| Pokrycie testami względem ryzyka | 2 |
+| Dokumentacja | 5 |
+| Bezpieczeństwo | 1 |
 
 Werdykt modelu: **fail**
 
 Wynik bramki: **failed**. Powody:
-
 - werdykt modelu `fail`
 - oceny poniżej progu 5: Poprawność implementacji (3), Pokrycie testami względem ryzyka (2), Bezpieczeństwo (1)
 

@@ -40,7 +40,7 @@ const CASES: Record<string, RenderInput> = {
   },
 };
 
-const goldenUrl = (name: string) => new URL(`../fixtures/synthetic/comments/${name}.md`, import.meta.url);
+const goldenUrl = (name: string) => new URL(`../fixtures/synthetic/comments/${name}.md.golden`, import.meta.url);
 
 function checkGolden(name: string, actual: string): void {
   const url = goldenUrl(name);
@@ -48,7 +48,7 @@ function checkGolden(name: string, actual: string): void {
     mkdirSync(new URL("./", url), { recursive: true });
     writeFileSync(url, actual);
   }
-  assert.equal(actual, readFileSync(url, "utf8"), `${name}.md differs; run with UPDATE_GOLDEN=1 to refresh`);
+  assert.equal(actual, readFileSync(url, "utf8"), `${name}.md.golden differs; run with UPDATE_GOLDEN=1 to refresh`);
 }
 
 describe("renderComment", () => {

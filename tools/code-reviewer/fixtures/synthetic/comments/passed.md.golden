@@ -1,23 +1,18 @@
 <!-- ai-cr:sticky -->
 <!-- ai-cr:sha=0123456789abcdef0123456789abcdef01234567 -->
-<!-- ai-cr:stale -->
-
-> **Nieaktualne:** oceniono `0123456789abcdef0123456789abcdef01234567`, nowe commity do `fedcba9876543210fedcba9876543210fedcba98`. Dodaj etykietę `ai-cr:review`, aby ocenić ponownie.
-
-<!-- /ai-cr:stale -->
 
 ## Wynik AI code review: pozytywny (passed)
 
 Oceniony commit: `0123456789abcdef0123456789abcdef01234567` · [przebieg Actions](https://github.com/example/repo/actions/runs/1)
 
-| Kryterium                        | Ocena |
-| -------------------------------- | ----- |
-| Poprawność implementacji         | 8     |
-| Idiomatyczność                   | 9     |
-| Złożoność                        | 8     |
-| Pokrycie testami względem ryzyka | —     |
-| Dokumentacja                     | 7     |
-| Bezpieczeństwo                   | 9     |
+| Kryterium | Ocena |
+| --- | --- |
+| Poprawność implementacji | 8 |
+| Idiomatyczność | 9 |
+| Złożoność | 8 |
+| Pokrycie testami względem ryzyka | — |
+| Dokumentacja | 7 |
+| Bezpieczeństwo | 9 |
 
 Werdykt modelu: **pass**
 
