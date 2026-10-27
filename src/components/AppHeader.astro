@@ -1,38 +1,114 @@
 ---
+import { LogOut, Moon, Plus } from "lucide-react";
+import Logo from "@/components/Logo.astro";
 import ThemeToggle from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
 
 const { user } = Astro.locals;
 const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
+const initial = (user?.email?.[0] ?? "?").toUpperCase();
 ---
 
-<header class="border-border bg-card/50 border-b backdrop-blur-xl">
-  <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-    <a href="/" class="from-brand-from to-brand-to bg-gradient-to-r bg-clip-text text-xl font-bold text-transparent">
-      PasujeMi
-    </a>
-    <div class="flex min-w-0 items-center gap-3 text-sm">
+<header class="border-border bg-background sm:bg-card border-b">
+  <div class="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-8">
+    <Logo />
+
+    {/* Desktop: everything stays in the header. */}
+    <div class="hidden min-w-0 items-center gap-3 text-sm sm:flex">
       <a
         href="/recipes/new"
         aria-current={onNewRecipe ? "page" : undefined}
-        class:list={[buttonVariants({ variant: onNewRecipe ? "nav-current" : "ghost", size: "sm" }), "shrink-0"]}
+        class:list={[buttonVariants({ variant: onNewRecipe ? "nav-current" : "ghost" }), "shrink-0"]}
       >
+        <Plus aria-hidden="true" />
         Dodaj przepis
       </a>
-      <span class="text-muted-foreground truncate">{user?.email}</span>
+      <span class="text-muted-foreground max-w-48 truncate">{user?.email}</span>
       <ThemeToggle client:load />
       <form method="POST" action="/api/auth/signout" class="shrink-0" data-signout>
-        <button type="submit" class:list={[buttonVariants({ variant: "outline", size: "sm" })]}>
+        <button type="submit" class:list={[buttonVariants({ variant: "outline" })]}>
           Wyloguj
         </button>
       </form>
+    </div>
+
+    {/* Phone: add button + account menu. The Popover API gives Esc and click-outside dismissal and returns focus to the trigger. */}
+    <div class="flex items-center gap-1 sm:hidden">
+      <a
+        href="/recipes/new"
+        aria-label="Dodaj przepis"
+        aria-current={onNewRecipe ? "page" : undefined}
+        class:list={[buttonVariants({ variant: onNewRecipe ? "nav-current" : "ghost", size: "icon" })]}
+      >
+        <Plus aria-hidden="true" />
+      </a>
+      <button
+        type="button"
+        popovertarget="account-menu"
+        aria-label="Menu konta"
+        class="bg-accent text-accent-foreground grid size-11 place-items-center rounded-full font-bold focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        {initial}
+      </button>
+      <div
+        id="account-menu"
+        popover
+        class="bg-card text-card-foreground border-border fixed inset-auto top-16 right-4 m-0 w-72 overflow-hidden rounded-2xl border p-0 shadow-lg"
+      >
+        <div class="px-4 py-3">
+          <p class="text-muted-foreground text-sm">Zalogowano jako</p>
+          <p class="truncate font-semibold">{user?.email}</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked="false"
+          data-theme-switch
+          class="group border-border hover:bg-accent flex min-h-12 w-full items-center gap-3 border-t px-4 text-left focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
+        >
+          <Moon className="size-5" aria-hidden="true" />
+          <span class="flex-1 font-medium">Ciemny motyw</span>
+          <span
+            class="bg-secondary group-aria-checked:bg-primary flex h-7 w-12 items-center rounded-full px-1 transition-colors"
+            aria-hidden="true"
+          >
+            <span class="bg-card size-5 rounded-full transition-transform group-aria-checked:translate-x-5 motion-reduce:transition-none"></span>
+          </span>
+        </button>
+        <form method="POST" action="/api/auth/signout" data-signout class="border-border border-t">
+          <button
+            type="submit"
+            class="hover:bg-accent flex min-h-12 w-full items-center gap-3 px-4 text-left font-medium focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
+          >
+            <LogOut className="size-5" aria-hidden="true" />
+            Wyloguj
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </header>
 
 <script>
   import { endListState } from "@/lib/list-state";
+  import { applyTheme, saveTheme, type Theme } from "@/lib/theme";
 
   // The pantry tags are private to the session: don't leave them for whoever signs in next in this tab.
-  document.querySelector("[data-signout]")?.addEventListener("submit", endListState);
+  document.querySelectorAll("[data-signout]").forEach((form) => {
+    form.addEventListener("submit", endListState);
+  });
+
+  const themeSwitch = document.querySelector("[data-theme-switch]");
+  const syncSwitch = () => {
+    themeSwitch?.setAttribute("aria-checked", String(document.documentElement.classList.contains("dark")));
+  };
+  syncSwitch();
+  // The desktop toggle can change the theme while the menu is closed, so re-read it each time the menu opens.
+  document.getElementById("account-menu")?.addEventListener("toggle", syncSwitch);
+  themeSwitch?.addEventListener("click", () => {
+    const next: Theme = document.documentElement.classList.contains("dark") ? "light" : "dark";
+    applyTheme(next);
+    saveTheme(next);
+    syncSwitch();
+  });
 </script>

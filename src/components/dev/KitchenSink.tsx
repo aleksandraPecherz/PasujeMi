@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { Plus, SlidersHorizontal, X } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
 import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignUpForm";
@@ -11,9 +11,11 @@ import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeDetails } from "@/components/recipes/RecipeDetails";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
+import ThemeLink from "@/components/ThemeLink";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { cardVariants } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { cn } from "@/lib/utils";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
@@ -414,7 +416,7 @@ export default function KitchenSink() {
 
       <StateSection
         title="Kafelek przepisu: link"
-        note="Cały kafelek prowadzi do szczegółów (link na tytule rozciągnięty na kafelek); bez dopasowania i z dopasowaniem. Kafelek ma ramkę i cień (wariant brutal karty) i nie wciska się przy kliknięciu. Najedź kursorem i przejdź klawiszem Tab, żeby zobaczyć hover i focus-visible."
+        note="Cały kafelek prowadzi do szczegółów (link na tytule rozciągnięty na kafelek); bez dopasowania i z dopasowaniem. Kafelek to płaska karta (kolor zamiast cienia). Najedź kursorem i przejdź klawiszem Tab, żeby zobaczyć hover i focus-visible."
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <RecipeTile recipe={RECIPE} />
@@ -464,13 +466,13 @@ export default function KitchenSink() {
         note="Pusty formularz logowania; logowanie po złym haśle i rejestracja po błędzie — e-mail zostaje, hasła są puste. Na stronie fokus trafia na pole hasła; tutaj jest wyłączony, żeby strona nie przewijała się sama."
       >
         <div className="grid gap-4 lg:grid-cols-3">
-          <div className="bg-cosmic rounded-2xl p-6">
-            <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
+          <div className="bg-background rounded-2xl p-6">
+            <div className={cn(cardVariants(), "p-8")}>
               <SignInForm idPrefix="ks-signin-empty-" />
             </div>
           </div>
-          <div className="bg-cosmic rounded-2xl p-6">
-            <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
+          <div className="bg-background rounded-2xl p-6">
+            <div className={cn(cardVariants(), "p-8")}>
               <SignInForm
                 idPrefix="ks-signin-error-"
                 initialEmail={SAMPLE_EMAIL}
@@ -478,8 +480,8 @@ export default function KitchenSink() {
               />
             </div>
           </div>
-          <div className="bg-cosmic rounded-2xl p-6">
-            <div className={cn(cardVariants({ variant: "brutal" }), "p-8")}>
+          <div className="bg-background rounded-2xl p-6">
+            <div className={cn(cardVariants(), "p-8")}>
               <SignUpForm
                 idPrefix="ks-signup-error-"
                 initialEmail={SAMPLE_EMAIL}
@@ -491,16 +493,55 @@ export default function KitchenSink() {
       </StateSection>
 
       <StateSection
-        title="Przycisk wciskany"
-        note="Wariant pressable: default i disabled. Najedź kursorem (hover), przytrzymaj (active), przejdź klawiszem Tab (focus-visible). Stan pending widać w formularzach logowania (SubmitButton)."
+        title="Przyciski"
+        note="Główna akcja ma 48 px (lg), ikonowy 44 px; default i sm zostają kompaktowe. Stany: default, disabled; hover i focus-visible — najedź kursorem i przejdź klawiszem Tab."
       >
-        <div className="flex flex-wrap gap-3">
-          <Button type="button" variant="pressable">
-            Zaloguj się
+        <div className="flex flex-wrap items-center gap-3">
+          <Button size="lg">Główny</Button>
+          <Button size="lg" disabled>
+            Nieaktywny
           </Button>
-          <Button type="button" variant="pressable" disabled>
-            Zaloguj się
+          <Button variant="secondary">Drugorzędny</Button>
+          <Button variant="outline">Obrys</Button>
+          <Button variant="ghost">Tekstowy</Button>
+          <Button variant="destructive">Usuń</Button>
+          <Button size="sm">Kompaktowy</Button>
+          <Button size="icon" variant="secondary" aria-label="Dodaj">
+            <Plus />
           </Button>
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Pola"
+        note="Pole 48 px z tekstem 16 px: zwykłe, wypełnione, błąd (aria-invalid) i nieaktywne. Fokus: przejdź Tabem."
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input aria-label="Zwykłe" placeholder="np. pomidor" />
+          <Input aria-label="Wypełnione" defaultValue="jajka" />
+          <Input aria-label="Błąd" defaultValue="ola@" aria-invalid />
+          <Input aria-label="Nieaktywne" placeholder="Nieaktywne" disabled />
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Karta płaska"
+        note="Karta odróżnia się od tła kolorem, bez ramki i cienia. Tutaj na tle strony i na panelu hero (strony auth)."
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="bg-background rounded-2xl p-6">
+            <div className={cn(cardVariants(), "p-6")}>Karta na tle</div>
+          </div>
+          <div className="bg-hero text-hero-foreground rounded-2xl p-6">Panel hero (logowanie, rejestracja)</div>
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Przełącznik motywu: link"
+        note="Przycisk wyglądający jak link na stronach auth. Etykieta zależy od motywu: „Ciemny motyw” w jasnym, „Jasny motyw” w ciemnym."
+      >
+        <div>
+          <ThemeLink />
         </div>
       </StateSection>
     </div>

@@ -49,7 +49,7 @@ export function RecipeTile({ recipe, match }: RecipeTileProps) {
   return (
     <article
       className={cn(
-        cardVariants({ variant: "brutal" }),
+        cardVariants(),
         "hover:border-ring hover:bg-accent relative flex min-w-0 flex-col gap-3 p-4 transition-colors sm:p-5",
       )}
     >
@@ -58,7 +58,7 @@ export function RecipeTile({ recipe, match }: RecipeTileProps) {
         <h3 className="text-card-foreground min-w-0 font-semibold break-words">
           <a
             href={`/recipes/${recipe.id}`}
-            className="after:ring-ring after:absolute after:inset-0 after:rounded-md focus-visible:outline-none focus-visible:after:ring-2"
+            className="after:ring-ring after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:ring-2"
           >
             {recipe.name}
           </a>

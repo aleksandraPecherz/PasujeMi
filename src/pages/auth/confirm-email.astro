@@ -1,39 +1,41 @@
 ---
+import { Check, Mail } from "lucide-react";
 import Layout from "@/layouts/Layout.astro";
-import ThemeToggle from "@/components/ThemeToggle";
-import { cardVariants } from "@/components/ui/card";
+import Logo from "@/components/Logo.astro";
+import ThemeLink from "@/components/ThemeLink";
+import { buttonVariants } from "@/components/ui/button";
 
 const isAutoConfirmed = import.meta.env.DEV;
 
 const content = isAutoConfirmed
   ? {
-      emoji: "✅",
       heading: "Konto założone",
       description: "Twoje konto jest gotowe. Możesz się teraz zalogować.",
       linkText: "Przejdź do logowania",
     }
   : {
-      emoji: "📧",
       heading: "Sprawdź skrzynkę e-mail",
       description: "Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto.",
       linkText: "Wróć do logowania",
     };
+const Icon = isAutoConfirmed ? Check : Mail;
 ---
 
 <Layout title={`${content.heading} · PasujeMi`}>
-  <div class="bg-cosmic relative flex min-h-screen items-center justify-center p-4">
-    <div class="absolute top-4 right-4">
-      <ThemeToggle client:load />
-    </div>
-    <div class:list={[cardVariants({ variant: "brutal" }), "w-full max-w-sm p-8 text-center"]}>
-      <div class="mb-4 text-5xl">{content.emoji}</div>
-      <h1 class="mb-3 bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-2xl font-bold text-transparent">
-        {content.heading}
-      </h1>
-      <p class="mb-6 text-muted-foreground">{content.description}</p>
-      <a href="/auth/signin" class="text-sm text-foreground underline hover:no-underline">
+  <div class="bg-background flex min-h-screen flex-col px-4 py-6">
+    <Logo />
+    <main class="mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center text-center">
+      <div class="bg-hero text-hero-foreground mb-6 grid size-24 place-items-center rounded-full">
+        <Icon className="size-10" aria-hidden="true" />
+      </div>
+      <h1 class="mb-3 text-3xl font-extrabold">{content.heading}</h1>
+      <p class="text-muted-foreground mb-8">{content.description}</p>
+      <a href="/auth/signin" class:list={buttonVariants({ variant: "secondary", size: "lg" })}>
         {content.linkText}
       </a>
+    </main>
+    <div class="text-center">
+      <ThemeLink client:load />
     </div>
   </div>
 </Layout>

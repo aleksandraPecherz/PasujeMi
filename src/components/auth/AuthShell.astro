@@ -1,0 +1,26 @@
+---
+import Logo from "@/components/Logo.astro";
+import ThemeLink from "@/components/ThemeLink";
+---
+
+<div class="bg-background min-h-screen md:grid md:grid-cols-2">
+  <aside class="bg-hero flex flex-col gap-10 px-4 py-6 md:justify-between md:p-12">
+    <Logo />
+    <div>
+      <p class="text-hero-foreground md:text-foreground text-2xl font-extrabold md:text-4xl md:leading-tight">
+        Gotuj z tego, co już masz w domu.
+      </p>
+      <p class="text-hero-foreground mt-3 hidden text-lg md:block">
+        Wpisz produkty, a pokażemy przepisy, do których brakuje Ci najmniej.
+      </p>
+    </div>
+  </aside>
+  <main class="flex flex-col px-4 py-8 md:px-12">
+    <div class="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
+      <slot />
+    </div>
+    <div class="mt-8 text-center">
+      <ThemeLink client:load />
+    </div>
+  </main>
+</div>

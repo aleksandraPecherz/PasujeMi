@@ -41,6 +41,9 @@ export const CLEAN_FILES = [
   "src/components/NotFoundView.astro",
   "src/pages/404.astro",
   "src/components/Banner.astro",
+  "src/components/Logo.astro",
+  "src/components/ThemeLink.tsx",
+  "src/components/auth/AuthShell.astro",
 ];
 
 const PALETTE =

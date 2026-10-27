@@ -1,7 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import ThemeToggle from "@/components/ThemeToggle";
-import { cardVariants } from "@/components/ui/card";
+import AuthShell from "@/components/auth/AuthShell.astro";
 import SignUpForm from "@/components/auth/SignUpForm";
 import { authErrorMessage, emailFromQuery } from "@/lib/auth-errors";
 
@@ -11,21 +10,15 @@ const email = error ? emailFromQuery(Astro.url.searchParams.get("email")) : "";
 ---
 
 <Layout title="Załóż konto · PasujeMi">
-  <div class="bg-cosmic relative flex min-h-screen items-center justify-center p-4">
-    <div class="absolute top-4 right-4">
-      <ThemeToggle client:load />
-    </div>
-    <div class:list={[cardVariants({ variant: "brutal" }), "w-full max-w-sm p-8"]}>
-      <h1 class="mb-6 bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-center text-2xl font-bold text-transparent">
-        Załóż konto
-      </h1>
-      <SignUpForm serverError={error} initialEmail={email} autoFocusPassword={Boolean(email)} client:load />
-      <p class="mt-4 text-center text-sm text-muted-foreground">
-        Masz już konto?{" "}
-        <a href="/auth/signin" class="text-foreground underline hover:no-underline">
-          Zaloguj się
-        </a>
-      </p>
-    </div>
-  </div>
+  <AuthShell>
+    <h1 class="text-3xl font-extrabold">Załóż konto</h1>
+    <p class="text-muted-foreground mt-2 mb-6">Zapamiętamy Twoje produkty stałe i wykluczenia.</p>
+    <SignUpForm serverError={error} initialEmail={email} autoFocusPassword={Boolean(email)} client:load />
+    <p class="text-muted-foreground mt-6 text-center">
+      Masz już konto?{" "}
+      <a href="/auth/signin" class="text-primary font-bold underline hover:no-underline">
+        Zaloguj się
+      </a>
+    </p>
+  </AuthShell>
 </Layout>

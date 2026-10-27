@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CircleAlert } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface FormFieldProps {
   id: string;
@@ -12,7 +13,6 @@ interface FormFieldProps {
   placeholder?: string;
   error?: string;
   hint?: ReactNode;
-  icon: ReactNode;
   endContent?: ReactNode;
   autoFocus?: boolean;
 }
@@ -27,17 +27,15 @@ export function FormField({
   placeholder,
   error,
   hint,
-  icon,
   endContent,
   autoFocus,
 }: FormFieldProps) {
   return (
     <div>
-      <label htmlFor={id} className="text-foreground mb-1 block text-sm">
+      <label htmlFor={id} className="text-foreground mb-2 block text-sm font-semibold">
         {label}
       </label>
       <div className="relative">
-        <span className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2">{icon}</span>
         <Input
           id={id}
           name={name ?? id}
@@ -49,13 +47,13 @@ export function FormField({
           placeholder={placeholder}
           autoFocus={autoFocus}
           aria-invalid={error ? true : undefined}
-          className="pl-10"
+          className={cn(endContent && "pr-12")}
         />
         {endContent}
       </div>
       {error ? (
-        <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
-          <CircleAlert className="size-3" />
+        <p className="text-destructive mt-2 flex items-center gap-1.5 text-sm">
+          <CircleAlert className="size-4 shrink-0" aria-hidden="true" />
           {error}
         </p>
       ) : (
