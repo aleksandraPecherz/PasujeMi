@@ -552,7 +552,7 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 - [x] 2.12 Dodanie niezwiązanej etykiety nie uruchamia review i nie anuluje trwającego przebiegu — A: run 40389900276 (documentation), job review skipped; B: review 40389967626 (19:48:06–19:48:33) nie anulowany przez niezwiązaną etykietę dodaną 19:48:14 (run 40389991143, job skipped), doszedł do publikacji i bramki (czerwona dla error)
 - [x] 2.13 PR otwarty jako draft nie uruchamia review; `ready_for_review` uruchamia — opened jako draft: PR #59, run 40396422834 (AI code review, event pull_request, 20:31:35Z): workflow powstał, job review skipped (1 s), bez komentarza i etykiet; `ready_for_review`: run 40390255268 na #58 (19:50:02, uruchomił review) — na #59 nie powtarzano, PR zostaje draftem
 - [ ] 2.14 PR zmieniający wyłącznie `package-lock.json`: jawny skip z powodem i listą plików, bez `ai-cr:passed` — POKRYTE TESTAMI JEDNOSTKOWYMI, NIEZWERYFIKOWANE NA GITHUBIE: input.test.ts (pusty diff z pominiętymi plikami → skip z listą) i golden komentarza skipped; część w shellu action.yml (git diff --name-only | grep, wykluczenie pathspec) NIE jest pokryta testami; brak przebiegu na PR-ze zmieniającym wyłącznie package-lock.json
-- [ ] 2.15 Logi: token nie pojawia się w żadnym kroku poza maskowanym inputem; uprawnienia joba w logu to `contents: read` i `pull-requests: write` — CZĘŚCIOWO (runy 40387486698, 40390255268): uprawnienia GITHUB_TOKEN w logu = Contents: read, Metadata: read, PullRequests: write; CLAUDE_CODE_OAUTH_TOKEN występuje w logu tylko jako pusta wartość env kroku recenzenta, ANTHROPIC_API_KEY tylko w env -u; sekretu nie ma w repo, więc maskowanie prawdziwego tokenu NIE zostało zweryfikowane (niezweryfikowane; faza 3 nie ma takiego punktu, więc zostaje otwarte do osobnej decyzji po utworzeniu sekretu)
+- [x] 2.15 Logi: token nie pojawia się w żadnym kroku poza maskowanym inputem; uprawnienia joba w logu to `contents: read` i `pull-requests: write` — runy 40387486698, 40390255268 (bez sekretu): uprawnienia GITHUB_TOKEN = Contents: read, Metadata: read, PullRequests: write; ANTHROPIC_API_KEY tylko w env -u. Run 40522190492 (z prawdziwym sekretem, 2026-10-27): `CLAUDE_CODE_OAUTH_TOKEN: ***` w env kroku recenzenta, jedyne wystąpienie nazwy zmiennej w logu; w pobranym logu tego runu nie znaleziono ciągów `sk-ant-` (grep wzorca `sk-ant-[A-Za-z0-9_-]{8,}` = 0). Zakres kontroli: log tekstowy jednego runu (`gh run view --log`) i wzorzec prefiksu tokenu; nie obejmuje artefaktów, job summary ani logów poza tym runem, więc to dowód braku wycieku w sprawdzonym zakresie, nie gwarancja absolutna
 
 ### Phase 3: Próba na prawdziwym PR-ze z `CLAUDE_CODE_OAUTH_TOKEN`
 
@@ -560,14 +560,16 @@ Jeden przebieg SDK, czyli jedno uruchomienie `query()`, na prawdziwym PR-ze. Pot
 
 #### Automated
 
-- [ ] 3.1 Job review dla wybranego PR-a zakończył się statusem zgodnym z macierzą (`passed`/`incomplete` → zielony, `failed` → czerwony), a nie `error`
+- [x] 3.1 Job review dla wybranego PR-a zakończył się statusem zgodnym z macierzą (`passed`/`incomplete` → zielony, `failed` → czerwony), a nie `error` — run 40522190492 (PR #59, SHA 8a9d41e, 2026-10-27): wynik `passed`, job `review` success, wszystkie kroki z sukcesem łącznie z bramką
 
 #### Manual
 
-- [ ] 3.2 Autorka potwierdziła wyłączone extra usage i gotowość do fazy 3 przed uruchomieniem
-- [ ] 3.3 Dokładnie jeden przebieg SDK w tej fazie: jeden run review z jednym uruchomieniem `query()`, bez ponowień całego review; `num_turns` ≤ 2 zapisane w summary
-- [ ] 3.4 SDK uwierzytelnił się `CLAUDE_CODE_OAUTH_TOKEN` (brak błędu auth, brak `ANTHROPIC_API_KEY` w środowisku kroku)
-- [ ] 3.5 API przyjęło schemat z `nullable` i `notAssessed` (brak 400, wynik przeszedł `validateReview`)
-- [ ] 3.6 Sticky komentarz zawiera wynik, SHA, link do przebiegu, tabelę ocen, `notAssessed` i koszt oznaczony jako szacunek SDK; jest dokładnie jedna etykieta wynikowa
+- [x] 3.2 Autorka potwierdziła wyłączone extra usage i gotowość do fazy 3 przed uruchomieniem — potwierdzenie autorki w poleceniu uruchamiającym fazę 3 (2026-10-27): extra usage wyłączone, sekret `CLAUDE_CODE_OAUTH_TOKEN` dodany, zgoda na jeden przebieg SDK na PR #59
+- [x] 3.3 Dokładnie jeden przebieg SDK w tej fazie: jeden run review z jednym uruchomieniem `query()`, bez ponowień całego review; `num_turns` ≤ 2 zapisane w summary — jedyny run wywołany etykietą `ai-cr:review` (14:33:06Z) to 40522190492; `num_turns` = 2, bez ponowień i bez Re-run jobs; liczba tur w summary i w komentarzu
+- [x] 3.4 SDK uwierzytelnił się `CLAUDE_CODE_OAUTH_TOKEN` (brak błędu auth, brak `ANTHROPIC_API_KEY` w środowisku kroku) — run 40522190492: `error` nie wystąpił, w logu brak 401/auth; krok recenzenta uruchomiony przez `env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN npm run review`
+- [x] 3.5 API przyjęło schemat z `nullable` i `notAssessed` (brak 400, wynik przeszedł `validateReview`) — run 40522190492: brak 400 w logu, wynik `reviewed/passed` powstaje w `run.ts` tylko po sukcesie `validateReview`; w tej odpowiedzi model nie użył `null` ani `notAssessed` (gałąź z `null` pokrywają testy jednostkowe, nie ten przebieg)
+- [x] 3.6 Sticky komentarz zawiera wynik, SHA, link do przebiegu, tabelę ocen, `notAssessed` i koszt oznaczony jako szacunek SDK; jest dokładnie jedna etykieta wynikowa — komentarz 6426657054 (github-actions[bot]): wynik `passed`, SHA 8a9d41e, link do runu, tabela 6 ocen (9, 9, 8, 9, 9, 10), koszt $0,0639 „szacunek SDK, nie rachunek”; etykieta wynikowa tylko `ai-cr:passed`; sekcji `notAssessed` brak, bo lista była pusta
 - [ ] 3.7 Push commita po udanym review daje `ai-cr:stale` i baner w komentarzu, bez nowego przebiegu SDK
-- [ ] 3.8 Szacunek kosztu z `metrics-file` zapisany w summary; zużycie limitów Pro obserwowane ręcznie (informacyjnie, nie warunek zakończenia)
+- [x] 3.8 Szacunek kosztu z `metrics-file` zapisany w summary; zużycie limitów Pro obserwowane ręcznie (informacyjnie, nie warunek zakończenia) — job summary potwierdzone na zrzucie ekranu autorki: wynik, SHA, szacunek kosztu SDK ($0,0639) i liczba tur (2); zużycie limitów Pro nie było mierzone (punkt informacyjny)
+
+> Annotations runu 40522190492 (1 warning, 1 notice) to deprecacje platformy, nie błędy tej zmiany: Node 20 dla `actions/checkout` i `actions/setup-node` (runner wymusza Node 24) oraz migracja `ubuntu-latest` na Ubuntu 26 od 2026-10-19. Aktualizacja akcji to osobne utwardzenie poza zakresem.
