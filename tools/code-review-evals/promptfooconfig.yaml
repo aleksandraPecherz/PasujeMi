@@ -1,0 +1,67 @@
+# Evals of the real runReview() on 3 fictional cases x 2 models. Deterministic assertions only (see expectations.md);
+# no model-graded assertions. Flags that affect the run live here and in package.json, so the fingerprint covers them.
+description: code-reviewer evals (3 fictional cases x 2 models, deterministic assertions)
+
+prompts:
+  - "unused: the provider builds its own prompt from vars"
+
+providers:
+  - id: file://src/provider.ts
+    label: model-A
+    config:
+      model: claude-sonnet-5-5 # production model; proven on the subscription token in the CI run
+  - id: file://src/provider.ts
+    label: model-B
+    config:
+      model: claude-haiku-5-5 # lighter model; confirm in the /model picker that it is not billed to usage credits
+
+evaluateOptions:
+  maxConcurrency: 1
+  repeat: 1
+  cache: false
+
+defaultTest:
+  assert:
+    - type: is-json
+      metric: json
+      value:
+        type: object
+        required: [status, outcome]
+    - type: javascript
+      metric: status-reviewed
+      value: file://src/assertions.ts:statusReviewed
+    - type: javascript
+      metric: review-schema
+      value: file://src/assertions.ts:reviewSchema
+    - type: javascript
+      metric: model-used
+      value: file://src/assertions.ts:modelUsed
+
+tests:
+  - description: correct
+    vars:
+      title: file://diffs/correct.title.txt
+      body: file://diffs/correct.body.txt
+      diff: file://diffs/correct.diff
+    assert:
+      - type: javascript
+        metric: expected
+        value: file://src/assertions.ts:correctCase
+  - description: bug
+    vars:
+      title: file://diffs/bug.title.txt
+      body: file://diffs/bug.body.txt
+      diff: file://diffs/bug.diff
+    assert:
+      - type: javascript
+        metric: expected
+        value: file://src/assertions.ts:bugCase
+  - description: no-data
+    vars:
+      title: file://diffs/no-data.title.txt
+      body: file://diffs/no-data.body.txt
+      diff: file://diffs/no-data.diff
+    assert:
+      - type: javascript
+        metric: expected
+        value: file://src/assertions.ts:noDataCase

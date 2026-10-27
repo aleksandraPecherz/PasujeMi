@@ -1,0 +1,38 @@
+# Loader checks only: the real provider class with a canned queryFn. No model, no SDK, no credentials.
+description: loader-check
+prompts:
+  - "unused: the provider builds its own prompt from vars"
+providers:
+  - id: file://fake-provider.ts
+    label: model-A
+    config:
+      model: fake-model-a
+  - id: file://fake-provider.ts
+    label: model-B
+    config:
+      model: fake-model-b
+tests:
+  - description: case-one
+    vars:
+      title: Add a helper
+      body: Adds add().
+      diff: file://sample.diff
+    assert:
+      - type: is-json
+        value:
+          type: object
+          required: [status, outcome]
+          properties:
+            status: { type: string, enum: [reviewed, error, skipped] }
+            outcome: { type: string }
+      - type: javascript
+        value: |
+          const prompt = context.providerResponse.prompt || '';
+          return prompt.includes('diff --git a/src/lib/demo/add.ts') && prompt.includes('<pr_title>');
+  - description: case-two
+    vars:
+      title: Another
+      body: Another.
+      diff: file://sample.diff
+    assert:
+      - type: is-json

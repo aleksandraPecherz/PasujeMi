@@ -1,0 +1,1 @@
+Adds `formatQuantity()`, which shows grams as kilograms and millilitres as litres from 1000 up and leaves every other value and unit unchanged (for example `1500 g` becomes `1.5 kg`, `250 g` stays `250 g`).
