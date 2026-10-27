@@ -1,0 +1,3 @@
+Adds `mergeQuantities()`, which sums the quantities of shopping list items that share a name (trimmed, case-insensitive) and keeps the first spelling and order.
+
+It throws a `RangeError` for a negative or non-finite quantity and does not modify its input. Covered by unit tests.

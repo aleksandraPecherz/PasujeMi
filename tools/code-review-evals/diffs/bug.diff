@@ -1,0 +1,64 @@
+diff --git a/src/pages/api/shopping-list.ts b/src/pages/api/shopping-list.ts
+new file mode 100644
+--- /dev/null
++++ b/src/pages/api/shopping-list.ts
+@@ -0,0 +1,22 @@
++import type { APIRoute } from "astro";
++import { supabase } from "@/lib/supabase";
++
++export const POST: APIRoute = async ({ request }) => {
++  let body: unknown;
++  try {
++    body = await request.json();
++  } catch {
++    return new Response(JSON.stringify({ error: "invalid_json" }), { status: 400 });
++  }
++
++  const { name, quantity } = (body ?? {}) as { name?: unknown; quantity?: unknown };
++  const validName = typeof name === "string" && name.trim() !== "";
++  const validQuantity = typeof quantity === "number" && Number.isFinite(quantity) && quantity > 0;
++  if (!validName || !validQuantity) {
++    return new Response(JSON.stringify({ error: "invalid_body" }), { status: 400 });
++  }
++
++  await supabase.from("shopping_items").insert({ name: name.trim(), quantity });
++
++  return new Response(JSON.stringify({ ok: true }), { status: 200 });
++};
+diff --git a/src/pages/api/_shopping-list.test.ts b/src/pages/api/_shopping-list.test.ts
+new file mode 100644
+--- /dev/null
++++ b/src/pages/api/_shopping-list.test.ts
+@@ -0,0 +1,32 @@
++import { describe, expect, it, vi } from "vitest";
++
++vi.mock("@/lib/supabase", () => ({
++  supabase: { from: vi.fn(() => ({ insert: vi.fn().mockResolvedValue({ error: null }) })) },
++}));
++
++import { POST } from "./shopping-list";
++
++const post = (rawBody: string) =>
++  POST({
++    request: new Request("http://localhost/api/shopping-list", { method: "POST", body: rawBody }),
++  } as Parameters<typeof POST>[0]);
++
++describe("POST /api/shopping-list", () => {
++  it("adds an item and returns ok", async () => {
++    const response = await post(JSON.stringify({ name: "Milk", quantity: 2 }));
++    expect(response.status).toBe(200);
++    expect(await response.json()).toEqual({ ok: true });
++  });
++
++  it("rejects a body without a positive numeric quantity", async () => {
++    const response = await post(JSON.stringify({ name: "Milk" }));
++    expect(response.status).toBe(400);
++    expect(await response.json()).toEqual({ error: "invalid_body" });
++  });
++
++  it("rejects a body that is not valid JSON", async () => {
++    const response = await post("{not json");
++    expect(response.status).toBe(400);
++    expect(await response.json()).toEqual({ error: "invalid_json" });
++  });
++});

@@ -1,0 +1,64 @@
+diff --git a/src/lib/demo/merge-quantities.ts b/src/lib/demo/merge-quantities.ts
+new file mode 100644
+--- /dev/null
++++ b/src/lib/demo/merge-quantities.ts
+@@ -0,0 +1,17 @@
++export type ListItem = { name: string; quantity: number };
++
++// Sums the quantities of items that share a name (trimmed, case-insensitive).
++// Keeps the first spelling and the first-seen order; the input is not modified.
++export function mergeQuantities(items: readonly ListItem[]): ListItem[] {
++  const merged = new Map<string, ListItem>();
++  for (const item of items) {
++    if (!Number.isFinite(item.quantity) || item.quantity < 0) {
++      throw new RangeError(`Invalid quantity for "${item.name}": ${item.quantity}`);
++    }
++    const key = item.name.trim().toLowerCase();
++    const existing = merged.get(key);
++    if (existing) existing.quantity += item.quantity;
++    else merged.set(key, { name: item.name.trim(), quantity: item.quantity });
++  }
++  return [...merged.values()];
++}
+diff --git a/src/lib/demo/merge-quantities.test.ts b/src/lib/demo/merge-quantities.test.ts
+new file mode 100644
+--- /dev/null
++++ b/src/lib/demo/merge-quantities.test.ts
+@@ -0,0 +1,37 @@
++import { describe, expect, it } from "vitest";
++import { mergeQuantities } from "@/lib/demo/merge-quantities";
++
++describe("mergeQuantities", () => {
++  it("sums quantities of items with the same name, ignoring case and surrounding spaces", () => {
++    const result = mergeQuantities([
++      { name: "Milk", quantity: 1 },
++      { name: " milk ", quantity: 2 },
++      { name: "Eggs", quantity: 6 },
++    ]);
++    expect(result).toEqual([
++      { name: "Milk", quantity: 3 },
++      { name: "Eggs", quantity: 6 },
++    ]);
++  });
++
++  it("returns an empty list for no items", () => {
++    expect(mergeQuantities([])).toEqual([]);
++  });
++
++  it("does not modify the input", () => {
++    const input = [
++      { name: "Milk", quantity: 1 },
++      { name: "milk", quantity: 2 },
++    ];
++    mergeQuantities(input);
++    expect(input).toEqual([
++      { name: "Milk", quantity: 1 },
++      { name: "milk", quantity: 2 },
++    ]);
++  });
++
++  it("throws a RangeError for a negative or non-finite quantity", () => {
++    expect(() => mergeQuantities([{ name: "Milk", quantity: -1 }])).toThrow(RangeError);
++    expect(() => mergeQuantities([{ name: "Milk", quantity: Number.NaN }])).toThrow(RangeError);
++  });
++});

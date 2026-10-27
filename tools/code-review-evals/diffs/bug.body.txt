@@ -1,0 +1,8 @@
+Adds `POST /api/shopping-list`.
+
+- Returns 400 `{ "error": "invalid_json" }` when the request body is not valid JSON.
+- Returns 400 `{ "error": "invalid_body" }` when `name` is not a non-empty string or `quantity` is not a positive number.
+- Inserts the item into `shopping_items` and returns 200 `{ "ok": true }`.
+- Returns 500 `{ "error": "db_error" }` when the database write fails.
+
+Tests cover the success path and both 400 responses.

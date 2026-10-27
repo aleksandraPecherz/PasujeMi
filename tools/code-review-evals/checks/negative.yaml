@@ -1,0 +1,18 @@
+# is-json must reject text that is not JSON and JSON that does not match the minimal ResultFile schema.
+description: negative-check
+prompts:
+  - "unused"
+providers:
+  - id: file://text-provider.ts
+    label: not-json
+  - id: file://text-provider.ts
+    label: wrong-shape
+    config:
+      output: '{"foo":1}'
+tests:
+  - description: shape
+    assert:
+      - type: is-json
+        value:
+          type: object
+          required: [status, outcome]
