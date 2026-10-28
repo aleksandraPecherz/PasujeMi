@@ -33,4 +33,4 @@ Order of work:
 
 Phases 1-4 implemented and committed locally (ff84a6b, 5ef7230, aaf34ef, 8ef4e2e). Lint, check:ui and astro check pass; format tests pass. Author accepted: author actions and delete confirmation (p1), NotFoundView (p2), details look after the phone correction (p3), kitchen sink (p4).
 
-Not verified: Progress 4.5 (320 px and 130% text) stays open; a long title was not measured at 320/390 px. Before M-2 is closed, all changed views are still compared with the mockups together (see Notes).
+Deferred to the collective M-2 verification (not done, left unchecked on purpose): Progress 4.5 (320 px and 130% text) and measuring a long title at 320/390 px. `status: implemented` means the code is done, not that the visual acceptance is complete. Before M-2 is closed, all changed views are compared with the mockups together (see Notes).

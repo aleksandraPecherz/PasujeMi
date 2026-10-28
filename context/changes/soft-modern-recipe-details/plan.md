@@ -195,6 +195,8 @@ Document the new states and run the final checks.
 - `/dev/kitchen-sink` shows all new states in both themes.
 - 320 px width and 130% text size: no clipped text, no overlap.
 
+**Deferred**: this check (Progress 4.5) is postponed on purpose to the collective M-2 verification of all changed views against the mockups and stays unchecked until then.
+
 ---
 
 ## Testing Strategy
