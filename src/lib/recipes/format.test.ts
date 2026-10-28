@@ -49,20 +49,27 @@ describe("formatServings", () => {
 });
 
 describe("formatNutrition", () => {
-  it("lists every value that is present", () => {
+  it("lists every value that is present, with the number and the unit kept apart", () => {
     expect(formatNutrition({ kcal: 350, proteinG: 12.5, carbsG: 40, fatG: 8 })).toEqual([
-      { label: "Kalorie", value: "350 kcal" },
-      { label: "Białko", value: "12,5 g" },
-      { label: "Węglowodany", value: "40 g" },
-      { label: "Tłuszcz", value: "8 g" },
+      { label: "Kalorie", shortLabel: "kcal", amount: "350", unit: "kcal", value: "350 kcal" },
+      { label: "Białko", shortLabel: "białko", amount: "12,5", unit: "g", value: "12,5 g" },
+      { label: "Węglowodany", shortLabel: "węglow.", amount: "40", unit: "g", value: "40 g" },
+      { label: "Tłuszcz", shortLabel: "tłuszcze", amount: "8", unit: "g", value: "8 g" },
     ]);
   });
 
   it("skips missing values and returns nothing when all are missing", () => {
-    expect(formatNutrition({ kcal: 200, proteinG: null, carbsG: null, fatG: 3 })).toEqual([
-      { label: "Kalorie", value: "200 kcal" },
-      { label: "Tłuszcz", value: "3 g" },
+    expect(formatNutrition({ kcal: 200, proteinG: null, carbsG: null, fatG: 3 }).map((item) => item.label)).toEqual([
+      "Kalorie",
+      "Tłuszcz",
     ]);
     expect(formatNutrition({ kcal: null, proteinG: null, carbsG: null, fatG: null })).toEqual([]);
+  });
+
+  it("keeps a zero as a value", () => {
+    expect(formatNutrition({ kcal: 0, proteinG: null, carbsG: null, fatG: null })[0]).toMatchObject({
+      amount: "0",
+      value: "0 kcal",
+    });
   });
 });

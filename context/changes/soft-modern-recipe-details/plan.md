@@ -135,6 +135,10 @@ Rebuild `RecipeDetails` around the illustration and the Soft Modern cards (M11, 
 
 **Contract**: `RecipeDetails({ recipe, actions })` signature unchanged; headings keep their `aria-labelledby` ids; the list-based semantics (`ul`/`ol`) stay for ingredients and steps; illustration is decorative (empty alt, from `RecipeIllustration`).
 
+**Correction after review (phone, M11/M18)**: the phone layout is not a scaled-down desktop card. Phone: a full-bleed strip at the top in the illustration tone (`--illus-*`, `bg-secondary` for the placeholder) with the illustration centered (no second plate around the SVG), the round back button and the actions in its top corners (no duplicated "Przepisy" link); the title (`text-xl`, `leading-snug`, bold, never truncated) and the pills (one wrapping flex container) sit on the page background under a rounded top edge, not in a white card; nutrition, ingredients and steps are separate cards below. From `sm` the desktop layout (back link row, card with a 192 px illustration) stays as accepted. The actions node is rendered once and positioned per breakpoint. `RecipeIllustration.tsx` exports `TONE_CLASS` for the strip.
+
+**Acceptance note (phase 3)**: the author accepted the details look after the phone correction. Not performed: measuring a long title at 320 and 390 px (the dev server failed with a Vite dependency-cache 500 and was not restarted by the agent), and the rendering of data variants (no nutrition, no illustration, several kinds) in the real page; 3.5 stays open until phase 4 shows these variants in the kitchen sink.
+
 #### 3. Page
 
 **File**: `src/pages/recipes/[id].astro`
@@ -247,28 +251,28 @@ None; no data or schema change.
 
 #### Automated
 
-- [x] 2.1 Lint passes: `npm run lint`
-- [x] 2.2 UI literals guard passes: `npm run check:ui`
-- [x] 2.3 Type check passes: `npx astro check`
+- [x] 2.1 Lint passes: `npm run lint` — 5ef7230
+- [x] 2.2 UI literals guard passes: `npm run check:ui` — 5ef7230
+- [x] 2.3 Type check passes: `npx astro check` — 5ef7230
 
 #### Manual
 
-- [x] 2.4 Bad id, failed load and generic 404 show the new layout with original texts in both themes and at 320 px
+- [x] 2.4 Bad id, failed load and generic 404 show the new layout with original texts in both themes and at 320 px — 5ef7230
 
 ### Phase 3: Recipe details layout
 
 #### Automated
 
-- [ ] 3.1 Lint passes: `npm run lint`
-- [ ] 3.2 UI literals guard passes: `npm run check:ui`
-- [ ] 3.3 Type check passes: `npx astro check`
-- [ ] 3.4 Format tests pass: `npx vitest run src/lib/recipes`
+- [x] 3.1 Lint passes: `npm run lint`
+- [x] 3.2 UI literals guard passes: `npm run check:ui`
+- [x] 3.3 Type check passes: `npx astro check`
+- [x] 3.4 Format tests pass: `npx vitest run src/lib/recipes`
 
 #### Manual
 
 - [ ] 3.5 Recipes with and without nutrition, substitutes, null illustration and several kinds render correctly on desktop and phone
-- [ ] 3.6 Illustration does not push ingredients far down on a phone
-- [ ] 3.7 Light and dark themes match M11/M18; long names wrap
+- [x] 3.6 Illustration does not push ingredients far down on a phone
+- [x] 3.7 Light and dark themes match M11/M18; long names wrap
 
 ### Phase 4: Kitchen sink and final checks
 

@@ -27,6 +27,8 @@ Order of work:
 3. `RecipeDetails`: illustration, pills, nutrition tiles, ingredients, numbered steps, single back link; `[id].astro`.
 4. Kitchen sink states.
 
+- Before M-2 is closed, all changed views are compared together with the mockups. "Looks good" is not conformance with the design: every significant difference is either fixed or explicitly accepted by the author.
+
 ## Result
 
 Step 1 done (author actions + delete confirmation look): lint, check:ui, astro check pass; `recipes.test.ts` (service delete) passes; no component tests exist for deletion. Steps 2-4 pending.
