@@ -399,19 +399,19 @@ None: no schema, data or API change.
 
 #### Automated
 
-- [x] 2.1 `npm run lint`, `npm run check:ui`, `npx astro check`
-- [x] 2.2 Tests pass: `npm test`
+- [x] 2.1 `npm run lint`, `npm run check:ui`, `npx astro check` — f54a1da
+- [x] 2.2 Tests pass: `npm test` — f54a1da
 
 #### Manual
 
-- [x] 2.3 Desktop against D02/D05: proportions, tiles equal within each row, no cut substitute information (D02-01…07)
+- [x] 2.3 Desktop against D02/D05: proportions, tiles equal within each row, no cut substitute information (D02-01…07) — f54a1da
 - [ ] 2.4 Phone: M05, M10A tiles, M08, M09, M19 states, skeletons and dimming behaviour, "Pokaż więcej"
 
 ### Phase 3: Pantry sheet and filters
 
 #### Automated
 
-- [ ] 3.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`
+- [x] 3.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test` — PH3
 
 #### Manual
 

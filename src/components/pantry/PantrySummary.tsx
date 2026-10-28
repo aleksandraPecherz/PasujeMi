@@ -18,7 +18,7 @@ interface PantrySummaryProps {
 
 function PantryCounts({ lists }: { lists: PantryLists }) {
   return (
-    <ul className="flex flex-wrap gap-x-3 gap-y-1">
+    <ul className="flex flex-wrap gap-x-3 gap-y-1 font-medium">
       {PANTRY_SECTIONS.map(({ section, summaryLabel }) => (
         <li key={section} className="flex items-center gap-1.5">
           <SectionDot section={section} />
@@ -55,10 +55,7 @@ export function PantrySummary({ lists, stale, loading, onEdit, onApply, onStart 
     return (
       <section
         data-pantry-bar
-        className={cn(
-          cardVariants(),
-          "bg-warning-surface border-warning/40 flex flex-col gap-3 border-2 p-4 lg:hidden",
-        )}
+        className={cn(cardVariants(), "border-warning-border flex flex-col gap-3 rounded-2xl border-2 p-4 lg:hidden")}
       >
         <p className="text-warning flex items-start gap-2 font-bold">
           <CircleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />

@@ -48,99 +48,109 @@ export function PantryEditor({
       aria-labelledby="pantry-editor-title"
       className={cn(
         "bg-card text-card-foreground backdrop:bg-foreground/40 border-0 p-0",
-        "max-lg:fixed max-lg:inset-x-0 max-lg:top-auto max-lg:bottom-0 max-lg:m-0 max-lg:max-h-5/6 max-lg:w-full",
-        "max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:rounded-t-3xl max-lg:shadow-lg",
+        "max-lg:fixed max-lg:inset-x-0 max-lg:top-auto max-lg:bottom-0 max-lg:m-0 max-lg:h-19/20 max-lg:w-full",
+        "max-lg:overflow-hidden max-lg:rounded-t-3xl max-lg:shadow-lg",
         "lg:static lg:m-0 lg:block lg:w-full lg:overflow-visible lg:rounded-2xl",
       )}
     >
-      <div className="p-4 lg:p-5 lg:pb-4">
-        <div className="mb-4 flex items-start justify-between gap-3 lg:mb-2">
-          <div>
-            <h2 id="pantry-editor-title" className="text-2xl font-extrabold lg:text-xl">
-              Twoja spiżarka
-            </h2>
+      {/* Phone: a column that fills the sheet. The handle, title and tabs stay on top, the lists scroll, and the action stays at the bottom. */}
+      <div className="flex flex-col max-lg:h-full">
+        <div
+          aria-hidden="true"
+          data-handle
+          className="bg-border mx-auto mt-2 h-1 w-9 shrink-0 rounded-full lg:hidden"
+        />
+        <div className="shrink-0 px-4 pt-3 lg:p-5 lg:pb-0">
+          <div className="mb-4 flex items-start justify-between gap-3 lg:mb-2">
+            <div>
+              <h2 id="pantry-editor-title" className="text-xl font-extrabold">
+                Twoja spiżarka
+              </h2>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              aria-label="Zamknij"
+              className="lg:hidden"
+            >
+              <X aria-hidden="true" />
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Zamknij"
-            className="lg:hidden"
+
+          <div
+            role="group"
+            aria-label="Lista produktów"
+            className="bg-secondary mb-5 grid grid-cols-3 gap-1 rounded-xl p-1 lg:hidden"
           >
-            <X aria-hidden="true" />
+            {PANTRY_SECTIONS.map(({ section, tabLabel }) => (
+              <button
+                key={section}
+                type="button"
+                aria-pressed={tab === section}
+                onClick={() => {
+                  onTabChange(section);
+                }}
+                className={cn(
+                  "focus-visible:outline-ring flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-1 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2",
+                  tab === section ? "bg-card text-foreground" : "text-muted-foreground",
+                )}
+              >
+                <span className={tab === section ? "font-bold" : "font-semibold"}>{tabLabel}</span>
+                <span className="flex items-center gap-1.5 text-xs font-semibold">
+                  <SectionDot section={section} />
+                  {productCount(lists[section].length)}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4 pb-4 max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain lg:px-5">
+          <div className="flex flex-col gap-5 lg:gap-3">
+            {PANTRY_SECTIONS.map(({ section, label, hint, placeholder, variant }, i) => (
+              <div
+                key={section}
+                className={cn(
+                  "flex flex-col gap-3 lg:gap-1.5",
+                  tab !== section && "max-lg:hidden",
+                  i > 0 && "lg:border-border lg:border-t lg:pt-3",
+                )}
+              >
+                <h3 className="hidden items-center gap-2 text-lg font-bold lg:flex">
+                  <SectionDot section={section} />
+                  {label}
+                  <span className="text-muted-foreground text-base font-normal">· {lists[section].length}</span>
+                </h3>
+                <p className="text-muted-foreground">{hint}</p>
+                <TagInput
+                  id={`pantry-${section}`}
+                  label={label}
+                  placeholder={placeholder}
+                  tags={lists[section]}
+                  onAdd={(tag) => onAdd(section, tag)}
+                  onRemove={(tag) => {
+                    onRemove(section, tag);
+                  }}
+                  tagVariant={variant}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 flex flex-col gap-2 empty:hidden">
+            <LimitNotice message={limitNotice} />
+            <SaveNotice message={saveNotice} />
+          </div>
+        </div>
+
+        <div className="bg-card border-border shrink-0 border-t p-4 lg:border-0 lg:p-5 lg:pt-0">
+          <Button type="button" size="lg" onClick={onApply} disabled={loading} className="w-full">
+            <SlidersHorizontal aria-hidden="true" />
+            Zastosuj filtry
           </Button>
         </div>
-
-        <div
-          role="group"
-          aria-label="Lista produktów"
-          className="bg-secondary mb-5 grid grid-cols-3 gap-1 rounded-xl p-1 lg:hidden"
-        >
-          {PANTRY_SECTIONS.map(({ section, tabLabel }) => (
-            <button
-              key={section}
-              type="button"
-              aria-pressed={tab === section}
-              onClick={() => {
-                onTabChange(section);
-              }}
-              className={cn(
-                "focus-visible:outline-ring flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-1 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2",
-                tab === section ? "bg-card text-foreground" : "text-muted-foreground",
-              )}
-            >
-              <span className="font-bold">{tabLabel}</span>
-              <span className="flex items-center gap-1.5 text-xs font-medium">
-                <SectionDot section={section} />
-                {productCount(lists[section].length)}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-5 lg:gap-3">
-          {PANTRY_SECTIONS.map(({ section, label, hint, placeholder, variant }, i) => (
-            <div
-              key={section}
-              className={cn(
-                "flex flex-col gap-3 lg:gap-1.5",
-                tab !== section && "max-lg:hidden",
-                i > 0 && "lg:border-border lg:border-t lg:pt-3",
-              )}
-            >
-              <h3 className="hidden items-center gap-2 text-lg font-bold lg:flex">
-                <SectionDot section={section} />
-                {label}
-                <span className="text-muted-foreground text-base font-normal">· {lists[section].length}</span>
-              </h3>
-              <p className="text-muted-foreground">{hint}</p>
-              <TagInput
-                id={`pantry-${section}`}
-                label={label}
-                placeholder={placeholder}
-                tags={lists[section]}
-                onAdd={(tag) => onAdd(section, tag)}
-                onRemove={(tag) => {
-                  onRemove(section, tag);
-                }}
-                tagVariant={variant}
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-col gap-2 empty:hidden">
-          <LimitNotice message={limitNotice} />
-          <SaveNotice message={saveNotice} />
-        </div>
-      </div>
-
-      <div className="bg-card border-border sticky bottom-0 border-t p-4 lg:static lg:border-0 lg:p-5 lg:pt-0">
-        <Button type="button" size="lg" onClick={onApply} disabled={loading} className="w-full">
-          <SlidersHorizontal aria-hidden="true" />
-          Zastosuj filtry
-        </Button>
       </div>
     </section>
   );

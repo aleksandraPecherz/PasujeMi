@@ -24,3 +24,7 @@ Phase 2 adjustment after the author's review: desktop tile illustration is 104 p
 D02-05 changed to an accepted deviation on 2026-10-28 after measuring real data: desktop tiles are equal within each row, not across the whole grid (whole-grid equality made 15 of 21 tiles 88 px too tall); `auto-rows-fr` removed. Illustration stays 104 px from xl.
 
 Phase 2 confirmations by the author: the desktop list layout (equal heights within each row, 104 px illustration from xl, proportions) and the mobile list as shown are accepted. Row 2.3 is checked. Row 2.4 stays open: M05 empty card, M08 skeletons, M09 no results and M19 error states were shown only in test screenshots and have not been reviewed by the author.
+
+Phase 3 implemented, not committed (waiting for the author). Sheet: 95% of the viewport height, handle, title/tabs fixed, lists scroll, action at the bottom; tabs and counters stronger, tags without borders; stale card white with an amber border (new warning-border token, darker amber in dark theme). Desktop panel unchanged.
+
+Phase 3 look accepted by the author (pantry sheet and the not-applied filters card, light and dark). Row 3.2 stays open: it also covers a real phone keyboard and other interactions that were not confirmed.

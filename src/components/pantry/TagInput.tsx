@@ -79,7 +79,10 @@ export function TagInput({ id, label, placeholder, tags, onAdd, onRemove, tagVar
         <ul aria-label={label} className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <li key={tag} className="max-w-full">
-              <Badge variant={tagVariant} className="max-w-full gap-1 py-1 pr-1 pl-3 text-base whitespace-normal">
+              <Badge
+                variant={tagVariant}
+                className="max-w-full gap-1 border-transparent py-1 pr-1 pl-3 text-base font-semibold whitespace-normal"
+              >
                 <span className="min-w-0 break-words">{tag}</span>
                 <Button
                   type="button"
