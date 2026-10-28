@@ -353,8 +353,8 @@ Phase 4 adds one additive migration (one function in `private`, one trigger); it
 
 #### Automated
 
-- [x] 3.1 Tests pass: `npm test`
-- [x] 3.2 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` pass
+- [x] 3.1 Tests pass: `npm test` — a689f3f
+- [x] 3.2 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` pass — a689f3f
 
 #### Manual
 
