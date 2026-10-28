@@ -43,6 +43,11 @@ describe("initialDisclosure", () => {
     expect(initialDisclosure(empty, false).openIngredient).toBe(empty.ingredients[0]?.key);
   });
 
+  it("opens nutrition at the start only when it already has values", () => {
+    expect(initialDisclosure({ ...form, kcal: "420" }, true).nutritionOpen).toBe(true);
+    expect(initialDisclosure({ ...form, kcal: "  ", fatG: "" }, true).nutritionOpen).toBe(false);
+  });
+
   it("starts an edit with every ingredient collapsed", () => {
     expect(initialDisclosure(form, true)).toEqual({ openIngredient: null, openSubstitutes: [], nutritionOpen: false });
   });
@@ -165,7 +170,13 @@ describe("error order", () => {
       path: "ingredients.1.name",
       label: "Składnik 2",
       message: "Nazwa: pole jest wymagane.",
+      text: "Składnik 2 · Nazwa: pole jest wymagane.",
     });
+    expect(items.map((item) => item.text)).toEqual([
+      "Składnik 2 · Nazwa: pole jest wymagane.",
+      "Składnik 2 · Zamiennik 1 · Nazwa: pole jest wymagane.",
+      "Krok 2: pole jest wymagane.",
+    ]);
   });
 
   it("sorts unknown paths last", () => {

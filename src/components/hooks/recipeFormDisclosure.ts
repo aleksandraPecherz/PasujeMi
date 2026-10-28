@@ -13,13 +13,17 @@ export interface Disclosure {
 }
 
 type Rows = Pick<RecipeFormState, "ingredients">;
+type NutritionValues = Partial<Pick<RecipeFormState, "kcal" | "proteinG" | "carbsG" | "fatG">>;
 
-/** A new recipe opens its first ingredient; an edit starts with all of them collapsed. */
-export function initialDisclosure(form: Rows, editing: boolean): Disclosure {
+/**
+ * A new recipe opens its first ingredient; an edit starts with all of them collapsed.
+ * Nutrition starts open only when it already has values (an edit of a recipe that has them).
+ */
+export function initialDisclosure(form: Rows & NutritionValues, editing: boolean): Disclosure {
   return {
     openIngredient: editing ? null : (form.ingredients[0]?.key ?? null),
     openSubstitutes: [],
-    nutritionOpen: false,
+    nutritionOpen: [form.kcal, form.proteinG, form.carbsG, form.fatG].some((value) => (value ?? "").trim() !== ""),
   };
 }
 
@@ -133,15 +137,24 @@ export interface ErrorSummaryItem {
   /** Where the error is, e.g. "Składnik 2 · Zamiennik 1"; empty when the message says it all. */
   label: string;
   message: string;
+  /** The line for the banner: "Składnik 2 · Nazwa: pole jest wymagane." / "Krok 2: pole jest wymagane." */
+  text: string;
+}
+
+function summaryText(label: string, message: string): string {
+  if (label === "") return message;
+  // The step messages start with "Krok:"; the label already says which step.
+  if (label.startsWith("Krok ") && message.startsWith("Krok:")) return `${label}${message.slice("Krok".length)}`;
+  return `${label} · ${message}`;
 }
 
 /** The error list for the banner, in form order. */
 export function errorSummary(errors: Record<string, string>): ErrorSummaryItem[] {
-  return orderedErrorPaths(errors).map((path) => ({
-    path,
-    label: parsePath(path).label,
-    message: errors[path] ?? "",
-  }));
+  return orderedErrorPaths(errors).map((path) => {
+    const { label } = parsePath(path);
+    const message = errors[path] ?? "";
+    return { path, label, message, text: summaryText(label, message) };
+  });
 }
 
 /**

@@ -15,7 +15,13 @@ import {
 } from "@/components/pantry/PantryStates";
 import { PantrySummary } from "@/components/pantry/PantrySummary";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
-import { initialDisclosure, toggleIngredient, toggleSubstitutes } from "@/components/hooks/recipeFormDisclosure";
+import {
+  initialDisclosure,
+  revealErrors,
+  toggleIngredient,
+  toggleNutrition,
+  toggleSubstitutes,
+} from "@/components/hooks/recipeFormDisclosure";
 import {
   emptyRecipeForm,
   type RecipeFormActions,
@@ -230,9 +236,12 @@ const FORM_ERRORS: Record<string, string> = {
   kcal: "Kcal: wartość od 0 do 10000.",
 };
 
-function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) {
+function SampleRecipeForm({
+  editing = false,
+  ...props
+}: Partial<Parameters<typeof RecipeFormView>[0]> & { editing?: boolean }) {
   const [form] = useState(() => props.form ?? filledForm());
-  const [disclosure, setDisclosure] = useState(() => initialDisclosure(form, props.cancelHref !== undefined));
+  const [disclosure, setDisclosure] = useState(() => initialDisclosure(form, editing));
   // Toggles work here so the collapsed and expanded states can be tried; the form data stays fixed.
   const disclosureActions: RecipeFormDisclosureActions = {
     toggleIngredient: (key) => {
@@ -241,8 +250,12 @@ function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) 
     toggleSubstitutes: (key) => {
       setDisclosure((prev) => toggleSubstitutes(prev, key));
     },
-    toggleNutrition: NOOP,
-    reveal: NOOP,
+    toggleNutrition: () => {
+      setDisclosure((prev) => toggleNutrition(prev));
+    },
+    reveal: (path) => {
+      setDisclosure((prev) => revealErrors(prev, form, { [path]: "" }));
+    },
   };
   return (
     <RecipeFormView
@@ -254,6 +267,8 @@ function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) 
       serverError={null}
       actions={NOOP_ACTIONS}
       onSubmit={NOOP}
+      cancelHref={editing ? `/recipes/${RECIPE.id}` : "/"}
+      {...(editing && { title: "Edytuj przepis", submitLabel: "Zapisz zmiany" })}
       {...props}
     />
   );
@@ -489,7 +504,7 @@ export default function KitchenSink() {
         title="Formularz przepisu: edycja"
         note="Tryb edycji (/recipes/[id]/edit): tytuł „Edytuj przepis”, przycisk „Zapisz zmiany” i link „Anuluj” do szczegółów."
       >
-        <SampleRecipeForm title="Edytuj przepis" submitLabel="Zapisz zmiany" cancelHref={`/recipes/${RECIPE.id}`} />
+        <SampleRecipeForm editing />
       </StateSection>
 
       <StateSection title="Formularz przepisu: wysyłka" note="Przycisk wyłączony z aria-busy.">

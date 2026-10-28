@@ -22,11 +22,16 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe } = {}) {
     recipe,
   });
 
-  // After a failed save the focus goes to the first invalid field in page order (or to the field a banner link asked for).
+  // After a failed save the focus goes to the first invalid field in page order (or to the field a banner link
+  // asked for). By now the section that holds it is open. An error without an input (a list-level one) is scrolled to.
   useEffect(() => {
-    if (focus.token > 0) {
-      const target = focus.path === null ? null : document.getElementById(fieldId(focus.path));
-      (target ?? document.querySelector<HTMLElement>('[aria-invalid="true"]'))?.focus();
+    if (focus.token === 0) return;
+    const input = focus.path === null ? null : document.getElementById(fieldId(focus.path));
+    const target = input ?? document.querySelector<HTMLElement>('[aria-invalid="true"]');
+    if (target) {
+      target.focus();
+    } else if (focus.path !== null) {
+      document.getElementById(`${fieldId(focus.path)}-error`)?.scrollIntoView({ block: "center" });
     }
   }, [focus]);
 
@@ -46,7 +51,8 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe } = {}) {
       onSubmit={() => {
         void submit();
       }}
-      {...(recipe && { title: "Edytuj przepis", submitLabel: "Zapisz zmiany", cancelHref: `/recipes/${recipe.id}` })}
+      cancelHref={recipe ? `/recipes/${recipe.id}` : "/"}
+      {...(recipe && { title: "Edytuj przepis", submitLabel: "Zapisz zmiany" })}
     />
   );
 }
