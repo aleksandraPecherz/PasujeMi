@@ -23,7 +23,8 @@ export function errorProps(id: string, error: string | undefined, hintId?: strin
 export function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={`${id}-error`} className="text-destructive text-sm">
+    <p id={`${id}-error`} className="text-destructive flex items-start gap-1.5 text-sm">
+      <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       {message}
     </p>
   );
@@ -40,10 +41,12 @@ interface OptionFieldsProps {
   context: string;
   errors: Record<string, string>;
   onChange: (field: OptionField, value: string) => void;
+  /** `false`: from `md` up the hint is read by screen readers only; the row shows it beside the substitutes button. */
+  inlineHint?: boolean;
 }
 
 /** Name, product, amount and unit: stacked on the phone (amount and unit side by side), one row from `md` up. */
-function OptionFields({ path, row, context, errors, onChange }: OptionFieldsProps) {
+function OptionFields({ path, row, context, errors, onChange, inlineHint = true }: OptionFieldsProps) {
   const nameId = fieldId(`${path}.name`);
   const productId = fieldId(`${path}.product`);
   const amountId = fieldId(`${path}.amount`);
@@ -88,7 +91,7 @@ function OptionFields({ path, row, context, errors, onChange }: OptionFieldsProp
           }}
           {...errorProps(productId, productError, `${productId}-hint`)}
         />
-        <p id={`${productId}-hint`} className="text-muted-foreground text-xs">
+        <p id={`${productId}-hint`} className={cn("text-muted-foreground text-xs", !inlineHint && "md:sr-only")}>
           Puste = weźmiemy z nazwy. Po nim szukamy w spiżarce.
         </p>
         <FieldError id={productId} message={productError} />
@@ -239,21 +242,34 @@ export function IngredientFields({
             <ChevronDown aria-hidden="true" className="text-muted-foreground" />
           )}
         </Button>
-        {/* Level with the first row of inputs (label line + gap, then half the difference in height). */}
-        <NumberBadge number={number} className="mt-8 hidden md:order-1 md:flex" />
+        {/* Level with the inputs: a spacer made of the label classes, then a box as high as an input (h-12). */}
+        <div className="hidden md:order-1 md:flex md:flex-col md:gap-1.5">
+          <span aria-hidden="true" className="invisible text-sm leading-none">
+            Nazwa
+          </span>
+          <span className="flex h-12 items-center">
+            <NumberBadge number={number} />
+          </span>
+        </div>
         {canRemove && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="shrink-0 md:order-3 md:mt-7"
-            aria-label={`Usuń składnik ${name || number}`}
-            onClick={() => {
-              actions.removeIngredient(index);
-            }}
-          >
-            <Trash2 aria-hidden="true" />
-          </Button>
+          <div className="shrink-0 md:order-3 md:flex md:flex-col md:gap-1.5">
+            <span aria-hidden="true" className="invisible hidden text-sm leading-none md:block">
+              Nazwa
+            </span>
+            <span className="flex items-center md:h-12">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={`Usuń składnik ${name || number}`}
+                onClick={() => {
+                  actions.removeIngredient(index);
+                }}
+              >
+                <Trash2 aria-hidden="true" />
+              </Button>
+            </span>
+          </div>
         )}
       </div>
 
@@ -261,7 +277,7 @@ export function IngredientFields({
       <div
         id={panelId}
         className={cn(
-          "min-w-0 flex-col gap-4 px-1 pb-1 md:order-2 md:flex md:flex-1 md:p-0",
+          "min-w-0 flex-col gap-4 px-1 pb-1 md:order-2 md:flex md:flex-1 md:gap-3 md:p-0",
           expanded ? "flex" : "hidden",
         )}
       >
@@ -269,33 +285,42 @@ export function IngredientFields({
           path={path}
           row={row}
           context={`składnika ${number}`}
+          inlineHint={false}
           errors={errors}
           onChange={(field, value) => {
             actions.setIngredient(index, field, value);
           }}
         />
 
-        <Button
-          type="button"
-          variant="secondary"
-          size="lg"
-          aria-expanded={substitutesOpen}
-          aria-controls={substitutesPanelId}
-          className="w-full justify-between text-sm md:w-auto md:self-start"
-          onClick={onToggleSubstitutes}
-        >
-          <span className="flex items-center gap-2">
-            <ArrowLeftRight aria-hidden="true" />
-            Zamienniki{row.substitutes.length > 0 && ` · ${row.substitutes.length}`}
-            {!substitutesOpen && hasSubstituteErrors && (
-              <>
-                <CircleAlert aria-hidden="true" className="text-destructive" />
-                <span className="sr-only">(są błędy)</span>
-              </>
-            )}
-          </span>
-          {substitutesOpen ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
-        </Button>
+        <div className="flex flex-col md:grid md:grid-cols-12 md:items-center md:gap-3">
+          <div className="md:col-span-4">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              aria-expanded={substitutesOpen}
+              aria-controls={substitutesPanelId}
+              className="w-full justify-between text-sm md:h-9 md:w-auto"
+              onClick={onToggleSubstitutes}
+            >
+              <span className="flex items-center gap-2">
+                <ArrowLeftRight aria-hidden="true" />
+                Zamienniki{row.substitutes.length > 0 && ` · ${row.substitutes.length}`}
+                {!substitutesOpen && hasSubstituteErrors && (
+                  <>
+                    <CircleAlert aria-hidden="true" className="text-destructive" />
+                    <span className="sr-only">(są błędy)</span>
+                  </>
+                )}
+              </span>
+              {substitutesOpen ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
+            </Button>
+          </div>
+          {/* Desktop: the product hint, beside the button instead of a line of its own (the field keeps it for screen readers). */}
+          <p aria-hidden="true" className="text-muted-foreground hidden text-xs md:col-span-4 md:block">
+            Puste = weźmiemy z nazwy. Po nim szukamy w spiżarce.
+          </p>
+        </div>
 
         <div id={substitutesPanelId} className={cn("min-w-0 flex-col gap-3", substitutesOpen ? "flex" : "hidden")}>
           {row.substitutes.map((substitute, j) => (

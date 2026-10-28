@@ -421,19 +421,19 @@ None: no schema, data or API change.
 
 #### Automated
 
-- [x] 4.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test` — PH4
+- [x] 4.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test` — 0d1f374
 
 #### Manual
 
 - [ ] 4.2 Desktop against D03: top card, left-aligned macro, 1/3 and 2/3 split
-- [x] 4.3 Phone against M11/M18 including the lower part — PH4
+- [x] 4.3 Phone against M11/M18 including the lower part — 0d1f374
 
 ### Phase 5: Form and success screen
 
 #### Automated
 
-- [ ] 5.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`
-- [ ] 5.2 Build passes: `npm run build`
+- [x] 5.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test` — PH5
+- [x] 5.2 Build passes: `npm run build` — PH5
 
 #### Manual
 

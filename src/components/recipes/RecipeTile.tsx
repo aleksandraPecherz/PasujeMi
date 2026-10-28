@@ -24,7 +24,7 @@ type Missing =
   | { kind: "replaced"; name: string; via: string };
 
 /** "1 składnik", "2 składniki", "5 składników". */
-function ingredientCount(count: number): string {
+export function ingredientCount(count: number): string {
   if (count === 1) return "1 składnik";
   const lastDigit = count % 10;
   const lastTwo = count % 100;

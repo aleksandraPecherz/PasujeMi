@@ -30,13 +30,11 @@ export function RecipeIllustrationPreview({
         : "Brak dopasowania do nazwy, pokażemy ogólną ilustrację.";
 
   return (
-    <div
-      className={cn(
-        layout === "row" ? "flex items-center gap-3" : "flex flex-col items-center gap-2 text-center",
-        className,
-      )}
-    >
-      <RecipeIllustration illustration={key} className={layout === "row" ? "size-16" : "size-28"} />
+    <div className={cn(layout === "row" ? "flex items-center gap-3" : "flex flex-col items-stretch gap-3", className)}>
+      <RecipeIllustration
+        illustration={key}
+        className={layout === "row" ? "size-16" : "aspect-square size-auto w-full"}
+      />
       <p className="text-muted-foreground text-sm">{caption}</p>
     </div>
   );

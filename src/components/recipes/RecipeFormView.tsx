@@ -93,25 +93,25 @@ export function RecipeFormView({
       noValidate
       aria-labelledby="recipe-form-heading"
       // A focused field must not end up under the sticky save bar (phone).
-      className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start [&_*]:scroll-mb-28 lg:[&_*]:scroll-mb-0"
+      className="flex flex-col gap-4 lg:grid lg:grid-cols-11 lg:items-start lg:gap-6 [&_*]:scroll-mb-28 lg:[&_*]:scroll-mb-0"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
       }}
     >
-      <div className="flex min-w-0 flex-col gap-6 lg:col-span-9">
+      <div className="flex min-w-0 flex-col gap-4 lg:col-span-8">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button asChild variant="ghost" size="icon" className="-ml-2 lg:hidden">
               <a href={cancelHref} aria-label="Zamknij formularz">
                 <X aria-hidden="true" />
               </a>
             </Button>
-            <h1 id="recipe-form-heading" className="text-xl font-semibold sm:text-2xl lg:text-3xl">
+            <h1 id="recipe-form-heading" className="text-lg font-bold sm:text-2xl lg:text-3xl lg:font-extrabold">
               {title}
             </h1>
           </div>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-xs lg:text-sm">
             Pola z gwiazdką <span aria-hidden="true">*</span>
             <span className="sr-only">(wymagane)</span> są wymagane. Reszta jest opcjonalna.
           </p>
@@ -119,11 +119,11 @@ export function RecipeFormView({
 
         {summary.length > 0 && (
           <div role="alert" className="bg-exclude text-destructive flex flex-col gap-2 rounded-xl p-4 text-sm">
-            <p className="flex items-center gap-2 font-semibold">
+            <p className="flex items-center gap-2 font-bold">
               <CircleAlert className="size-5 shrink-0" aria-hidden="true" />
               Popraw {summary.length} {plural(summary.length, "pole", "pola", "pól")}, żeby zapisać
             </p>
-            <ul className="flex flex-col gap-1 pl-7">
+            <ul className="flex list-disc flex-col gap-1 pl-7">
               {summary.map((item) => (
                 <li key={item.path}>
                   {/* Opens the section that holds the field, then moves the focus to it. */}
@@ -275,7 +275,7 @@ export function RecipeFormView({
           </Button>
         </section>
 
-        <section aria-labelledby="recipe-extra-heading" className={CARD}>
+        <section aria-labelledby="recipe-extra-heading" className={cn(CARD, "md:rounded-b-none md:pb-4")}>
           <h2 id="recipe-extra-heading" className="text-lg font-semibold">
             Dodatkowe informacje
           </h2>
@@ -311,7 +311,7 @@ export function RecipeFormView({
               })}
             </div>
           </fieldset>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {GENERAL_FIELDS.map(({ field, label }) => {
               const id = fieldId(field);
               return (
@@ -334,7 +334,8 @@ export function RecipeFormView({
           </div>
         </section>
 
-        <section aria-labelledby="recipe-nutrition-heading" className={CARD}>
+        {/* From md the two cards read as one: the nutrition card is the lower part of "Dodatkowe informacje" (D04). */}
+        <section aria-labelledby="recipe-nutrition-heading" className={cn(CARD, "md:-mt-4 md:rounded-t-none md:pt-0")}>
           {/* Phone: the header toggles the fields. From `md` up it is a plain heading and the fields are always shown. */}
           <Button
             type="button"
@@ -358,12 +359,9 @@ export function RecipeFormView({
             </span>
             {disclosure.nutritionOpen ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
           </Button>
-          <div className="hidden md:block">
-            <h2 id="recipe-nutrition-heading" className="text-lg font-semibold">
-              Wartości odżywcze
-            </h2>
-            <p className="text-muted-foreground text-sm">Na 1 porcję · opcjonalne</p>
-          </div>
+          <h2 id="recipe-nutrition-heading" className="hidden text-base font-bold md:block">
+            Wartości odżywcze <span className="text-muted-foreground font-normal">na 1 porcję · opcjonalne</span>
+          </h2>
           <div
             id={NUTRITION_PANEL_ID}
             className={cn("gap-4 sm:grid-cols-2 md:grid md:grid-cols-4", disclosure.nutritionOpen ? "grid" : "hidden")}
@@ -393,7 +391,7 @@ export function RecipeFormView({
 
       {/* Phone: a save bar stuck to the bottom of the page (in flow, so it never hides the end of the form).
           From `lg` up: a column on the right with "Zapisz" and "Anuluj". */}
-      <div className="bg-background border-border lg:bg-card sticky bottom-0 z-10 -mx-4 flex flex-col gap-3 border-t px-4 py-3 lg:top-6 lg:bottom-auto lg:col-span-3 lg:mx-0 lg:rounded-xl lg:border-0 lg:p-4">
+      <div className="bg-background border-border lg:bg-card sticky bottom-0 z-10 -mx-4 flex flex-col gap-3 border-t px-4 py-3 lg:top-6 lg:bottom-auto lg:col-span-3 lg:mx-0 lg:rounded-xl lg:border-0 lg:p-5">
         <RecipeIllustrationPreview
           name={form.name}
           savedIllustration={savedIllustration}
