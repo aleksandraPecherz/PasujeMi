@@ -244,7 +244,7 @@ None; no data or schema change.
 #### Manual
 
 - [x] 1.5 Phone popover opens under "⋯", closes with Esc and outside click, Tab moves through its items — ff84a6b
-- [x] 1.6 Desktop shows both buttons; "Usuń" is red
+- [x] 1.6 Desktop shows both buttons; "Usuń" is red — ff84a6b
 - [x] 1.7 Confirmation dialog looks right in both themes and focus returns to the trigger after "Anuluj" — ff84a6b
 
 ### Phase 2: NotFoundView restyle
@@ -263,26 +263,26 @@ None; no data or schema change.
 
 #### Automated
 
-- [x] 3.1 Lint passes: `npm run lint`
-- [x] 3.2 UI literals guard passes: `npm run check:ui`
-- [x] 3.3 Type check passes: `npx astro check`
-- [x] 3.4 Format tests pass: `npx vitest run src/lib/recipes`
+- [x] 3.1 Lint passes: `npm run lint` — aaf34ef
+- [x] 3.2 UI literals guard passes: `npm run check:ui` — aaf34ef
+- [x] 3.3 Type check passes: `npx astro check` — aaf34ef
+- [x] 3.4 Format tests pass: `npx vitest run src/lib/recipes` — aaf34ef
 
 #### Manual
 
-- [ ] 3.5 Recipes with and without nutrition, substitutes, null illustration and several kinds render correctly on desktop and phone
-- [x] 3.6 Illustration does not push ingredients far down on a phone
-- [x] 3.7 Light and dark themes match M11/M18; long names wrap
+- [x] 3.5 Recipes with and without nutrition, substitutes, null illustration and several kinds render correctly on desktop and phone
+- [x] 3.6 Illustration does not push ingredients far down on a phone — aaf34ef
+- [x] 3.7 Light and dark themes match M11/M18; long names wrap — aaf34ef
 
 ### Phase 4: Kitchen sink and final checks
 
 #### Automated
 
-- [ ] 4.1 Lint passes: `npm run lint`
-- [ ] 4.2 UI literals guard passes: `npm run check:ui`
-- [ ] 4.3 Type check passes: `npx astro check`
+- [x] 4.1 Lint passes: `npm run lint`
+- [x] 4.2 UI literals guard passes: `npm run check:ui`
+- [x] 4.3 Type check passes: `npx astro check`
 
 #### Manual
 
-- [ ] 4.4 `/dev/kitchen-sink` shows all new states in both themes
+- [x] 4.4 `/dev/kitchen-sink` shows all new states in both themes
 - [ ] 4.5 320 px and 130% text show no clipped text or overlap

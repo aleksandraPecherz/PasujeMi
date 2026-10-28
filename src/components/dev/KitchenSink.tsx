@@ -66,6 +66,14 @@ const RECIPE: Recipe = {
   fatG: 7,
 };
 
+// A long name and no illustration: the title must wrap in full and the phone strip falls back to the placeholder.
+const LONG_NAME_RECIPE: Recipe = {
+  ...RECIPE,
+  id: "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
+  name: "Pieczone pomidory koktajlowe z kremowym serkiem, świeżą bazylią i chrupiącą grzanką czosnkową",
+  illustration: null,
+};
+
 // A recipe with missing data: no time, servings, kinds or nutrition.
 const SPARSE_RECIPE: Recipe = {
   id: "0b7e9c1a-5d42-4f86-8a3b-7c6d5e4f3a2b",
@@ -547,14 +555,14 @@ export default function KitchenSink() {
 
       <StateSection
         title="Szczegóły przepisu"
-        note="Pełny przepis: czas, porcje, rodzaje, wartości odżywcze, składniki z zamiennikami i kroki. Linki nie prowadzą do istniejących przepisów."
+        note="Pełny przepis: czas, porcje, rodzaje, wartości odżywcze (liczba i jednostka), składniki z zamiennikami i numerowane kroki. Na telefonie pas w kolorze ilustracji z przyciskiem wstecz, od sm karta z ilustracją 192 px. Linki nie prowadzą do istniejących przepisów."
       >
         <RecipeDetails recipe={RECIPE} />
       </StateSection>
 
       <StateSection
         title="Szczegóły przepisu: akcje autora"
-        note="Autor widzi „Edytuj” i „Usuń” obok „Wróć do listy” (zawijanie na telefonie)."
+        note="Autor lub administrator widzi „Edytuj” i „Usuń” w wierszu z linkiem wstecz; na telefonie okrągły przycisk „⋯” w prawym rogu pasa otwiera natywny popover (Esc i kliknięcie poza nim zamykają go)."
       >
         <RecipeDetails recipe={RECIPE} actions={<AuthorActions />} />
       </StateSection>
@@ -564,6 +572,13 @@ export default function KitchenSink() {
         note="Okno jest modalne, więc przyciski otwierają po jednym stanie: bezczynny, w trakcie usuwania (oba przyciski wyłączone, okno nie zamyka się — odśwież stronę) i błąd (komunikat w oknie)."
       >
         <DeleteDialogStates />
+      </StateSection>
+
+      <StateSection
+        title="Szczegóły przepisu: długa nazwa, bez ilustracji"
+        note="Pełna nazwa bez obcinania; brak klucza ilustracji pokazuje zastępczy kafelek (pas na telefonie w kolorze secondary)."
+      >
+        <RecipeDetails recipe={LONG_NAME_RECIPE} actions={<AuthorActions />} />
       </StateSection>
 
       <StateSection
