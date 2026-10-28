@@ -53,21 +53,21 @@ const initial = (user?.email?.[0] ?? "?").toUpperCase();
       <div
         id="account-menu"
         popover
-        class="bg-card text-card-foreground border-border fixed inset-auto top-16 right-4 m-0 w-72 overflow-hidden rounded-2xl border p-0 shadow-lg"
+        class="bg-card text-card-foreground fixed inset-auto top-16 right-4 m-0 w-72 overflow-hidden rounded-3xl border-0 p-0 shadow-xl"
       >
-        <div class="px-4 py-3">
+        <div class="px-4 py-4">
           <p class="text-muted-foreground text-sm">Zalogowano jako</p>
-          <p class="truncate font-semibold">{user?.email}</p>
+          <p class="truncate font-bold">{user?.email}</p>
         </div>
         <button
           type="button"
           role="switch"
           aria-checked="false"
           data-theme-switch
-          class="group border-border hover:bg-accent flex min-h-12 w-full items-center gap-3 border-t px-4 text-left focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
+          class="group border-border hover:bg-accent flex min-h-14 w-full items-center gap-3 border-t px-4 text-left focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
         >
           <Moon className="size-5" aria-hidden="true" />
-          <span class="flex-1 font-medium">Ciemny motyw</span>
+          <span class="flex-1 font-semibold">Ciemny motyw</span>
           <span
             class="bg-secondary group-aria-checked:bg-primary flex h-7 w-12 items-center rounded-full px-1 transition-colors"
             aria-hidden="true"
@@ -78,7 +78,7 @@ const initial = (user?.email?.[0] ?? "?").toUpperCase();
         <form method="POST" action="/api/auth/signout" data-signout class="border-border border-t">
           <button
             type="submit"
-            class="hover:bg-accent flex min-h-12 w-full items-center gap-3 px-4 text-left font-medium focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
+            class="hover:bg-accent flex min-h-14 w-full items-center gap-3 px-4 text-left font-semibold focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
           >
             <LogOut className="size-5" aria-hidden="true" />
             Wyloguj

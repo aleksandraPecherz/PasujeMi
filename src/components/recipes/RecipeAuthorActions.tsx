@@ -26,7 +26,7 @@ interface RecipeAuthorActionsViewProps {
 }
 
 const MENU_ITEM =
-  "hover:bg-accent flex min-h-12 w-full items-center gap-3 px-4 text-left font-medium focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2";
+  "hover:bg-accent flex min-h-14 w-full items-center gap-3 px-4 text-left font-semibold focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-2";
 
 export function RecipeAuthorActionsView({
   recipeId,
@@ -100,7 +100,7 @@ export function RecipeAuthorActionsView({
           id={menuId}
           popover="auto"
           onToggle={placeMenu}
-          className="bg-card text-card-foreground border-border fixed inset-auto m-0 w-56 overflow-hidden rounded-2xl border p-0 shadow-lg"
+          className="bg-card text-card-foreground fixed inset-auto m-0 w-56 overflow-hidden rounded-3xl border-0 p-0 shadow-xl"
         >
           <a href={`/recipes/${recipeId}/edit`} className={MENU_ITEM}>
             <Pencil className="size-5" aria-hidden="true" />
@@ -126,7 +126,7 @@ export function RecipeAuthorActionsView({
         }}
       >
         <AlertDialogContent
-          className="rounded-2xl border-0 p-6"
+          className="rounded-3xl border-0 p-5"
           onCloseAutoFocus={(event) => {
             // The control that opened the dialog may be hidden (the popover item), so focus the visible one.
             event.preventDefault();
@@ -134,7 +134,7 @@ export function RecipeAuthorActionsView({
           }}
         >
           <AlertDialogHeader className="place-items-start text-left">
-            <AlertDialogMedia className="bg-destructive/10 text-destructive rounded-full">
+            <AlertDialogMedia className="bg-destructive/10 text-destructive size-12 rounded-full">
               <Trash2 aria-hidden="true" />
             </AlertDialogMedia>
             <AlertDialogTitle className="text-xl font-extrabold">Usunąć przepis?</AlertDialogTitle>

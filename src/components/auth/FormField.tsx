@@ -12,7 +12,8 @@ interface FormFieldProps {
   onChange: (value: string) => void;
   placeholder?: string;
   error?: string;
-  hint?: ReactNode;
+  /** A permanent hint under the field (e.g. the minimum length); tied to the input through aria-describedby. */
+  hint?: string;
   endContent?: ReactNode;
   autoFocus?: boolean;
 }
@@ -30,9 +31,13 @@ export function FormField({
   endContent,
   autoFocus,
 }: FormFieldProps) {
+  const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+  const describedBy = [error ? errorId : null, hint ? hintId : null].filter(Boolean).join(" ") || undefined;
+
   return (
     <div>
-      <label htmlFor={id} className="text-foreground mb-2 block text-sm font-semibold">
+      <label htmlFor={id} className="text-foreground mb-2 block text-sm font-bold">
         {label}
       </label>
       <div className="relative">
@@ -47,17 +52,21 @@ export function FormField({
           placeholder={placeholder}
           autoFocus={autoFocus}
           aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           className={cn(endContent && "pr-12")}
         />
         {endContent}
       </div>
-      {error ? (
-        <p className="text-destructive mt-2 flex items-center gap-1.5 text-sm">
+      {error && (
+        <p id={errorId} className="text-destructive mt-2 flex items-center gap-1.5 text-sm">
           <CircleAlert className="size-4 shrink-0" aria-hidden="true" />
           {error}
         </p>
-      ) : (
-        hint
+      )}
+      {hint && (
+        <p id={hintId} className="text-muted-foreground mt-2 text-sm">
+          {hint}
+        </p>
       )}
     </div>
   );

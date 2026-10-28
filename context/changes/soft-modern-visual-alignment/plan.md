@@ -432,8 +432,8 @@ None: no schema, data or API change.
 
 #### Automated
 
-- [x] 5.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test` — PH5
-- [x] 5.2 Build passes: `npm run build` — PH5
+- [x] 5.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test` — bbf40f3
+- [x] 5.2 Build passes: `npm run build` — bbf40f3
 
 #### Manual
 
@@ -445,7 +445,7 @@ None: no schema, data or API change.
 
 #### Automated
 
-- [ ] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build`
+- [x] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` — PH6
 
 #### Manual
 

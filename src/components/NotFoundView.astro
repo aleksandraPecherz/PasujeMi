@@ -11,13 +11,16 @@ const { message = "Nie znaleziono strony", description = "Adres mógł się zmie
   Astro.props;
 ---
 
-<section class="mx-auto flex max-w-md flex-col items-center gap-4 py-12 text-center sm:py-20">
-  <div aria-hidden="true" class="bg-secondary text-muted-foreground mb-2 grid size-32 place-items-center rounded-full">
-    <Utensils className="size-12" />
+<section class="mx-auto flex max-w-md flex-col items-center gap-4 pt-24 pb-16 text-center sm:pt-32">
+  <div
+    aria-hidden="true"
+    class="bg-secondary text-muted-foreground/60 mb-2 grid size-40 place-items-center rounded-full"
+  >
+    <Utensils className="size-20" />
   </div>
-  <h1 class="text-foreground text-3xl font-extrabold">{message}</h1>
+  <h1 class="text-foreground text-2xl font-extrabold sm:text-3xl">{message}</h1>
   <p class="text-muted-foreground">{description}</p>
-  <a href="/" class:list={[buttonVariants({ size: "lg" }), "mt-2"]}>
+  <a href="/" class:list={[buttonVariants({ size: "lg" }), "mt-2 font-bold"]}>
     Wróć do listy przepisów
   </a>
 </section>

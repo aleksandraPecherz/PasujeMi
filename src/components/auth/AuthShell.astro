@@ -11,17 +11,17 @@ const { variant } = Astro.props;
 
 const VARIANTS = {
   signin: {
-    panel: "bg-hero",
+    panel: "bg-hero min-h-44 md:min-h-0",
     taglineOnPhone: true,
     phoneTiles: [
-      { key: "kanapka-jajko", position: "-right-10 top-6 w-36" },
-      { key: "salatka", position: "-bottom-5 right-10 w-20" },
+      { key: "kanapka-jajko", position: "-right-3 top-8 w-36" },
+      { key: "salatka", position: "-bottom-4 right-32 w-20" },
     ],
   },
   signup: {
-    panel: "bg-illus-yellow",
+    panel: "bg-illus-yellow min-h-28 md:min-h-0",
     taglineOnPhone: false,
-    phoneTiles: [{ key: "kanapka", position: "-right-6 -bottom-6 w-28" }],
+    phoneTiles: [{ key: "kanapka", position: "-right-2 top-6 w-32" }],
   },
 };
 
@@ -40,7 +40,7 @@ const tileClass = "pointer-events-none absolute select-none";
 <div class="bg-background min-h-screen md:grid md:grid-cols-2">
   <aside class:list={["relative flex flex-col gap-6 overflow-hidden px-4 py-6 md:justify-between md:p-12", panel]}>
     <div class="relative z-10">
-      <Logo />
+      <Logo large />
     </div>
     {phoneTiles.map((tile) => (
       <img
@@ -65,16 +65,16 @@ const tileClass = "pointer-events-none absolute select-none";
       ))}
     </div>
     <div class:list={["relative z-10", !taglineOnPhone && "hidden md:block"]}>
-      <p class="text-hero-foreground md:text-foreground w-3/5 text-lg font-extrabold md:w-auto md:text-4xl md:leading-tight">
+      <p class="text-hero-foreground md:text-foreground w-3/5 text-lg font-extrabold md:w-auto md:max-w-108 md:text-3xl md:leading-tight">
         Gotuj z tego, co już masz w domu.
       </p>
-      <p class="text-hero-foreground mt-3 hidden text-lg md:block">
+      <p class="text-hero-foreground mt-3 hidden text-base md:block md:max-w-108">
         Wpisz produkty, a pokażemy przepisy, do których brakuje Ci najmniej.
       </p>
     </div>
   </aside>
   <main class="flex flex-col px-4 py-8 md:px-12">
-    <div class="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
+    <div class="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center md:max-w-100">
       <slot />
     </div>
     <div class="mt-8 text-center">
