@@ -1,7 +1,7 @@
 ---
 change_id: soft-modern-recipe-form
 title: Recipe add/edit form in Soft Modern
-status: implementing
+status: implemented
 created: 2026-10-28
 updated: 2026-10-28
 archived_at: null
@@ -24,3 +24,5 @@ Phase 5 accepted visually by the author (illustration preview on phone and deskt
 Phase 6 implemented, not yet committed (waiting for the author): kitchen sink states added (sections open, error in a collapsed ingredient, illustration preview, state matrix) and the AGENTS.md rule on key-based disclosure. Automated rows 6.1-6.2 pass. Row 6.3 stays open: desktop and phone (390 px) screenshots, light and dark, were taken in a local browser run (kept outside the repo) but not reviewed or confirmed by the author. Row 6.4 stays open: the aggregate mockup comparison must happen before M-2 closes.
 
 Aggregate comparison of M-2 with the mockups (author, after phase 6): it found discrepancies, so full conformance is NOT claimed and M-2 is not closed. Row 6.4 stays open; the findings are tracked in the follow-up change soft-modern-visual-alignment.
+
+Epilogue (2026-10-28): the aggregate mockup comparison (row 6.4) was done in the follow-up change soft-modern-visual-alignment (findings, fixes and the author's acceptance of the final screenshot set; 2149b00). Only results actually confirmed there are carried over: 6.4. Rows left open on purpose, none of them re-checked here: 2.3 and 2.4 (typed values after collapse/expand, Tab order, desktop row detail were checked only by an automated browser run, not confirmed by the author), 3.3-3.5 (failed-save focus, ingredient removal, sticky bar and save/404 behaviour: automated run only), 4.5 (migration review by the author) and 4.6 (nothing applied to a remote database: no remote step was made in this work, not confirmed by the author), 5.5 (edit keeps a stored illustration and a new recipe saves with the previewed one: verified on the local database by an automated run, not confirmed by the author), 6.3 (screenshots of /recipes/new accepted in the follow-up change; the edit form and the kitchen sink were not reviewed). A real phone keyboard and other device interactions were never tested. Not archived.

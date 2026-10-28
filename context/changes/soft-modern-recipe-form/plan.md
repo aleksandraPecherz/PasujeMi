@@ -393,10 +393,10 @@ Phase 4 adds one additive migration (one function in `private`, one trigger); it
 
 #### Automated
 
-- [x] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` pass
-- [x] 6.2 The hard-coded value scan on the form files returns 0 hits
+- [x] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` pass — 8a1e540
+- [x] 6.2 The hard-coded value scan on the form files returns 0 hits — 8a1e540
 
 #### Manual
 
 - [ ] 6.3 Screenshots at desktop and one phone width, light and dark
-- [ ] 6.4 Aggregate mockup comparison left open for the M-2 close
+- [x] 6.4 Aggregate mockup comparison left open for the M-2 close — done in soft-modern-visual-alignment (2149b00)
