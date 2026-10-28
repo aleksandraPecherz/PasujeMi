@@ -51,8 +51,17 @@ const RECIPE: Recipe = {
   fatG: null,
 };
 
-function render(options: { editing?: boolean; fieldErrors?: Record<string, string>; cancelHref?: string } = {}) {
-  const form = options.editing ? recipeToFormState(RECIPE) : emptyRecipeForm();
+function render(
+  options: {
+    editing?: boolean;
+    fieldErrors?: Record<string, string>;
+    cancelHref?: string;
+    name?: string;
+    savedIllustration?: string | null;
+  } = {},
+) {
+  const base = options.editing ? recipeToFormState(RECIPE) : emptyRecipeForm();
+  const form = options.name === undefined ? base : { ...base, name: options.name };
   return renderToStaticMarkup(
     createElement(RecipeFormView, {
       form,
@@ -64,6 +73,7 @@ function render(options: { editing?: boolean; fieldErrors?: Record<string, strin
       disclosureActions: DISCLOSURE_ACTIONS,
       onSubmit: NOOP,
       cancelHref: options.cancelHref ?? "/",
+      savedIllustration: options.savedIllustration,
     }),
   );
 }
@@ -99,6 +109,35 @@ describe("RecipeFormView markup", () => {
       expect(html).toContain(`href="#${id}"`);
       expect(html).toContain(`id="${id}"`);
     }
+  });
+
+  describe("illustration preview", () => {
+    const tiles = (html: string, key: string) => html.split(`src="/illustrations/${key}.svg"`).length - 1;
+
+    it("previews the picked illustration for a new recipe, on phone and in the desktop column", () => {
+      const html = render({ name: "Kanapka z serem" });
+      expect(tiles(html, "kanapka")).toBe(2);
+      expect(html).toContain("Dobrana automatycznie po nazwie.");
+    });
+
+    it("previews the pick for an edited recipe whose stored illustration is empty", () => {
+      const html = render({ editing: true, name: "Zupa dyniowa", savedIllustration: null });
+      expect(tiles(html, "zupa")).toBe(2);
+    });
+
+    it("keeps a stored illustration whatever the name says", () => {
+      const html = render({ editing: true, name: "Zupa dyniowa", savedIllustration: "talerz" });
+      expect(tiles(html, "talerz")).toBe(2);
+      expect(tiles(html, "zupa")).toBe(0);
+      expect(html).toContain("Ilustracja przepisu zostaje bez zmian.");
+    });
+
+    it("shows the placeholder and an explanation when no rule matches", () => {
+      const html = render({ name: "Zakwas" });
+      expect(html).not.toContain("/illustrations/");
+      expect(html).toContain("Brak dopasowania do nazwy, pokażemy ogólną ilustrację.");
+      expect(render()).toContain("Wpisz nazwę, a dobierzemy ilustrację.");
+    });
   });
 
   it("shows no banner without errors", () => {

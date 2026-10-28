@@ -25,6 +25,7 @@ export const CLEAN_FILES = [
   "src/components/recipes/RecipeForm.tsx",
   "src/components/recipes/RecipeFormView.tsx",
   "src/components/recipes/IngredientFields.tsx",
+  "src/components/recipes/RecipeIllustrationPreview.tsx",
   "src/components/recipes/RecipeSaved.tsx",
   "src/pages/auth/signin.astro",
   "src/pages/auth/signup.astro",

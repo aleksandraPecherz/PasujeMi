@@ -16,6 +16,7 @@ import {
   errorProps,
   fieldId,
 } from "@/components/recipes/IngredientFields";
+import { RecipeIllustrationPreview } from "@/components/recipes/RecipeIllustrationPreview";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -61,6 +62,8 @@ interface RecipeFormViewProps {
   onSubmit: () => void;
   /** Where the close button (phone) and "Anuluj" (desktop) lead: the list when adding, the details when editing. */
   cancelHref: string;
+  /** `recipes.illustration` of the recipe being edited; the form only previews it and never sends it. */
+  savedIllustration?: string | null;
   title?: string;
   submitLabel?: string;
 }
@@ -75,6 +78,7 @@ export function RecipeFormView({
   disclosureActions,
   onSubmit,
   cancelHref,
+  savedIllustration,
   title = "Dodaj przepis",
   submitLabel = "Zapisz przepis",
 }: RecipeFormViewProps) {
@@ -160,6 +164,13 @@ export function RecipeFormView({
             />
             <FieldError id={nameId} message={fieldErrors.name} />
           </div>
+          {/* Phone: under the field, so the field keeps its width. From `lg` the preview sits in the right column. */}
+          <RecipeIllustrationPreview
+            name={form.name}
+            savedIllustration={savedIllustration}
+            layout="row"
+            className="lg:hidden"
+          />
         </section>
 
         <section aria-labelledby="recipe-ingredients-heading" className={CARD}>
@@ -383,6 +394,12 @@ export function RecipeFormView({
       {/* Phone: a save bar stuck to the bottom of the page (in flow, so it never hides the end of the form).
           From `lg` up: a column on the right with "Zapisz" and "Anuluj". */}
       <div className="bg-background border-border lg:bg-card sticky bottom-0 z-10 -mx-4 flex flex-col gap-3 border-t px-4 py-3 lg:top-6 lg:bottom-auto lg:col-span-3 lg:mx-0 lg:rounded-xl lg:border-0 lg:p-4">
+        <RecipeIllustrationPreview
+          name={form.name}
+          savedIllustration={savedIllustration}
+          layout="column"
+          className="hidden lg:flex"
+        />
         <ServerError message={serverError} />
         <Button type="submit" size="lg" disabled={submitting} aria-busy={submitting} className="w-full">
           {submitting ? "Zapisywanie…" : submitLabel}

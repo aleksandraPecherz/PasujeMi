@@ -366,10 +366,10 @@ Phase 4 adds one additive migration (one function in `private`, one trigger); it
 
 #### Automated
 
-- [x] 4.1 TS rules pass the shared cases: `npx vitest run src/lib/recipes`
-- [x] 4.2 Migration applies to the local database: `npx supabase migration up --local`
-- [x] 4.3 SQL and TS agree on the shared cases and the grants hold: `npm run check:illustration-rules` (local database)
-- [x] 4.4 `npm run lint`, `npx astro check`, `npm test` pass
+- [x] 4.1 TS rules pass the shared cases: `npx vitest run src/lib/recipes` — 70ad3c4
+- [x] 4.2 Migration applies to the local database: `npx supabase migration up --local` — 70ad3c4
+- [x] 4.3 SQL and TS agree on the shared cases and the grants hold: `npm run check:illustration-rules` (local database) — 70ad3c4
+- [x] 4.4 `npm run lint`, `npx astro check`, `npm test` pass — 70ad3c4
 
 #### Manual
 
@@ -380,13 +380,13 @@ Phase 4 adds one additive migration (one function in `private`, one trigger); it
 
 #### Automated
 
-- [ ] 5.1 Tests pass: `npm test`
-- [ ] 5.2 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` pass
+- [x] 5.1 Tests pass: `npm test`
+- [x] 5.2 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` pass
 
 #### Manual
 
-- [ ] 5.3 Phone: typing a name changes the preview next to it; unknown name shows the placeholder
-- [ ] 5.4 Desktop: preview sits above Save/Anuluj in the right column
+- [x] 5.3 Phone: typing a name changes the preview next to it; unknown name shows the placeholder
+- [x] 5.4 Desktop: preview sits above Save/Anuluj in the right column
 - [ ] 5.5 Edit keeps a stored illustration; a new recipe saves with the previewed one (local database)
 
 ### Phase 6: Kitchen sink and final gate

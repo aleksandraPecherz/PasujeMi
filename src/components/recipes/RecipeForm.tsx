@@ -52,6 +52,7 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe } = {}) {
         void submit();
       }}
       cancelHref={recipe ? `/recipes/${recipe.id}` : "/"}
+      savedIllustration={recipe?.illustration}
       {...(recipe && { title: "Edytuj przepis", submitLabel: "Zapisz zmiany" })}
     />
   );
