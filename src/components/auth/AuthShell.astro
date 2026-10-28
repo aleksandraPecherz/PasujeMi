@@ -1,13 +1,71 @@
 ---
 import Logo from "@/components/Logo.astro";
 import ThemeLink from "@/components/ThemeLink";
+
+interface Props {
+  /** `signin`: green panel with the tagline on phones; `signup`: yellow, compact panel with the logo only. */
+  variant: "signin" | "signup";
+}
+
+const { variant } = Astro.props;
+
+const VARIANTS = {
+  signin: {
+    panel: "bg-hero",
+    taglineOnPhone: true,
+    phoneTiles: [
+      { key: "kanapka-jajko", position: "-right-10 top-6 w-36" },
+      { key: "salatka", position: "-bottom-5 right-10 w-20" },
+    ],
+  },
+  signup: {
+    panel: "bg-illus-yellow",
+    taglineOnPhone: false,
+    phoneTiles: [{ key: "kanapka", position: "-right-6 -bottom-6 w-28" }],
+  },
+};
+
+// Positions are fractions of the panel's content box on desktop (composition from the D01 mockup).
+const DESKTOP_TILES = [
+  { key: "kanapka-jajko", position: "left-1/12 top-1/6 w-5/12" },
+  { key: "salatka", position: "left-1/2 top-1/12 w-1/3" },
+  { key: "kanapka", position: "left-0 top-4/7 w-2/7" },
+  { key: "slodka-miska", position: "left-5/12 top-1/2 w-3/8" },
+];
+
+const { panel, taglineOnPhone, phoneTiles } = VARIANTS[variant];
+const tileClass = "pointer-events-none absolute select-none";
 ---
 
 <div class="bg-background min-h-screen md:grid md:grid-cols-2">
-  <aside class="bg-hero flex flex-col gap-10 px-4 py-6 md:justify-between md:p-12">
-    <Logo />
-    <div>
-      <p class="text-hero-foreground md:text-foreground text-2xl font-extrabold md:text-4xl md:leading-tight">
+  <aside class:list={["relative flex flex-col gap-6 overflow-hidden px-4 py-6 md:justify-between md:p-12", panel]}>
+    <div class="relative z-10">
+      <Logo />
+    </div>
+    {phoneTiles.map((tile) => (
+      <img
+        src={`/illustrations/${tile.key}.svg`}
+        alt=""
+        aria-hidden="true"
+        width="100"
+        height="100"
+        class:list={[tileClass, tile.position, "md:hidden"]}
+      />
+    ))}
+    <div class="relative hidden flex-1 md:block">
+      {DESKTOP_TILES.map((tile) => (
+        <img
+          src={`/illustrations/${tile.key}.svg`}
+          alt=""
+          aria-hidden="true"
+          width="100"
+          height="100"
+          class:list={[tileClass, tile.position]}
+        />
+      ))}
+    </div>
+    <div class:list={["relative z-10", !taglineOnPhone && "hidden md:block"]}>
+      <p class="text-hero-foreground md:text-foreground w-3/5 text-lg font-extrabold md:w-auto md:text-4xl md:leading-tight">
         Gotuj z tego, co już masz w domu.
       </p>
       <p class="text-hero-foreground mt-3 hidden text-lg md:block">

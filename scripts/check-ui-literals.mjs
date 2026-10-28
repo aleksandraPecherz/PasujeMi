@@ -19,6 +19,7 @@ export const CLEAN_FILES = [
   "src/components/dev/KitchenSink.tsx",
   "src/pages/dev/kitchen-sink.astro",
   "src/components/auth/ServerError.tsx",
+  "src/components/auth/AuthShell.astro",
   "src/pages/recipes/new.astro",
   "src/components/recipes/RecipeForm.tsx",
   "src/components/recipes/RecipeFormView.tsx",

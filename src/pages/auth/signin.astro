@@ -10,7 +10,7 @@ const email = error ? emailFromQuery(Astro.url.searchParams.get("email")) : "";
 ---
 
 <Layout title="Zaloguj się · PasujeMi">
-  <AuthShell>
+  <AuthShell variant="signin">
     <h1 class="text-3xl font-extrabold">Zaloguj się</h1>
     <p class="text-muted-foreground mt-2 mb-6">Twoja spiżarka i przepisy czekają.</p>
     <SignInForm serverError={error} initialEmail={email} autoFocusPassword={Boolean(email)} client:load />
