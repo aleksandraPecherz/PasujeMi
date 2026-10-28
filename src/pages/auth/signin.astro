@@ -1,7 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import ThemeToggle from "@/components/ThemeToggle";
-import { cardVariants } from "@/components/ui/card";
+import AuthShell from "@/components/auth/AuthShell.astro";
 import SignInForm from "@/components/auth/SignInForm";
 import { authErrorMessage, emailFromQuery } from "@/lib/auth-errors";
 
@@ -11,21 +10,15 @@ const email = error ? emailFromQuery(Astro.url.searchParams.get("email")) : "";
 ---
 
 <Layout title="Zaloguj się · PasujeMi">
-  <div class="bg-cosmic relative flex min-h-screen items-center justify-center p-4">
-    <div class="absolute top-4 right-4">
-      <ThemeToggle client:load />
-    </div>
-    <div class:list={[cardVariants({ variant: "brutal" }), "w-full max-w-sm p-8"]}>
-      <h1 class="mb-6 bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-center text-2xl font-bold text-transparent">
-        Zaloguj się
-      </h1>
-      <SignInForm serverError={error} initialEmail={email} autoFocusPassword={Boolean(email)} client:load />
-      <p class="mt-4 text-center text-sm text-muted-foreground">
-        Nie masz konta?{" "}
-        <a href="/auth/signup" class="text-foreground underline hover:no-underline">
-          Zarejestruj się
-        </a>
-      </p>
-    </div>
-  </div>
+  <AuthShell>
+    <h1 class="text-3xl font-extrabold">Zaloguj się</h1>
+    <p class="text-muted-foreground mt-2 mb-6">Twoja spiżarka i przepisy czekają.</p>
+    <SignInForm serverError={error} initialEmail={email} autoFocusPassword={Boolean(email)} client:load />
+    <p class="text-muted-foreground mt-6 text-center">
+      Nie masz konta?{" "}
+      <a href="/auth/signup" class="text-primary font-bold underline hover:no-underline">
+        Załóż konto
+      </a>
+    </p>
+  </AuthShell>
 </Layout>

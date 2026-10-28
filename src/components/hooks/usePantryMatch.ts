@@ -9,6 +9,7 @@ import {
 } from "@/lib/list-state";
 import { MAX_TAG_LENGTH, MAX_TAGS, MAX_TOKENS, MAX_URL_LENGTH, countTokens } from "@/lib/matching/limits";
 import { MAX_SAVED_TOKENS } from "@/lib/pantry/limits";
+import { tagKey } from "@/lib/pantry/filters";
 import { initialFilters, type SavedPantry } from "@/lib/pantry/saved";
 import { createPantrySaver } from "@/lib/pantry/saver";
 import type { PantryLists, PantrySection, Recipe, RecipeMatch } from "@/types";
@@ -325,12 +326,12 @@ export function usePantryMatch({ userId, saved }: { userId: string; saved: Saved
     (section: PantrySection, tag: string): boolean => {
       const value = tag.trim();
       const current = lists[section];
-      const key = value.toLocaleLowerCase("pl");
+      const key = tagKey(value);
       if (
         value === "" ||
         value.length > MAX_TAG_LENGTH ||
         current.length >= MAX_TAGS ||
-        current.some((t) => t.toLocaleLowerCase("pl") === key)
+        current.some((t) => tagKey(t) === key)
       ) {
         return false;
       }
@@ -391,6 +392,8 @@ export function usePantryMatch({ userId, saved }: { userId: string; saved: Saved
     error,
     restoredScrollY,
     consumeRestoredScroll,
+    /** The filters of the shown list (the last successful request); `lists` are what is typed now. */
+    applied,
     /** Whether the shown list was requested with any tags. */
     filtered: hasFilters(applied),
   };

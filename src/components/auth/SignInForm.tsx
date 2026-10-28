@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Mail, Lock, LogIn } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -45,7 +44,9 @@ export default function SignInForm({ serverError, initialEmail = "", autoFocusPa
   }
 
   return (
-    <form method="POST" action="/api/auth/signin" className="space-y-4" onSubmit={handleSubmit} noValidate>
+    <form method="POST" action="/api/auth/signin" className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <ServerError message={serverError} />
+
       <FormField
         id={`${idPrefix}email`}
         name="email"
@@ -58,7 +59,6 @@ export default function SignInForm({ serverError, initialEmail = "", autoFocusPa
         }}
         placeholder="ty@przyklad.pl"
         error={errors.email}
-        icon={<Mail className="size-4" />}
       />
 
       <FormField
@@ -74,7 +74,6 @@ export default function SignInForm({ serverError, initialEmail = "", autoFocusPa
         }}
         placeholder="Twoje hasło"
         error={errors.password}
-        icon={<Lock className="size-4" />}
         endContent={
           <PasswordToggle
             visible={showPassword}
@@ -85,11 +84,7 @@ export default function SignInForm({ serverError, initialEmail = "", autoFocusPa
         }
       />
 
-      <ServerError message={serverError} />
-
-      <SubmitButton variant="pressable" pendingText="Logowanie…" icon={<LogIn className="size-4" />}>
-        Zaloguj się
-      </SubmitButton>
+      <SubmitButton pendingText="Logowanie…">Zaloguj się</SubmitButton>
     </form>
   );
 }

@@ -23,6 +23,8 @@ export interface Recipe {
   prepTimeMin: number | null;
   servings: number | null;
   kinds: RecipeKind[];
+  /** Key of the static illustration (`public/illustrations/<key>.svg`); null or unknown shows the placeholder. */
+  illustration?: string | null;
   /** Nutrition values are per single serving. */
   kcal: number | null;
   proteinG: number | null;

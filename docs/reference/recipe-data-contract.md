@@ -9,25 +9,45 @@
 
 ## Kształt rekordu
 
-| Kolumna (baza)  | Pole (`Recipe`) | Typ                     | Reguła                                                                         |
-| --------------- | --------------- | ----------------------- | ------------------------------------------------------------------------------ |
-| `id`            | `id`            | `uuid`                  | generowane przez bazę                                                          |
-| `name`          | `name`          | `text`                  | niepuste po przycięciu                                                         |
-| `steps`         | `steps`         | `text[]`                | co najmniej 1 krok                                                             |
-| `ingredients`   | `ingredients`   | `jsonb`                 | tablica, co najmniej 1 element (kształt elementu niżej)                        |
-| `prep_time_min` | `prepTimeMin`   | `integer` / `null`      | ≥ 0, w minutach                                                                |
-| `servings`      | `servings`      | `integer` / `null`      | > 0                                                                            |
-| `kinds`         | `kinds`         | `text[]`                | podzbiór: `na słodko`, `na wytrawnie`, `na ciepło`, `na zimno`; domyślnie `{}` |
-| `kcal`          | `kcal`          | `integer` / `null`      | ≥ 0, **na 1 porcję**                                                           |
-| `protein_g`     | `proteinG`      | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                           |
-| `carbs_g`       | `carbsG`        | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                           |
-| `fat_g`         | `fatG`          | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                           |
-| `author_id`     | —               | `uuid` / `null`         | z sesji (`auth.uid()`), `on delete set null`; seed ma `null`; poza `Recipe`    |
-| `created_at`    | —               | `timestamptz`           | domyślnie `now()`                                                              |
+| Kolumna (baza)  | Pole (`Recipe`) | Typ                | Reguła                                                                                                                |
+| --------------- | --------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `id`            | `id`            | `uuid`             | generowane przez bazę                                                                                                 |
+| `name`          | `name`          | `text`             | niepuste po przycięciu                                                                                                |
+| `steps`         | `steps`         | `text[]`           | co najmniej 1 krok                                                                                                    |
+| `ingredients`   | `ingredients`   | `jsonb`            | tablica, co najmniej 1 element (kształt elementu niżej)                                                               |
+| `prep_time_min` | `prepTimeMin`   | `integer` / `null` | ≥ 0, w minutach                                                                                                       |
+| `servings`      | `servings`      | `integer` / `null` | > 0                                                                                                                   |
+| `kinds`         | `kinds`         | `text[]`           | podzbiór: `na słodko`, `na wytrawnie`, `na ciepło`, `na zimno`; domyślnie `{}`                                        |
+| `illustration`  | `illustration`  | `text` / `null`    | klucz statycznej ilustracji kafelka (`public/illustrations/<klucz>.svg`), `^[a-z][a-z0-9-]*# Kontrakt danych przepisu |
+
+Źródło prawdy o kształcie przepisu w PasujeMi i o regułach konwersji z pliku autorki `data/recipes.xlsx`. Korzystają z niego: import F-02, dopasowanie S-03 i dodawanie przepisów S-05.
+
+- Tabela: `public.recipes` (`supabase/migrations/20261012120000_create_recipes.sql`).
+- Typy TS: `src/types.ts` (`Recipe`, `RecipeIngredient`, `IngredientOption`, `RecipeKind`).
+- Odczyt: `src/lib/services/recipes.ts` (`listRecipes`), `GET /api/recipes?limit=&offset=`.
+- `data/recipes.xlsx` jest tylko lokalnie u autorki (`data/` w `.gitignore`); nigdy nie trafia do repo.
+
+## Kształt rekordu
+
+| Kolumna (baza)                                             | Pole (`Recipe`) | Typ                     | Reguła                                                                      |
+| ---------------------------------------------------------- | --------------- | ----------------------- | --------------------------------------------------------------------------- |
+| `id`                                                       | `id`            | `uuid`                  | generowane przez bazę                                                       |
+| `name`                                                     | `name`          | `text`                  | niepuste po przycięciu                                                      |
+| `steps`                                                    | `steps`         | `text[]`                | co najmniej 1 krok                                                          |
+| `ingredients`                                              | `ingredients`   | `jsonb`                 | tablica, co najmniej 1 element (kształt elementu niżej)                     |
+| `prep_time_min`                                            | `prepTimeMin`   | `integer` / `null`      | ≥ 0, w minutach                                                             |
+| `servings`                                                 | `servings`      | `integer` / `null`      | > 0                                                                         |
+| , ≤ 40 znaków; `null` lub nieznany klucz = obraz zastępczy |
+| `kcal`                                                     | `kcal`          | `integer` / `null`      | ≥ 0, **na 1 porcję**                                                        |
+| `protein_g`                                                | `proteinG`      | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                        |
+| `carbs_g`                                                  | `carbsG`        | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                        |
+| `fat_g`                                                    | `fatG`          | `numeric(6,1)` / `null` | ≥ 0, **na 1 porcję**                                                        |
+| `author_id`                                                | —               | `uuid` / `null`         | z sesji (`auth.uid()`), `on delete set null`; seed ma `null`; poza `Recipe` |
+| `created_at`                                               | —               | `timestamptz`           | domyślnie `now()`                                                           |
 
 `numeric` przychodzi z PostgREST jako tekst — serwis zamienia go na `number` (`null` zostaje `null`).
 
-Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`. Aktualizować (`update`) i usuwać (`delete`) przepis może jego autor (`author_id = auth.uid()`) albo admin (wiersz w `public.admins`), przez `PUT` / `DELETE /api/recipes/[id]`; `PUT` nie przyjmuje `author_id` ani `match_keys`, także od admina. Zmiana składników zeruje `match_keys`. Admin może zmienić i usunąć też przepisy z `author_id = null` (np. seed); dla pozostałych użytkowników takie przepisy są tylko do odczytu. `authenticated` widzi w `public.admins` tylko swój wiersz i nie może do niej pisać.
+Dostęp (RLS): zalogowany (`authenticated`) czyta wszystkie przepisy; anonim nie ma uprawnień ani polityk. `authenticated` wstawia przepis tylko jako siebie (`author_id = auth.uid()`) i bez `match_keys`, przez `POST /api/recipes`. Aktualizować (`update`) i usuwać (`delete`) przepis może jego autor (`author_id = auth.uid()`) albo admin (wiersz w `public.admins`), przez `PUT` / `DELETE /api/recipes/[id]`; `PUT` nie przyjmuje `author_id` ani `match_keys`, także od admina. Zmiana składników zeruje `match_keys`. Kolumna `illustration` nie należy do kolumn zapisywalnych przez `authenticated` (granty `insert`/`update` jej nie obejmują): `POST` i `PUT` jej nie zapisują ani nie zerują, a przypisuje ją jednorazowo skrypt `npm run assign-illustrations` kluczem serwisowym (mapa: `scripts/illustration-map.json`; runbook: `context/changes/soft-modern-pantry-recipes/runbook.md`). Kod czytający `recipes` wymaga migracji `20261027120000_add_recipe_illustration.sql`. Admin może zmienić i usunąć też przepisy z `author_id = null` (np. seed); dla pozostałych użytkowników takie przepisy są tylko do odczytu. `authenticated` widzi w `public.admins` tylko swój wiersz i nie może do niej pisać.
 
 Rolę nadaje się ręcznie w panelu Supabase (SQL Editor), bez ekranu w aplikacji:
 

@@ -35,10 +35,12 @@ PasujeMi is a Polish-language recipe-matching web app built on the 10x Astro Sta
 
 ## UI
 
-- Tokens live in `src/styles/global.css`: values in `:root` / `.dark`, published to Tailwind via `@theme inline`. Dark theme comes from `class="dark"` on `<html>` in `src/layouts/Layout.astro`; value sources are recorded in `context/archive/2026-10-17-ui-palette/tokens.md`.
+- Tokens live in `src/styles/global.css`: values in `:root` / `.dark`, published to Tailwind via `@theme inline`. Dark theme comes from `class="dark"` on `<html>` in `src/layouts/Layout.astro`; Soft Modern v2 hex values and their source mockups are in `palette.md` of the `soft-modern-foundation-auth` change (`context/changes/`, or `context/archive/` once archived). Font: Plus Jakarta Sans (`@fontsource-variable/plus-jakarta-sans`, self-hosted).
 - Check `src/components/ui/` before creating a component; add a missing one with `npx shadcn@latest add <name>`. A missing look is a new variant in `ui/`, not a color in `className`.
 - No literal colors or arbitrary values (`bg-purple-600`, `#0a0e1a`, `p-[13px]`) in views — use tokens. `npm run check:ui` (also run by lint-staged and CI) guards the files listed in `CLEAN_FILES` in `scripts/check-ui-literals.mjs`; add a file there once you clean it. `src/components/ui/` is not scanned (upstream shadcn keeps literals like `text-white`, `ring-[3px]`), so a new variant there must use tokens only — the scan will not catch it.
-- The neo-brutal look is `cardVariants({ variant: "brutal" })` from `ui/card.tsx` and `Button variant="pressable"`; shadows are the `shadow-brutal` / `shadow-brutal-sm` tokens from `global.css`. Use it only on `RecipeTile` and the auth cards.
+- The look is Soft Modern v2: flat surfaces. Cards differ from the background by color (`bg-card`), not by shadow or border; borders stay on form fields and thin separators; shadow only on overlays (menu, sheet, dialog). `cardVariants()` and `Button` have no neo-brutal variants (`brutal`, `pressable`) and there are no `shadow-brutal*` tokens — do not bring them back.
+- Sizes: primary actions are `Button size="lg"` (48 px), icon buttons `size="icon"` (44 px), fields 48 px with 16 px text; `default` and `sm` stay compact for secondary actions. Radius comes from `--radius` (12 px; cards `rounded-xl`).
+- Recipe illustrations are static SVGs in `public/illustrations/<key>.svg` (plate and dish on a transparent background, the same in both themes); the tile background comes from the `--illus-*` tokens, never from the semantic `have`/`staple`/`exclude`/`warning` ones. A new illustration is an SVG plus one line in `src/lib/recipes/illustrations.ts`; `recipes.illustration` is written only by `scripts/assign-illustrations.ts` (the forms and API never touch it) and `null` or an unknown key shows the placeholder.
 - Kitchen sink: `/dev/kitchen-sink` (dev only) — add each new component state there when you create it.
 
 ## Testing

@@ -4,15 +4,17 @@ import Layout from "@/layouts/Layout.astro";
 
 interface Props {
   title?: string;
+  /** Wider content column (the home page: a side panel next to two columns of recipes). */
+  wide?: boolean;
 }
 
-const { title = "PasujeMi" } = Astro.props;
+const { title = "PasujeMi", wide = false } = Astro.props;
 ---
 
 <Layout title={title}>
-  <div class="bg-cosmic text-foreground min-h-screen">
-    <AppHeader />
-    <main class="mx-auto w-full max-w-5xl px-4 py-6 sm:py-8">
+  <div class="bg-background text-foreground min-h-screen">
+    <AppHeader wide={wide} />
+    <main class:list={["mx-auto w-full px-4 py-6 sm:py-8", wide ? "max-w-6xl" : "max-w-5xl"]}>
       <slot />
     </main>
   </div>

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Mail, Lock, UserPlus } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -75,7 +74,9 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
     ) : undefined;
 
   return (
-    <form method="POST" action="/api/auth/signup" className="space-y-4" onSubmit={handleSubmit} noValidate>
+    <form method="POST" action="/api/auth/signup" className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <ServerError message={serverError} />
+
       <FormField
         id={`${idPrefix}email`}
         name="email"
@@ -88,7 +89,6 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
         }}
         placeholder="ty@przyklad.pl"
         error={errors.email}
-        icon={<Mail className="size-4" />}
       />
 
       <FormField
@@ -105,7 +105,6 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
         placeholder="Min. 6 znaków"
         error={errors.password}
         hint={passwordHint}
-        icon={<Lock className="size-4" />}
         endContent={
           <PasswordToggle
             visible={showPassword}
@@ -128,7 +127,6 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
         }}
         placeholder="Wpisz hasło ponownie"
         error={errors.confirmPassword}
-        icon={<Lock className="size-4" />}
         endContent={
           <PasswordToggle
             visible={showConfirmPassword}
@@ -139,11 +137,7 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
         }
       />
 
-      <ServerError message={serverError} />
-
-      <SubmitButton variant="pressable" pendingText="Zakładanie konta…" icon={<UserPlus className="size-4" />}>
-        Załóż konto
-      </SubmitButton>
+      <SubmitButton pendingText="Zakładanie konta…">Załóż konto</SubmitButton>
     </form>
   );
 }
