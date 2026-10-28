@@ -232,28 +232,28 @@ None; no data or schema change.
 
 #### Automated
 
-- [x] 1.1 Lint passes: `npm run lint`
-- [x] 1.2 UI literals guard passes: `npm run check:ui`
-- [x] 1.3 Type check passes: `npx astro check`
-- [x] 1.4 Service delete tests pass: `npx vitest run src/lib/services/recipes.test.ts`
+- [x] 1.1 Lint passes: `npm run lint` — ff84a6b
+- [x] 1.2 UI literals guard passes: `npm run check:ui` — ff84a6b
+- [x] 1.3 Type check passes: `npx astro check` — ff84a6b
+- [x] 1.4 Service delete tests pass: `npx vitest run src/lib/services/recipes.test.ts` — ff84a6b
 
 #### Manual
 
-- [x] 1.5 Phone popover opens under "⋯", closes with Esc and outside click, Tab moves through its items
+- [x] 1.5 Phone popover opens under "⋯", closes with Esc and outside click, Tab moves through its items — ff84a6b
 - [x] 1.6 Desktop shows both buttons; "Usuń" is red
-- [x] 1.7 Confirmation dialog looks right in both themes and focus returns to the trigger after "Anuluj"
+- [x] 1.7 Confirmation dialog looks right in both themes and focus returns to the trigger after "Anuluj" — ff84a6b
 
 ### Phase 2: NotFoundView restyle
 
 #### Automated
 
-- [ ] 2.1 Lint passes: `npm run lint`
-- [ ] 2.2 UI literals guard passes: `npm run check:ui`
-- [ ] 2.3 Type check passes: `npx astro check`
+- [x] 2.1 Lint passes: `npm run lint`
+- [x] 2.2 UI literals guard passes: `npm run check:ui`
+- [x] 2.3 Type check passes: `npx astro check`
 
 #### Manual
 
-- [ ] 2.4 Bad id, failed load and generic 404 show the new layout with original texts in both themes and at 320 px
+- [x] 2.4 Bad id, failed load and generic 404 show the new layout with original texts in both themes and at 320 px
 
 ### Phase 3: Recipe details layout
 
