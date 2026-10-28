@@ -380,21 +380,21 @@ Phase 4 adds one additive migration (one function in `private`, one trigger); it
 
 #### Automated
 
-- [x] 5.1 Tests pass: `npm test`
-- [x] 5.2 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` pass
+- [x] 5.1 Tests pass: `npm test` — 4f80b52
+- [x] 5.2 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm run build` pass — 4f80b52
 
 #### Manual
 
-- [x] 5.3 Phone: typing a name changes the preview next to it; unknown name shows the placeholder
-- [x] 5.4 Desktop: preview sits above Save/Anuluj in the right column
+- [x] 5.3 Phone: typing a name changes the preview next to it; unknown name shows the placeholder — 4f80b52
+- [x] 5.4 Desktop: preview sits above Save/Anuluj in the right column — 4f80b52
 - [ ] 5.5 Edit keeps a stored illustration; a new recipe saves with the previewed one (local database)
 
 ### Phase 6: Kitchen sink and final gate
 
 #### Automated
 
-- [ ] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` pass
-- [ ] 6.2 The hard-coded value scan on the form files returns 0 hits
+- [x] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` pass
+- [x] 6.2 The hard-coded value scan on the form files returns 0 hits
 
 #### Manual
 

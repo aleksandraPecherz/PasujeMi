@@ -32,6 +32,7 @@ import { RecipeAuthorActionsView } from "@/components/recipes/RecipeAuthorAction
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeDetails } from "@/components/recipes/RecipeDetails";
 import { RecipeIllustration } from "@/components/recipes/RecipeIllustration";
+import { RecipeIllustrationPreview } from "@/components/recipes/RecipeIllustrationPreview";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import ThemeLink from "@/components/ThemeLink";
@@ -236,12 +237,26 @@ const FORM_ERRORS: Record<string, string> = {
   kcal: "Kcal: wartość od 0 do 10000.",
 };
 
+// `open` starts the sample with sections open (ingredient and substitutes by position); without it a new form opens
+// the first ingredient and an edit starts collapsed, as the real form does.
 function SampleRecipeForm({
   editing = false,
+  open,
   ...props
-}: Partial<Parameters<typeof RecipeFormView>[0]> & { editing?: boolean }) {
+}: Partial<Parameters<typeof RecipeFormView>[0]> & {
+  editing?: boolean;
+  open?: { ingredient: number | null; substitutes: number[]; nutrition: boolean };
+}) {
   const [form] = useState(() => props.form ?? filledForm());
-  const [disclosure, setDisclosure] = useState(() => initialDisclosure(form, editing));
+  const [disclosure, setDisclosure] = useState(() =>
+    open
+      ? {
+          openIngredient: open.ingredient === null ? null : (form.ingredients[open.ingredient]?.key ?? null),
+          openSubstitutes: open.substitutes.flatMap((index) => form.ingredients[index]?.key ?? []),
+          nutritionOpen: open.nutrition,
+        }
+      : initialDisclosure(form, editing),
+  );
   // Toggles work here so the collapsed and expanded states can be tried; the form data stays fixed.
   const disclosureActions: RecipeFormDisclosureActions = {
     toggleIngredient: (key) => {
@@ -504,7 +519,50 @@ export default function KitchenSink() {
         title="Formularz przepisu: edycja"
         note="Tryb edycji (/recipes/[id]/edit): tytuł „Edytuj przepis”, przycisk „Zapisz zmiany” i link „Anuluj” do szczegółów."
       >
-        <SampleRecipeForm editing />
+        <SampleRecipeForm editing savedIllustration="talerz" />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: rozwinięcia"
+        note="Telefon: składnik 1 rozwinięty z sekcją „Zamienniki · 1” i wartości odżywcze otwarte (strzałki przełączają). Od md wszystko jest widoczne bez przełączania."
+      >
+        <SampleRecipeForm open={{ ingredient: 0, substitutes: [0], nutrition: true }} />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: błąd w zwiniętym składniku"
+        note="Edycja, wszystkie składniki zwinięte: baner „Popraw 2 pola” z linkami, obramowanie błędu na zwiniętym składniku 3 i ikona błędu przy zwiniętych wartościach odżywczych. Linki w banerze otwierają sekcję."
+      >
+        <SampleRecipeForm
+          editing
+          fieldErrors={{ "ingredients.2.name": "Nazwa: pole jest wymagane.", kcal: FORM_ERRORS.kcal }}
+          status="error"
+        />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: podgląd ilustracji"
+        note="Tylko do odczytu, bez wybieraka. Od lewej: dobrana po nazwie, brak dopasowania, pusta nazwa, zapisana ilustracja zostaje mimo nazwy. Telefon: kafelek i opis w rzędzie; kolumna desktopu: kafelek nad opisem."
+      >
+        <div className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <RecipeIllustrationPreview name="Owsianka z jabłkiem" layout="row" />
+            <RecipeIllustrationPreview name="Zakwas" layout="row" />
+            <RecipeIllustrationPreview name="" layout="row" />
+            <RecipeIllustrationPreview name="Zupa dyniowa" savedIllustration="talerz" layout="row" />
+          </div>
+          <div className="grid max-w-md grid-cols-2 gap-4">
+            <RecipeIllustrationPreview name="Sałatka z pesto" layout="column" />
+            <RecipeIllustrationPreview name="Zakwas" layout="column" />
+          </div>
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: macierz stanów"
+        note="default: pusty, wypełniony i edycja powyżej. hover i focus-visible: tokeny przycisków i pól, do sprawdzenia myszą i klawiszem Tab na formularzach powyżej (chip rodzaju ma własny pierścień). disabled i loading: „wysyłka” (przycisk wyłączony, aria-busy, „Zapisywanie…”). error: błędy pól, zwinięty składnik, błąd serwera. empty: formularz pusty. Przycisk „Dodaj składnik” wyłączony przy limicie składników jest N/A: osiąga się go dopiero przy 40 składnikach."
+      >
+        <p className="text-muted-foreground text-sm">Stany jak w opisie: każdy ma swoją sekcję na tej stronie.</p>
       </StateSection>
 
       <StateSection title="Formularz przepisu: wysyłka" note="Przycisk wyłączony z aria-busy.">
