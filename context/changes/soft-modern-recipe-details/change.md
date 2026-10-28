@@ -1,7 +1,7 @@
 ---
 change_id: soft-modern-recipe-details
 title: Soft Modern recipe details
-status: implementing
+status: implemented
 created: 2026-10-28
 updated: 2026-10-28
 archived_at: null
@@ -31,4 +31,6 @@ Order of work:
 
 ## Result
 
-Step 1 done (author actions + delete confirmation look): lint, check:ui, astro check pass; `recipes.test.ts` (service delete) passes; no component tests exist for deletion. Steps 2-4 pending.
+Phases 1-4 implemented and committed locally (ff84a6b, 5ef7230, aaf34ef, 8ef4e2e). Lint, check:ui and astro check pass; format tests pass. Author accepted: author actions and delete confirmation (p1), NotFoundView (p2), details look after the phone correction (p3), kitchen sink (p4).
+
+Not verified: Progress 4.5 (320 px and 130% text) stays open; a long title was not measured at 320/390 px. Before M-2 is closed, all changed views are still compared with the mockups together (see Notes).

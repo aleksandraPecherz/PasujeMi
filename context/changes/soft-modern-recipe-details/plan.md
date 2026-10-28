@@ -270,7 +270,7 @@ None; no data or schema change.
 
 #### Manual
 
-- [x] 3.5 Recipes with and without nutrition, substitutes, null illustration and several kinds render correctly on desktop and phone
+- [x] 3.5 Recipes with and without nutrition, substitutes, null illustration and several kinds render correctly on desktop and phone — 8ef4e2e
 - [x] 3.6 Illustration does not push ingredients far down on a phone — aaf34ef
 - [x] 3.7 Light and dark themes match M11/M18; long names wrap — aaf34ef
 
@@ -278,11 +278,11 @@ None; no data or schema change.
 
 #### Automated
 
-- [x] 4.1 Lint passes: `npm run lint`
-- [x] 4.2 UI literals guard passes: `npm run check:ui`
-- [x] 4.3 Type check passes: `npx astro check`
+- [x] 4.1 Lint passes: `npm run lint` — 8ef4e2e
+- [x] 4.2 UI literals guard passes: `npm run check:ui` — 8ef4e2e
+- [x] 4.3 Type check passes: `npx astro check` — 8ef4e2e
 
 #### Manual
 
-- [x] 4.4 `/dev/kitchen-sink` shows all new states in both themes
+- [x] 4.4 `/dev/kitchen-sink` shows all new states in both themes — 8ef4e2e
 - [ ] 4.5 320 px and 130% text show no clipped text or overlap
