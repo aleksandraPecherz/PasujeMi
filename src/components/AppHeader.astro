@@ -4,39 +4,29 @@ import Logo from "@/components/Logo.astro";
 import ThemeToggle from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
 
-interface Props {
-  wide?: boolean;
-}
-
-const { wide = false } = Astro.props;
 const { user } = Astro.locals;
 const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
 const initial = (user?.email?.[0] ?? "?").toUpperCase();
 ---
 
 <header class="border-border bg-background sm:bg-card border-b">
-  <div
-    class:list={[
-      "mx-auto flex h-14 items-center justify-between gap-4 px-4 sm:h-16 sm:px-8",
-      wide ? "max-w-6xl" : "max-w-5xl",
-    ]}
-  >
+  <div class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-8">
     <Logo />
 
     {/* Desktop: everything stays in the header. */}
-    <div class="hidden min-w-0 items-center gap-3 text-sm sm:flex">
+    <div class="hidden min-w-0 flex-1 items-center justify-end gap-3 text-sm sm:flex">
       <a
         href="/recipes/new"
         aria-current={onNewRecipe ? "page" : undefined}
-        class:list={[buttonVariants({ variant: onNewRecipe ? "nav-current" : "ghost" }), "shrink-0"]}
+        class:list={[buttonVariants({ variant: onNewRecipe ? "nav-current" : "ghost", size: "nav" }), "shrink-0"]}
       >
         <Plus aria-hidden="true" />
         Dodaj przepis
       </a>
-      <span class="text-muted-foreground max-w-48 truncate">{user?.email}</span>
+      <span class="text-muted-foreground min-w-0 truncate">{user?.email}</span>
       <ThemeToggle client:load />
       <form method="POST" action="/api/auth/signout" class="shrink-0" data-signout>
-        <button type="submit" class:list={[buttonVariants({ variant: "outline" })]}>
+        <button type="submit" class:list={[buttonVariants({ variant: "outline", size: "nav" })]}>
           Wyloguj
         </button>
       </form>

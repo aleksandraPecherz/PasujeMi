@@ -11,7 +11,7 @@ export default function ThemeToggle() {
   }
 
   return (
-    <Button type="button" variant="outline" size="icon" aria-label="Przełącz motyw jasny/ciemny" onClick={toggle}>
+    <Button type="button" variant="outline" size="nav-icon" aria-label="Przełącz motyw jasny/ciemny" onClick={toggle}>
       <Moon className="dark:hidden" aria-hidden="true" />
       <Sun className="hidden dark:block" aria-hidden="true" />
     </Button>
