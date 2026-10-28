@@ -3,12 +3,23 @@ import { Plus, SlidersHorizontal, X } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
 import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignUpForm";
-import { EmptyState, LimitNotice, RecipeCount, RecipeListSkeleton, SaveNotice } from "@/components/pantry/PantryStates";
+import {
+  EmptyState,
+  LimitNotice,
+  LoadError,
+  LoadingLine,
+  NoResults,
+  RecipeCount,
+  RecipeListSkeleton,
+  SaveNotice,
+} from "@/components/pantry/PantryStates";
+import { PantrySummary } from "@/components/pantry/PantrySummary";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
 import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
 import { RecipeAuthorActionsView } from "@/components/recipes/RecipeAuthorActions";
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeDetails } from "@/components/recipes/RecipeDetails";
+import { RecipeIllustration } from "@/components/recipes/RecipeIllustration";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import ThemeLink from "@/components/ThemeLink";
@@ -17,10 +28,11 @@ import { Button } from "@/components/ui/button";
 import { cardVariants } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { ILLUSTRATION_KEYS } from "@/lib/recipes/illustrations";
 import { cn } from "@/lib/utils";
 import { MAX_TAGS, MAX_TOKENS } from "@/lib/matching/limits";
 import { MAX_SAVED_TOKENS } from "@/lib/pantry/limits";
-import type { Recipe, RecipeIngredient, RecipeMatch } from "@/types";
+import type { PantryLists, Recipe, RecipeIngredient, RecipeMatch } from "@/types";
 
 // Sample data only; the page is served in dev mode (src/pages/dev/kitchen-sink.astro).
 
@@ -47,6 +59,7 @@ const RECIPE: Recipe = {
   prepTimeMin: 10,
   servings: 1,
   kinds: ["na słodko", "na ciepło"],
+  illustration: "slodka-miska",
   kcal: 320,
   proteinG: 9,
   carbsG: 52,
@@ -77,6 +90,54 @@ const MATCH: RecipeMatch = {
     { status: "have", mainExcluded: true, via: "mleko owsiane" },
     { status: "have", mainExcluded: false, via: null },
   ],
+};
+
+// Everything owned: "Masz wszystkie składniki", and a recipe without time or servings (the meta row shrinks to the badge).
+const SPARSE_ALL_MATCH: RecipeMatch = {
+  percent: 100,
+  ingredients: [
+    { status: "have", mainExcluded: false, via: null },
+    { status: "have", mainExcluded: false, via: null },
+  ],
+};
+
+// A name near the 120-character limit and many missing ingredients: title clamps to 3 lines, "Brakuje" ends with "+N".
+const LONG_RECIPE: Recipe = {
+  ...RECIPE,
+  id: "9c4e1f7a-2d63-4b85-8e0a-5f6b7c8d9e01",
+  name: "Owsianka nocna z jogurtem greckim, musem malinowym, płatkami migdałów, nasionami chia i prażonymi orzechami laskowymi",
+  illustration: "talerz",
+  ingredients: [
+    ingredient("Płatki owsiane górskie", "płatki owsiane"),
+    ingredient("Jogurt grecki", "jogurt grecki"),
+    ingredient("Maliny mrożone", "maliny"),
+    ingredient("Płatki migdałów", "migdały"),
+    ingredient("Nasiona chia", "chia"),
+    ingredient("Orzechy laskowe", "orzechy laskowe"),
+    ingredient("Mleko krowie", "mleko", ["mleko owsiane"]),
+    ingredient("Miód", "miód"),
+  ],
+};
+// Two owned, one main product excluded and replaced by a missing substitute, one excluded without any replacement.
+const LONG_MATCH: RecipeMatch = {
+  percent: 25,
+  ingredients: [
+    { status: "have", mainExcluded: false, via: null },
+    { status: "have", mainExcluded: false, via: null },
+    { status: "unknown", mainExcluded: false, via: null },
+    { status: "unknown", mainExcluded: false, via: null },
+    { status: "unknown", mainExcluded: false, via: null },
+    { status: "unknown", mainExcluded: true, via: null },
+    { status: "unknown", mainExcluded: true, via: "mleko owsiane" },
+    { status: "unknown", mainExcluded: false, via: null },
+  ],
+};
+
+const EMPTY_LISTS: PantryLists = { have: [], staple: [], exclude: [] };
+const SAMPLE_LISTS: PantryLists = {
+  have: ["jajka", "ser", "pomidor"],
+  staple: ["sól", "pieprz"],
+  exclude: ["orzechy"],
 };
 
 const SAMPLE_TAGS: { id: string; label: string; placeholder: string; variant: TagVariant; tags: string[] }[] = [
@@ -415,13 +476,73 @@ export default function KitchenSink() {
       </StateSection>
 
       <StateSection
-        title="Kafelek przepisu: link"
-        note="Cały kafelek prowadzi do szczegółów (link na tytule rozciągnięty na kafelek); bez dopasowania i z dopasowaniem. Kafelek to płaska karta (kolor zamiast cienia). Najedź kursorem i przejdź klawiszem Tab, żeby zobaczyć hover i focus-visible."
+        title="Kafelek przepisu"
+        note="Układ M10A: ilustracja, tytuł do 3 wierszy, procent przy czasie i porcjach, „Masz X z Y”, „Zamiennik” i „Brakuje” z „+N” (na ekranach poniżej 360 px 2 wpisy). Od lewej: bez filtrów; 75% z zamiennikiem, który masz; 100% bez czasu i porcji (obraz zastępczy); długa nazwa z wykluczonymi składnikami; nieznany klucz ilustracji. Cały kafelek jest linkiem — najedź kursorem i przejdź Tabem."
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <RecipeTile recipe={RECIPE} />
           <RecipeTile recipe={RECIPE} match={MATCH} />
+          <RecipeTile recipe={SPARSE_RECIPE} match={SPARSE_ALL_MATCH} />
+          <RecipeTile recipe={LONG_RECIPE} match={LONG_MATCH} />
+          <RecipeTile
+            recipe={{ ...SPARSE_RECIPE, id: "d1e2f3a4-0b1c-4d2e-8f3a-4b5c6d7e8f90", illustration: "nie-istnieje" }}
+          />
         </div>
+      </StateSection>
+
+      <StateSection
+        title="Spiżarka: pasek na telefonie"
+        note="Poniżej 1024 px: pusta spiżarka (karta „Co masz dziś w domu?”), pasek z licznikami i pasek z niezastosowanymi filtrami. Od 1024 px pasek jest ukryty, bo edytor jest panelem obok wyników (zmniejsz okno, żeby go zobaczyć)."
+      >
+        <div className="flex flex-col gap-4">
+          <PantrySummary
+            lists={EMPTY_LISTS}
+            stale={false}
+            loading={false}
+            onEdit={NOOP}
+            onApply={NOOP}
+            onStart={NOOP}
+          />
+          <PantrySummary
+            lists={SAMPLE_LISTS}
+            stale={false}
+            loading={false}
+            onEdit={NOOP}
+            onApply={NOOP}
+            onStart={NOOP}
+          />
+          <PantrySummary lists={SAMPLE_LISTS} stale loading={false} onEdit={NOOP} onApply={NOOP} onStart={NOOP} />
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Spiżarka: brak wyników, błąd i ładowanie"
+        note="Brak wyników z listą wykluczeń i przyciskiem „Zmień wykluczenia”, błąd z „Spróbuj ponownie” oraz linia ładowania (pod nią szkielet kafelków, patrz „Kafelek przepisu”)."
+      >
+        <NoResults excluded={["jajka", "mleko", "chleb", "masło"]} onEdit={NOOP} />
+        <LoadError message="Nie udało się pobrać przepisów. Spróbuj ponownie." onRetry={NOOP} busy={false} />
+        <LoadingLine />
+      </StateSection>
+
+      <StateSection
+        title="Biblioteka ilustracji"
+        note="Wszystkie ilustracje i obraz zastępczy (bez przypisania lub nieznany klucz) w rozmiarach 56, 88 i 160 px. Talerz i danie są takie same w obu motywach, zmienia się tylko dekoracyjne tło (tokeny --illus-*); przełącz motyw przyciskiem poniżej."
+      >
+        <div>
+          <ThemeToggle />
+        </div>
+        <ul className="flex flex-wrap gap-x-6 gap-y-5">
+          {[...ILLUSTRATION_KEYS, null].map((key) => (
+            <li key={key ?? "placeholder"} className="flex flex-col gap-2">
+              <div className="flex items-end gap-3">
+                <RecipeIllustration illustration={key} className="size-14" />
+                <RecipeIllustration illustration={key} />
+                <RecipeIllustration illustration={key} className="size-40" />
+              </div>
+              <span className="text-muted-foreground text-sm">{key ?? "obraz zastępczy"}</span>
+            </li>
+          ))}
+        </ul>
       </StateSection>
 
       <StateSection

@@ -3,7 +3,7 @@
 -- (local and CI); never pushed to production.
 
 -- Babeczki z jogurtem naturalnym: 10 ingredients, 9 steps
-insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g)
+insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g, illustration)
 values (
   'Babeczki z jogurtem naturalnym',
   array[
@@ -30,11 +30,11 @@ values (
     {"name": "Borówki amerykańskie, świeże lub mrożone", "product": "borówki amerykańskie, świeże lub mrożone", "amount": 100, "unit": "g", "substitutes": [{"name": "jabłko", "product": "jabłko", "amount": 115, "unit": "g"}, {"name": "kiwi", "product": "kiwi", "amount": 95, "unit": "g"}, {"name": "maliny świeże lub mrożone", "product": "maliny świeże lub mrożone", "amount": 135, "unit": "g"}, {"name": "truskawki świeże lub mrożone", "product": "truskawki świeże lub mrożone", "amount": 175, "unit": "g"}, {"name": "mango świeże lub mrożone", "product": "mango świeże lub mrożone", "amount": 85, "unit": "g"}]}
   ]'::jsonb,
   30, 2, array['na słodko', 'na ciepło']::text[],
-  406, 11, 75, 8
+  406, 11, 75, 8, 'deser'
 );
 
 -- Kanapka z serem, szynką i ogórkiem: 7 ingredients, 2 steps
-insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g)
+insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g, illustration)
 values (
   'Kanapka z serem, szynką i ogórkiem',
   array[
@@ -51,11 +51,11 @@ values (
     {"name": "papryka czerwona", "product": "papryka czerwona", "amount": 40, "unit": "g", "substitutes": []}
   ]'::jsonb,
   5, 1, array['na wytrawnie', 'na zimno']::text[],
-  385, 19, 33, 21
+  385, 19, 33, 21, 'kanapka'
 );
 
 -- Twarożek z makrelą, porem, szpinakiem oraz ogórkiem kiszonym i pieczywem: 9 ingredients, 4 steps
-insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g)
+insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g, illustration)
 values (
   'Twarożek z makrelą, porem, szpinakiem oraz ogórkiem kiszonym i pieczywem',
   array[
@@ -76,11 +76,11 @@ values (
     {"name": "Oliwa z oliwek", "product": "oliwa z oliwek", "amount": 5, "unit": "g", "substitutes": [{"name": "Olej rzepakowy", "product": "olej rzepakowy", "amount": 5, "unit": "g"}]}
   ]'::jsonb,
   10, 1, array['na zimno', 'na wytrawnie']::text[],
-  397, 27, 37, 17
+  397, 27, 37, 17, 'kanapka'
 );
 
 -- Danie jednogarnkowe z mięsem: 11 ingredients, 5 steps
-insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g)
+insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g, illustration)
 values (
   'Danie jednogarnkowe z mięsem',
   array[
@@ -104,11 +104,11 @@ values (
     {"name": "Sos sojowy", "product": "sos sojowy", "amount": 5, "unit": "g", "substitutes": []}
   ]'::jsonb,
   40, 1, array['na ciepło', 'na wytrawnie']::text[],
-  396, 29, 37, 11
+  396, 29, 37, 11, 'miska'
 );
 
 -- Domowe spaghetti: 11 ingredients, 8 steps
-insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g)
+insert into public.recipes (name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g, illustration)
 values (
   'Domowe spaghetti',
   array[
@@ -135,5 +135,5 @@ values (
     {"name": "Oregano suszone", "product": "oregano suszone", "amount": 3, "unit": "g", "substitutes": []}
   ]'::jsonb,
   30, 2, array['na ciepło', 'na wytrawnie']::text[],
-  422, 31, 41, 14
+  422, 31, 41, 14, 'makaron'
 );

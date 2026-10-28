@@ -4,13 +4,23 @@ import Logo from "@/components/Logo.astro";
 import ThemeToggle from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
 
+interface Props {
+  wide?: boolean;
+}
+
+const { wide = false } = Astro.props;
 const { user } = Astro.locals;
 const onNewRecipe = Astro.url.pathname.replace(/\/+$/, "") === "/recipes/new";
 const initial = (user?.email?.[0] ?? "?").toUpperCase();
 ---
 
 <header class="border-border bg-background sm:bg-card border-b">
-  <div class="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-8">
+  <div
+    class:list={[
+      "mx-auto flex h-14 items-center justify-between gap-4 px-4 sm:h-16 sm:px-8",
+      wide ? "max-w-6xl" : "max-w-5xl",
+    ]}
+  >
     <Logo />
 
     {/* Desktop: everything stays in the header. */}

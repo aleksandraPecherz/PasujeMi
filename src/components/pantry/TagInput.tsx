@@ -9,6 +9,7 @@ export type TagVariant = "have" | "staple" | "exclude";
 
 interface TagInputProps {
   id: string;
+  /** Accessible name of the field; the visible heading and hint are rendered by the caller. */
   label: string;
   placeholder: string;
   tags: string[];
@@ -22,11 +23,7 @@ export function TagInput({ id, label, placeholder, tags, onAdd, onRemove, tagVar
   const [value, setValue] = useState("");
   const full = tags.length >= MAX_TAGS;
 
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== "Enter" || e.nativeEvent.isComposing) {
-      return;
-    }
-    e.preventDefault();
+  function submit() {
     if (value.trim() === "") {
       return;
     }
@@ -35,33 +32,54 @@ export function TagInput({ id, label, placeholder, tags, onAdd, onRemove, tagVar
     }
   }
 
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter" || e.nativeEvent.isComposing) {
+      return;
+    }
+    e.preventDefault();
+    submit();
+  }
+
   return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <label htmlFor={id} className="text-muted-foreground text-sm font-medium">
+    <div className="flex min-w-0 flex-col gap-3 lg:gap-2">
+      <label htmlFor={id} className="sr-only">
         {label}
       </label>
-      <Input
-        id={id}
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
-        onKeyDown={handleKeyDown}
-        maxLength={MAX_TAG_LENGTH}
-        disabled={full}
-        placeholder={full ? `Limit ${MAX_TAGS} produktów` : placeholder}
-        aria-describedby={`${id}-hint`}
-        enterKeyHint="enter"
-        autoComplete="off"
-      />
+      <div className="flex gap-2">
+        <Input
+          id={id}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+          onKeyDown={handleKeyDown}
+          maxLength={MAX_TAG_LENGTH}
+          disabled={full}
+          placeholder={full ? `Limit ${MAX_TAGS} produktów` : placeholder}
+          aria-describedby={`${id}-hint`}
+          enterKeyHint="enter"
+          autoComplete="off"
+        />
+        {/* Enter adds a tag everywhere; the button is for touch screens, where the panel is a sheet. */}
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
+          onClick={submit}
+          disabled={full || value.trim() === ""}
+          className="shrink-0 lg:hidden"
+        >
+          Dodaj
+        </Button>
+      </div>
       <p id={`${id}-hint`} className="sr-only">
         Wpisz produkt i naciśnij Enter, żeby go dodać.
       </p>
       {tags.length > 0 && (
-        <ul aria-label={label} className="flex flex-wrap gap-1.5">
+        <ul aria-label={label} className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <li key={tag} className="max-w-full">
-              <Badge variant={tagVariant} className="max-w-full gap-1 py-1 pr-1 text-sm whitespace-normal">
+              <Badge variant={tagVariant} className="max-w-full gap-1 py-1 pr-1 pl-3 text-base whitespace-normal">
                 <span className="min-w-0 break-words">{tag}</span>
                 <Button
                   type="button"
@@ -71,9 +89,9 @@ export function TagInput({ id, label, placeholder, tags, onAdd, onRemove, tagVar
                     onRemove(tag);
                   }}
                   aria-label={`Usuń ${tag}`}
-                  className="size-5 rounded-full"
+                  className="size-8 rounded-full"
                 >
-                  <X className="size-3.5" aria-hidden="true" />
+                  <X className="size-4" aria-hidden="true" />
                 </Button>
               </Badge>
             </li>

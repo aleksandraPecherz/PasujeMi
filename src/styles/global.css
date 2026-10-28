@@ -42,6 +42,11 @@
   --sidebar-ring: oklch(0.708 0 0);
   --hero: oklch(0.9359 0.0286 119.9);
   --hero-foreground: oklch(0.38 0.08 128);
+  /* Decorative backgrounds of recipe illustrations; separate from the semantic have/staple/exclude/warning colors. */
+  --illus-green: oklch(0.9359 0.0286 119.9);
+  --illus-yellow: oklch(0.936 0.0403 88.2);
+  --illus-pink: oklch(0.9161 0.0294 36.2);
+  --illus-lilac: oklch(0.9312 0.0189 309.8);
   --have: oklch(0.9303 0.0342 121.5);
   --have-foreground: oklch(0.38 0.07 128);
   --staple: oklch(0.936 0.0403 88.2);
@@ -49,6 +54,7 @@
   --exclude: oklch(0.9161 0.0294 36.2);
   --exclude-foreground: oklch(0.42 0.09 30);
   --warning: oklch(0.45 0.09 70);
+  --warning-surface: oklch(0.936 0.0403 88.2);
   --primary-hover: oklch(0.43 0.095 129);
   --input-hover: oklch(0.8 0.025 90);
 }
@@ -89,6 +95,10 @@
   --sidebar-ring: oklch(0.556 0 0);
   --hero: oklch(0.3312 0.0426 128.5);
   --hero-foreground: oklch(0.89 0.065 128);
+  --illus-green: oklch(0.3312 0.0426 128.5);
+  --illus-yellow: oklch(0.3265 0.034 83);
+  --illus-pink: oklch(0.3019 0.0473 32.1);
+  --illus-lilac: oklch(0.3061 0.0414 295.8);
   --have: oklch(0.3312 0.0426 128.5);
   --have-foreground: oklch(0.89 0.065 128);
   --staple: oklch(0.3265 0.034 83);
@@ -96,11 +106,13 @@
   --exclude: oklch(0.3019 0.0473 32.1);
   --exclude-foreground: oklch(0.87 0.055 32);
   --warning: oklch(0.85 0.09 85);
+  --warning-surface: oklch(0.3265 0.034 83);
   --primary-hover: oklch(0.84 0.09 125);
   --input-hover: oklch(0.45 0.02 125);
 }
 
 @theme inline {
+  --breakpoint-xs: 22.5rem;
   --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -140,6 +152,10 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-hero: var(--hero);
   --color-hero-foreground: var(--hero-foreground);
+  --color-illus-green: var(--illus-green);
+  --color-illus-yellow: var(--illus-yellow);
+  --color-illus-pink: var(--illus-pink);
+  --color-illus-lilac: var(--illus-lilac);
   --color-have: var(--have);
   --color-have-foreground: var(--have-foreground);
   --color-staple: var(--staple);
@@ -147,6 +163,7 @@
   --color-exclude: var(--exclude);
   --color-exclude-foreground: var(--exclude-foreground);
   --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
   --color-primary-hover: var(--primary-hover);
   --color-input-hover: var(--input-hover);
 }

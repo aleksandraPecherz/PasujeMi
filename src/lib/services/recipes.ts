@@ -13,7 +13,9 @@ import { MAX_RECOMPUTED_RECIPES } from "@/lib/recipes/limits";
 import type { NewRecipe } from "@/lib/recipes/validate";
 import type { MatchKeys, MatchedRecipe, Recipe, RecipeIngredient, RecipeKind } from "@/types";
 
-const RECIPE_COLUMNS = "id, name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g";
+// `illustration` needs the 20261027120000 migration: a database without the column fails every recipe query.
+const RECIPE_COLUMNS =
+  "id, name, steps, ingredients, prep_time_min, servings, kinds, kcal, protein_g, carbs_g, fat_g, illustration";
 
 interface RecipeRow {
   id: string;
@@ -23,6 +25,7 @@ interface RecipeRow {
   prep_time_min: number | null;
   servings: number | null;
   kinds: RecipeKind[];
+  illustration?: string | null;
   kcal: number | null;
   // Postgres `numeric` arrives from PostgREST as a string.
   protein_g: string | number | null;
@@ -47,6 +50,7 @@ function toRecipe(row: RecipeRow): Recipe {
     prepTimeMin: row.prep_time_min,
     servings: row.servings,
     kinds: row.kinds,
+    illustration: row.illustration ?? null,
     kcal: row.kcal,
     proteinG: toNumber(row.protein_g),
     carbsG: toNumber(row.carbs_g),

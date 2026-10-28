@@ -16,7 +16,9 @@
     "bench:match": "tsx scripts/bench-match.ts",
     "match-keys": "tsx scripts/match-keys.ts",
     "import-recipes": "tsx scripts/import-recipes.ts",
-    "import-recipes:write": "tsx scripts/import-recipes.ts --write"
+    "import-recipes:write": "tsx scripts/import-recipes.ts --write",
+    "assign-illustrations": "tsx scripts/assign-illustrations.ts",
+    "assign-illustrations:write": "tsx scripts/assign-illustrations.ts --write"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

@@ -337,9 +337,17 @@ describe("updateRecipe", () => {
     expect(calls[0]).toMatchObject({ op: "update", filters: ["eq:id"] });
     expect(calls[0].select).toContain("steps");
     expect(calls[0].payload).toMatchObject({ name: "Nowa zupa", prep_time_min: 20, protein_g: 4 });
-    for (const column of ["author_id", "match_keys", "match_keys_version", "id"]) {
+    for (const column of ["author_id", "match_keys", "match_keys_version", "id", "illustration"]) {
       expect(calls[0].payload).not.toHaveProperty(column);
     }
+  });
+
+  it("never writes the illustration, even when the input carries one", async () => {
+    const { supabase, calls } = fakeClient(rows);
+
+    await updateRecipe(supabase, id, { ...draft, illustration: "deser" });
+
+    expect(calls[0].payload).not.toHaveProperty("illustration");
   });
 
   it("returns null when no row is left to update", async () => {
