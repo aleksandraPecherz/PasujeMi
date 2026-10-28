@@ -28,3 +28,7 @@ Phase 2 confirmations by the author: the desktop list layout (equal heights with
 Phase 3 implemented, not committed (waiting for the author). Sheet: 95% of the viewport height, handle, title/tabs fixed, lists scroll, action at the bottom; tabs and counters stronger, tags without borders; stale card white with an amber border (new warning-border token, darker amber in dark theme). Desktop panel unchanged.
 
 Phase 3 look accepted by the author (pantry sheet and the not-applied filters card, light and dark). Row 3.2 stays open: it also covers a real phone keyboard and other interactions that were not confirmed.
+
+Phase 4 implemented, not committed (waiting for the author). Desktop: macro inside the top card (left-aligned tiles with full labels, "węglowodany"), author actions at the right of the title, ingredients 1/3 and steps 2/3, 24 px gaps. Phone: illustration strip 216 px instead of 248 (box 208 px), 20 px gaps, time and servings pills white with a thin border (card color in dark), stronger pill labels, macro tiles use the page background (darker than the card in dark), separator under the ingredients heading also before the first item. Macro stays a separate card on the phone.
+
+Phase 4 accepted by the author for the variants viewed: desktop light, phone light, phone dark; illustration proportions stay. Row 4.3 (phone) is checked. Row 4.2 stays open: desktop dark and 1440 px were not viewed, nor other data cases (e.g. without macro).
