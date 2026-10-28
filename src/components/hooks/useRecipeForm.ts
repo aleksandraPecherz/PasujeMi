@@ -61,6 +61,14 @@ export interface RecipeFormActions {
   setStep: (index: number, text: string) => void;
 }
 
+export interface RecipeFormDisclosureActions {
+  toggleIngredient: (key: string) => void;
+  toggleSubstitutes: (key: string) => void;
+  toggleNutrition: () => void;
+  /** Opens the section that holds the field of a validator path and asks for the focus on it. */
+  reveal: (path: string) => void;
+}
+
 const SESSION_EXPIRED = "Sesja wygasła. Zaloguj się ponownie.";
 const SAVE_FAILED = "Nie udało się zapisać przepisu. Spróbuj ponownie.";
 const NO_CONNECTION = "Brak połączenia z serwerem. Spróbuj ponownie.";
@@ -343,7 +351,7 @@ export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
     setFocus((prev) => ({ path: orderedErrorPaths(errors)[0] ?? null, token: prev.token + 1 }));
   }
 
-  const disclosureActions = {
+  const disclosureActions: RecipeFormDisclosureActions = {
     toggleIngredient: (key: string) => {
       setDisclosure((prev) => toggleIngredient(prev, key));
     },

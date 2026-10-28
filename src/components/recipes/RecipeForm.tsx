@@ -6,7 +6,19 @@ import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import type { Recipe } from "@/types";
 
 export default function RecipeForm({ recipe }: { recipe?: Recipe } = {}) {
-  const { form, actions, status, fieldErrors, serverError, saved, focus, submit, reset } = useRecipeForm({
+  const {
+    form,
+    actions,
+    disclosure,
+    disclosureActions,
+    status,
+    fieldErrors,
+    serverError,
+    saved,
+    focus,
+    submit,
+    reset,
+  } = useRecipeForm({
     recipe,
   });
 
@@ -29,6 +41,8 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe } = {}) {
       status={status}
       serverError={serverError}
       actions={actions}
+      disclosure={disclosure}
+      disclosureActions={disclosureActions}
       onSubmit={() => {
         void submit();
       }}

@@ -15,7 +15,13 @@ import {
 } from "@/components/pantry/PantryStates";
 import { PantrySummary } from "@/components/pantry/PantrySummary";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
-import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
+import { initialDisclosure, toggleIngredient, toggleSubstitutes } from "@/components/hooks/recipeFormDisclosure";
+import {
+  emptyRecipeForm,
+  type RecipeFormActions,
+  type RecipeFormDisclosureActions,
+  type RecipeFormState,
+} from "@/components/hooks/useRecipeForm";
 import { RecipeAuthorActionsView } from "@/components/recipes/RecipeAuthorActions";
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeDetails } from "@/components/recipes/RecipeDetails";
@@ -178,7 +184,7 @@ const NOOP_ACTIONS: RecipeFormActions = {
   setStep: NOOP,
 };
 
-// A form with an ingredient that has a substitute, one step, a kind and the amount without a unit (the field errors below).
+// A form with three ingredients (the first has a substitute, the last is empty), one step, a kind and the amount without a unit (the field errors below).
 function filledForm(): RecipeFormState {
   const form = emptyRecipeForm();
   return {
@@ -202,6 +208,16 @@ function filledForm(): RecipeFormState {
           },
         ],
       },
+      {
+        key: "ks-ing-2",
+        name: "Płatki owsiane",
+        product: "płatki owsiane",
+        productEdited: false,
+        amount: "80",
+        unit: "g",
+        substitutes: [],
+      },
+      { key: "ks-ing-3", name: "", product: "", productEdited: false, amount: "", unit: "", substitutes: [] },
     ],
     steps: [{ ...form.steps[0], text: "Podgrzej mleko i dodaj płatki." }],
     kinds: ["na słodko"],
@@ -215,9 +231,24 @@ const FORM_ERRORS: Record<string, string> = {
 };
 
 function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) {
+  const [form] = useState(() => props.form ?? filledForm());
+  const [disclosure, setDisclosure] = useState(() => initialDisclosure(form, props.cancelHref !== undefined));
+  // Toggles work here so the collapsed and expanded states can be tried; the form data stays fixed.
+  const disclosureActions: RecipeFormDisclosureActions = {
+    toggleIngredient: (key) => {
+      setDisclosure((prev) => toggleIngredient(prev, key));
+    },
+    toggleSubstitutes: (key) => {
+      setDisclosure((prev) => toggleSubstitutes(prev, key));
+    },
+    toggleNutrition: NOOP,
+    reveal: NOOP,
+  };
   return (
     <RecipeFormView
-      form={filledForm()}
+      form={form}
+      disclosure={disclosure}
+      disclosureActions={disclosureActions}
       fieldErrors={{}}
       status="idle"
       serverError={null}
@@ -444,14 +475,7 @@ export default function KitchenSink() {
             Dodaj przepis
           </Button>
         </div>
-        <RecipeFormView
-          form={emptyRecipeForm()}
-          fieldErrors={{}}
-          status="idle"
-          serverError={null}
-          actions={NOOP_ACTIONS}
-          onSubmit={NOOP}
-        />
+        <SampleRecipeForm form={emptyRecipeForm()} />
       </StateSection>
 
       <StateSection

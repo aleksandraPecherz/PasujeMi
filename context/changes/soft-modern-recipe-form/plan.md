@@ -224,16 +224,16 @@ None; the row count is bounded by `MAX_INGREDIENTS`.
 
 #### Automated
 
-- [x] 1.1 New tests pass: `npx vitest run src/components/hooks`
-- [x] 1.2 Existing form tests still pass: `npm test`
-- [x] 1.3 Lint and types pass: `npm run lint` and `npx astro check`
+- [x] 1.1 New tests pass: `npx vitest run src/components/hooks` — deb53be
+- [x] 1.2 Existing form tests still pass: `npm test` — deb53be
+- [x] 1.3 Lint and types pass: `npm run lint` and `npx astro check` — deb53be
 
 ### Phase 2: Ingredient rows
 
 #### Automated
 
-- [ ] 2.1 Lint, `check:ui` and types pass: `npm run lint`, `npm run check:ui`, `npx astro check`
-- [ ] 2.2 Tests pass: `npm test`
+- [x] 2.1 Lint, `check:ui` and types pass: `npm run lint`, `npm run check:ui`, `npx astro check`
+- [x] 2.2 Tests pass: `npm test`
 
 #### Manual
 

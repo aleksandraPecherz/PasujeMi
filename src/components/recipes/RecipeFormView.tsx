@@ -1,8 +1,10 @@
 import { Plus, X } from "lucide-react";
 import { ServerError } from "@/components/auth/ServerError";
+import type { Disclosure } from "@/components/hooks/recipeFormDisclosure";
 import type {
   NumberField,
   RecipeFormActions,
+  RecipeFormDisclosureActions,
   RecipeFormState,
   RecipeFormStatus,
 } from "@/components/hooks/useRecipeForm";
@@ -37,6 +39,8 @@ interface RecipeFormViewProps {
   status: RecipeFormStatus;
   serverError: string | null;
   actions: RecipeFormActions;
+  disclosure: Disclosure;
+  disclosureActions: RecipeFormDisclosureActions;
   onSubmit: () => void;
   title?: string;
   submitLabel?: string;
@@ -50,6 +54,8 @@ export function RecipeFormView({
   status,
   serverError,
   actions,
+  disclosure,
+  disclosureActions,
   onSubmit,
   title = "Dodaj przepis",
   submitLabel = "Zapisz przepis",
@@ -118,6 +124,14 @@ export function RecipeFormView({
             errors={fieldErrors}
             actions={actions}
             canRemove={form.ingredients.length > 1}
+            expanded={disclosure.openIngredient === row.key}
+            substitutesOpen={disclosure.openSubstitutes.includes(row.key)}
+            onToggle={() => {
+              disclosureActions.toggleIngredient(row.key);
+            }}
+            onToggleSubstitutes={() => {
+              disclosureActions.toggleSubstitutes(row.key);
+            }}
           />
         ))}
         <Button
