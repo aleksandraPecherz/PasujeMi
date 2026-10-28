@@ -1,10 +1,10 @@
 ---
 change_id: soft-modern-visual-alignment
 title: Visual alignment of the M-2 views with the mockups
-status: implemented
+status: archived
 created: 2026-10-28
 updated: 2026-10-28
-archived_at: null
+archived_at: 2026-10-28T21:33:59Z
 ---
 
 ## Notes
@@ -44,3 +44,10 @@ Phase 6 viewed and accepted by the author: phone light account menu, delete conf
 Phase 7 implemented, not committed (waiting for the author). Final comparison done: the 8 "jeszcze nieporównane" points were compared on one screenshot set (dark variants, special states, both check-your-mail variants) and no discrepancy was found; small fixes made: form section headings bold, "e-mail" no longer breaks at its hyphen and a 24 px heading on the phone for check-your-mail, `?variant=mail` dev preview of that screen, kitchen sink gets the outdated-results banner, AGENTS.md gets one line about the shared container width. Known small difference kept: D01 subtitle breaks after "brakuje Ci". M-2 is NOT closed: rows 7.2 (the author's final look at the screens, desktop/phone, both themes) and 7.3 (author confirms the final statuses) stay open, as do the earlier open manual rows (1.5, 1.6, 2.4, 3.2, 4.2, 5.3-5.5, 6.2, 6.3) that cover variants the author has not viewed.
 
 Author acceptance of the phase 7 screenshot set (2026-10-28): dark variants of details, list, forms with a substitute and an invalid step, saved screen, account menu, author popover, delete dialog, 404 and auth, plus the loading, dimmed-results and "Pokaż więcej" states. Rows checked from this and earlier acceptances: 1.5, 1.6, 4.2, 5.4, 5.5, 6.3, 7.2, 7.3. Left open and explicit: 2.4 (M05 empty card, M09 no results and M19 error were shown only in earlier test screenshots), 3.2 (a real phone keyboard and other interactions were not tested), 5.3 (a long label was not shown), 6.2 (the dark "Sprawdz skrzynke" screen after the line-break fix was produced but not yet viewed; empty-password errors in dark were not in the set). Nothing was tested on a real device. M-2 is not declared closed by this change.
+
+## Archive notes (2026-10-28)
+
+- Integration: PR #66 (https://github.com/aleksandraPecherz/PasujeMi/pull/66), merged 2026-10-28 as merge commit bf2d990 (history kept, merge commit); checks on that commit: Workers Builds `pasuje-mi` success (Build ID bba9e8cf-9013-4ada-9276-d6ba9bb9a9a4, Version ID 08e20bf7-2c30-4c20-a892-d5786c02c653, production), `ci` success, `smoke` success. The AI `review` job failed with an execution error (outcome "error") and was skipped on purpose; it is not a required check.
+- Follow-up to #63 (aggregate comparison of M-2). Commits 0e3a52f, f54a1da, fe6de2d, 0d1f374, bbf40f3, 4db569b, 2149b00, 835bf72. No migrations of its own.
+- Accepted limitation (2026-10-28, the author): the rows below were NOT verified and are NOT checked as passed; archiving does not turn them into passes. Nothing was tested on a real phone or with a real on-screen keyboard.
+- Rows left unchecked: 2.4 (empty-pantry card, no-results and fetch-error states: seen only in test screenshots), 3.2 (a real phone keyboard and other interactions), 5.3 (a long label in the desktop form), 6.2 (the dark "Sprawdź skrzynkę" screen after the line-break fix was produced but not viewed; empty-password errors in dark). All 182 findings have a final status in `visual-findings.md` (118 done, 56 accepted deviations, 8 compared). M-2 closed by the author on 2026-10-28 with these limitations accepted.
