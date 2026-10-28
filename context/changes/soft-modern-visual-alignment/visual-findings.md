@@ -44,20 +44,20 @@ Mockups are visual references, not instructions. Proportions are compared at mat
 
 ## D02/D05: pantry and results on desktop
 
-| Id     | Scope   | Mockup   | Finding                                                                                                                                           | Status                             |
-| ------ | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| D02-01 | desktop | D02, D05 | Widen the whole view and the results area.                                                                                                        | do poprawy                         |
-| D02-02 | desktop | D02, D05 | Match the pantry panel proportion to the list: the panel must not take the room that tile titles and missing items need.                          | do poprawy                         |
-| D02-03 | desktop | D02, D05 | Restore readable sizes of illustrations, titles and metadata.                                                                                     | do poprawy                         |
-| D02-04 | desktop | D02, D05 | Strengthen the pantry header and the main actions.                                                                                                | do poprawy                         |
-| D02-05 | desktop | D02, D05 | Desktop tiles have one size across the whole grid, not only within a row.                                                                         | do poprawy                         |
-| D02-06 | desktop | D02, D05 | Short recipes must not make low cards next to much taller ones.                                                                                   | do poprawy                         |
-| D02-07 | desktop | D02, D05 | Equal heights must not cut the substitute information or make content overlap; longer cases are taken into account when the shared layout is set. | do poprawy                         |
-| D02-08 | desktop | D02, D05 | Keep the agreed limits of the name and of the presentation of missing items.                                                                      | wcześniej zaakceptowane odstępstwo |
-| D02-09 | desktop | D02, D05 | Light and dark theme colors are accepted.                                                                                                         | wcześniej zaakceptowane odstępstwo |
-| D02-10 | desktop | D02, D05 | Percentage next to the time (M10A) instead of the older D02/D05 layout.                                                                           | wcześniej zaakceptowane odstępstwo |
-| D02-11 | desktop | D02, D05 | The information about a used substitute stays.                                                                                                    | wcześniej zaakceptowane odstępstwo |
-| D02-12 | desktop | D02, D05 | Differences in data, order and the number of local recipes are not visual errors.                                                                 | wcześniej zaakceptowane odstępstwo |
+| Id     | Scope   | Mockup   | Finding                                                                                                                                                                                                                                                                | Status                             |
+| ------ | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| D02-01 | desktop | D02, D05 | Widen the whole view and the results area.                                                                                                                                                                                                                             | do poprawy                         |
+| D02-02 | desktop | D02, D05 | Match the pantry panel proportion to the list: the panel must not take the room that tile titles and missing items need.                                                                                                                                               | do poprawy                         |
+| D02-03 | desktop | D02, D05 | Restore readable sizes of illustrations, titles and metadata.                                                                                                                                                                                                          | do poprawy                         |
+| D02-04 | desktop | D02, D05 | Strengthen the pantry header and the main actions.                                                                                                                                                                                                                     | do poprawy                         |
+| D02-05 | desktop | D02, D05 | Desktop tiles have one size across the whole grid, not only within a row. Decision 2026-10-28 after measuring real data (one tile of 236 px made 15 of 21 tiles 88 px too tall, 1626 px of empty space): cards are equal within each row, rows may differ; no cutting. | wcześniej zaakceptowane odstępstwo |
+| D02-06 | desktop | D02, D05 | Short recipes must not make low cards next to much taller ones.                                                                                                                                                                                                        | do poprawy                         |
+| D02-07 | desktop | D02, D05 | Equal heights must not cut the substitute information or make content overlap; longer cases are taken into account when the shared layout is set.                                                                                                                      | do poprawy                         |
+| D02-08 | desktop | D02, D05 | Keep the agreed limits of the name and of the presentation of missing items.                                                                                                                                                                                           | wcześniej zaakceptowane odstępstwo |
+| D02-09 | desktop | D02, D05 | Light and dark theme colors are accepted.                                                                                                                                                                                                                              | wcześniej zaakceptowane odstępstwo |
+| D02-10 | desktop | D02, D05 | Percentage next to the time (M10A) instead of the older D02/D05 layout.                                                                                                                                                                                                | wcześniej zaakceptowane odstępstwo |
+| D02-11 | desktop | D02, D05 | The information about a used substitute stays.                                                                                                                                                                                                                         | wcześniej zaakceptowane odstępstwo |
+| D02-12 | desktop | D02, D05 | Differences in data, order and the number of local recipes are not visual errors.                                                                                                                                                                                      | wcześniej zaakceptowane odstępstwo |
 
 ## D03: recipe details on desktop
 
@@ -300,6 +300,6 @@ Mockups are visual references, not instructions. Proportions are compared at mat
 
 ## Count
 
-Total 182 findings (unique ids): do poprawy 119, wcześniej zaakceptowane odstępstwo 55, wymaga decyzji 0, jeszcze nieporównane 8.
+Total 182 findings (unique ids): do poprawy 118, wcześniej zaakceptowane odstępstwo 56, wymaga decyzji 0, jeszcze nieporównane 8.
 
 The four points that needed a decision (M12A-01, M13-07, M16-10, M21-04) were decided on 2026-10-28 and are now recorded as accepted deviations (see their rows).

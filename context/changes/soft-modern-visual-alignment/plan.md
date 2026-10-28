@@ -91,7 +91,7 @@ The pantry view on desktop and the tiles, empty, loading, no-results and error s
 
 **File**: `src/components/pantry/PantryMatch.tsx`, `src/components/recipes/RecipeTile.tsx`, `src/components/pantry/PantrySummary.tsx`
 
-**Intent**: Give the results the room of D02/D05 (panel ratio matched to the list so titles and missing items are not squeezed) and make every desktop tile the same size across the whole grid (`auto-rows-fr`, tile `h-full`) with the layout sized for the longest accepted case (three-line title, missing items, substitute information) so nothing is cut or overlapped. Mobile keeps M10A: height follows the content, percentage next to the time, title up to three lines. Fix the metadata hierarchy and spacing, the percentage (stronger text, proper fill, no outline), "+N" never alone on a row, and the list header hierarchy.
+**Intent**: Give the results the room of D02/D05 (panel ratio matched to the list so titles and missing items are not squeezed) and make desktop tiles equal in height within each row (tile `h-full` in the grid row; rows may differ, decided 2026-10-28 after measuring real data: whole-grid equality let one 236 px tile make 15 of 21 tiles 88 px too tall) with nothing cut or overlapped (three-line title, missing items, substitute information). Mobile keeps M10A: height follows the content, percentage next to the time, title up to three lines. Fix the metadata hierarchy and spacing, the percentage (stronger text, proper fill, no outline), "+N" never alone on a row, and the list header hierarchy.
 
 **Contract**: The agreed name and missing-items limits stay; tile data and ordering are untouched.
 
@@ -112,7 +112,7 @@ The pantry view on desktop and the tiles, empty, loading, no-results and error s
 
 #### Manual Verification:
 
-- Desktop (1280 and 1440, light and dark): proportions against D02/D05, all tiles equal, no cut substitute information (D02-01…07), checked with a long-title, a long-missing and a substitute recipe
+- Desktop (1280 and 1440, light and dark): proportions against D02/D05, tiles equal within each row, no cut substitute information (D02-01…07, D02-05 accepted as row-equal), checked with a long-title, a long-missing and a substitute recipe
 - Phone (390, light and dark): M05, M10A tiles, M08, M09, M19 states; the first load shows skeletons and later filtering dims the previous results (M08-05, M08-06); "Pokaż więcej" compared (M10-11)
 
 **Implementation Note**: Pause for the author's visual check before the commit.
@@ -317,9 +317,9 @@ Every id of `visual-findings.md` appears below exactly once. "Fix" = status `do 
 
 **Phase 2: List and tiles**
 
-- Fix (28): D02-01, D02-02, D02-03, D02-04, D02-05, D02-06, D02-07, M05-01, M05-02, M05-03, M05-04, M05-05, M10-01, M10-02, M10-03, M10-04, M10-05, M08-01, M08-02, M08-03, M08-04, M09-01, M09-02, M09-03, M09-04, M19-01, M19-02, M19-03
+- Fix (27): D02-01, D02-02, D02-03, D02-04, D02-06, D02-07, M05-01, M05-02, M05-03, M05-04, M05-05, M10-01, M10-02, M10-03, M10-04, M10-05, M08-01, M08-02, M08-03, M08-04, M09-01, M09-02, M09-03, M09-04, M19-01, M19-02, M19-03
 - Compare (3): M10-11, M08-05, M08-06
-- Kept (12): D02-08, D02-09, D02-10, D02-11, D02-12, M10-06, M10-07, M10-08, M10-09, M10-10, M09-05, M19-04. Reason: agreed name and missing-items limits, accepted colors, M10A percentage next to the time, substitute information, data differences are not visual errors, M19 text "Brak połączenia…" is an acceptable variant.
+- Kept (13): D02-05, D02-08, D02-09, D02-10, D02-11, D02-12, M10-06, M10-07, M10-08, M10-09, M10-10, M09-05, M19-04. Reason: agreed name and missing-items limits, accepted colors, M10A percentage next to the time, substitute information, data differences are not visual errors, M19 text "Brak połączenia…" is an acceptable variant.
 
 **Phase 3: Pantry sheet and filters**
 
@@ -399,12 +399,12 @@ None: no schema, data or API change.
 
 #### Automated
 
-- [ ] 2.1 `npm run lint`, `npm run check:ui`, `npx astro check`
-- [ ] 2.2 Tests pass: `npm test`
+- [x] 2.1 `npm run lint`, `npm run check:ui`, `npx astro check`
+- [x] 2.2 Tests pass: `npm test`
 
 #### Manual
 
-- [ ] 2.3 Desktop against D02/D05: proportions, equal tiles, no cut substitute information (D02-01…07)
+- [x] 2.3 Desktop against D02/D05: proportions, tiles equal within each row, no cut substitute information (D02-01…07)
 - [ ] 2.4 Phone: M05, M10A tiles, M08, M09, M19 states, skeletons and dimming behaviour, "Pokaż więcej"
 
 ### Phase 3: Pantry sheet and filters

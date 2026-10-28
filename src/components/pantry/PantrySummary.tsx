@@ -35,13 +35,13 @@ export function PantrySummary({ lists, stale, loading, onEdit, onApply, onStart 
 
   if (empty) {
     return (
-      <section data-pantry-bar className="bg-hero text-hero-foreground flex flex-col gap-4 rounded-2xl p-5 lg:hidden">
-        <h2 className="text-foreground text-3xl leading-tight font-extrabold">Co masz dziś w domu?</h2>
+      <section data-pantry-bar className="bg-hero text-hero-foreground flex flex-col gap-3 rounded-2xl p-5 lg:hidden">
+        <h2 className="text-foreground text-2xl leading-tight font-extrabold">Co masz dziś w domu?</h2>
         <p>Wpisz kilka produktów, a pokażemy przepisy, które z nich ugotujesz.</p>
         <button
           type="button"
           onClick={onStart}
-          className="bg-card text-muted-foreground focus-visible:outline-ring flex h-12 items-center gap-3 rounded-lg px-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="bg-card text-muted-foreground focus-visible:outline-ring flex min-h-12 items-center gap-2 rounded-lg px-4 py-2 text-left tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <Plus className="size-5 shrink-0" aria-hidden="true" />
           Dodaj produkty, np. jajka, pomidor

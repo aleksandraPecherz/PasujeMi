@@ -84,7 +84,7 @@ function MissingLine({ items }: { items: Missing[] }) {
   return (
     <p className="text-muted-foreground text-sm">
       Brakuje:{" "}
-      <span className="text-foreground font-semibold">
+      <span className="text-foreground font-bold">
         {shown.map((item, i) => (
           <span key={i} className={i === 2 ? "xs:inline hidden" : undefined}>
             {i > 0 && ", "}
@@ -92,8 +92,9 @@ function MissingLine({ items }: { items: Missing[] }) {
           </span>
         ))}
       </span>
-      {extraWide > 0 && <span className="max-xs:hidden"> +{extraWide}</span>}
-      {extraNarrow > 0 && <span className="xs:hidden"> +{extraNarrow}</span>}
+      {/* A no-break space ties "+N" to the last word, so it never sits alone on the next row. */}
+      {extraWide > 0 && <span className="max-xs:hidden">&nbsp;+{extraWide}</span>}
+      {extraNarrow > 0 && <span className="xs:hidden">&nbsp;+{extraNarrow}</span>}
     </p>
   );
 }
@@ -103,10 +104,8 @@ function SubstituteLine({ items }: { items: Substitute[] }) {
   return (
     <p className="text-muted-foreground text-sm">
       Zamiennik:{" "}
-      <span className="text-foreground font-semibold">
-        {shown.map((s) => `${s.via} (zamiast ${s.name})`).join(", ")}
-      </span>
-      {items.length > shown.length && ` +${items.length - shown.length}`}
+      <span className="text-foreground font-bold">{shown.map((s) => `${s.via} (zamiast ${s.name})`).join(", ")}</span>
+      {items.length > shown.length && <>&nbsp;+{items.length - shown.length}</>}
     </p>
   );
 }
@@ -120,10 +119,13 @@ export function RecipeTile({ recipe, match }: RecipeTileProps) {
 
   return (
     <article
-      className={cn(cardVariants(), "hover:bg-accent relative flex min-w-0 items-start gap-4 p-4 transition-colors")}
+      className={cn(
+        cardVariants(),
+        "hover:bg-accent relative flex h-full min-w-0 items-start gap-4 p-4 transition-colors",
+      )}
     >
-      <RecipeIllustration illustration={recipe.illustration} />
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+      <RecipeIllustration illustration={recipe.illustration} className="xl:size-26" />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
         {/* Stretched link: the pseudo-element covers the whole tile, so the title is the only focusable element. */}
         <h3 className="text-card-foreground line-clamp-3 text-base leading-snug font-bold break-words">
           <a
@@ -138,7 +140,7 @@ export function RecipeTile({ recipe, match }: RecipeTileProps) {
             {percent !== null && (
               <Badge
                 variant={percent === 100 ? "default" : "have"}
-                className="shrink-0 text-sm font-bold"
+                className="shrink-0 border-transparent px-3 py-1 text-sm font-bold"
                 aria-label={`Dopasowanie ${percent}%`}
               >
                 {percent}%
@@ -151,7 +153,7 @@ export function RecipeTile({ recipe, match }: RecipeTileProps) {
           <p className="text-muted-foreground text-sm">{ingredientCount(total)}</p>
         ) : (
           <>
-            <p className="text-foreground flex items-center gap-1 text-sm font-semibold">
+            <p className="text-foreground flex items-center gap-1 text-sm font-bold">
               {summary.have === total ? (
                 <>
                   <Check className="size-4 shrink-0" aria-hidden="true" />

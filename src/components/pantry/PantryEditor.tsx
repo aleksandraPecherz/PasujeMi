@@ -56,7 +56,7 @@ export function PantryEditor({
       <div className="p-4 lg:p-5 lg:pb-4">
         <div className="mb-4 flex items-start justify-between gap-3 lg:mb-2">
           <div>
-            <h2 id="pantry-editor-title" className="text-2xl font-extrabold lg:text-lg">
+            <h2 id="pantry-editor-title" className="text-2xl font-extrabold lg:text-xl">
               Twoja spiżarka
             </h2>
           </div>

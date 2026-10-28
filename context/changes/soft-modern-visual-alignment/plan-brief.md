@@ -13,7 +13,7 @@ Desktop content is too narrow (`max-w-5xl`, `max-w-6xl` only on the home page), 
 
 ## Desired End State
 
-One shared desktop width for content and header, calmer consistent typography, equal-size desktop tiles without cut information (mobile keeps M10A), D03/D04/D01 compositions, the form and success screens as in M13/M16, and auth, dialogs, 404 and the account menu close to their mockups, in both themes. Every finding ends with a final status.
+One shared desktop width for content and header, calmer consistent typography, desktop tiles equal within each row without cut information (mobile keeps M10A), D03/D04/D01 compositions, the form and success screens as in M13/M16, and auth, dialogs, 404 and the account menu close to their mockups, in both themes. Every finding ends with a final status.
 
 ## Key Decisions Made
 
@@ -62,6 +62,6 @@ Shared components (`label`, `button`, layout, header) and tokens in `global.css`
 
 ## Success Criteria (Summary)
 
-- All 119 `do poprawy` findings fixed and the 8 `jeszcze nieporównane` points compared; the 55 accepted deviations still hold.
+- All 118 `do poprawy` findings fixed and the 8 `jeszcze nieporównane` points compared; the 56 accepted deviations still hold.
 - Lint, `check:ui`, `astro check`, tests and build stay green; desktop and phone looked at in both themes.
 - Data semantics, validation, permissions and API behaviour unchanged.

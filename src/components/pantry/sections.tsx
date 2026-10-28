@@ -43,9 +43,9 @@ export const PANTRY_SECTIONS: {
 ];
 
 const DOT_CLASS: Record<PantrySection, string> = {
-  have: "bg-have-foreground",
-  staple: "bg-staple-foreground",
-  exclude: "bg-destructive",
+  have: "bg-dot-have",
+  staple: "bg-dot-staple",
+  exclude: "bg-dot-exclude",
 };
 
 /** The colored dot that marks a pantry section; decorative, the text next to it carries the meaning. */
