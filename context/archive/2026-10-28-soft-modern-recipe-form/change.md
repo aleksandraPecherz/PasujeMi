@@ -1,10 +1,10 @@
 ---
 change_id: soft-modern-recipe-form
 title: Recipe add/edit form in Soft Modern
-status: implemented
+status: archived
 created: 2026-10-28
 updated: 2026-10-28
-archived_at: null
+archived_at: 2026-10-28T21:33:53Z
 ---
 
 ## Notes
@@ -26,3 +26,11 @@ Phase 6 implemented, not yet committed (waiting for the author): kitchen sink st
 Aggregate comparison of M-2 with the mockups (author, after phase 6): it found discrepancies, so full conformance is NOT claimed and M-2 is not closed. Row 6.4 stays open; the findings are tracked in the follow-up change soft-modern-visual-alignment.
 
 Epilogue (2026-10-28): the aggregate mockup comparison (row 6.4) was done in the follow-up change soft-modern-visual-alignment (findings, fixes and the author's acceptance of the final screenshot set; 2149b00). Only results actually confirmed there are carried over: 6.4. Rows left open on purpose, none of them re-checked here: 2.3 and 2.4 (typed values after collapse/expand, Tab order, desktop row detail were checked only by an automated browser run, not confirmed by the author), 3.3-3.5 (failed-save focus, ingredient removal, sticky bar and save/404 behaviour: automated run only), 4.5 (migration review by the author) and 4.6 (nothing applied to a remote database: no remote step was made in this work, not confirmed by the author), 5.5 (edit keeps a stored illustration and a new recipe saves with the previewed one: verified on the local database by an automated run, not confirmed by the author), 6.3 (screenshots of /recipes/new accepted in the follow-up change; the edit form and the kitchen sink were not reviewed). A real phone keyboard and other device interactions were never tested. Not archived.
+
+## Archive notes (2026-10-28)
+
+- Integration: PR #66 (https://github.com/aleksandraPecherz/PasujeMi/pull/66), merged 2026-10-28 as merge commit bf2d990 (history kept, merge commit); checks on that commit: Workers Builds `pasuje-mi` success (Build ID bba9e8cf-9013-4ada-9276-d6ba9bb9a9a4, Version ID 08e20bf7-2c30-4c20-a892-d5786c02c653, production), `ci` success, `smoke` success. The AI `review` job failed with an execution error (outcome "error") and was skipped on purpose; it is not a required check.
+- Closed issue: #63 (milestone M-2). Commits deb53be, de70bfe, a689f3f, 70ad3c4, 4f80b52, 8a1e540, 127c12e.
+- Migration `20261028120000_auto_recipe_illustration.sql` (trigger `recipes_pick_illustration`, function `private.recipes_pick_illustration`): applied on the production project `zocbniggvvctublymudo` on 2026-10-28 with `supabase db push`, after a dry-run that listed only this migration. Read-only check afterwards: history in sync; function and trigger present; no `SECURITY DEFINER`; execute revoked from public, anon and authenticated (ACL `postgres=X/postgres`); 76 recipes, 76 with an illustration, no backfill.
+- Accepted limitation (2026-10-28, the author): the rows below were NOT verified and are NOT checked as passed; archiving does not turn them into passes. Nothing was tested on a real phone or with a real on-screen keyboard.
+- Rows left unchecked: 2.3 and 2.4 (typed values after collapse/expand, Tab order, desktop row detail: automated browser run only), 3.3-3.5 (failed-save focus, removal of an ingredient, sticky bar and save/404 behaviour: automated run only), 4.5 (the author's migration review) and 4.6 (nothing applied remotely: no remote step was taken inside the implementation; the migration was applied afterwards, see above), 5.5 (stored illustration kept on edit and previewed illustration saved on create: verified on the local database by an automated run), 6.3 (edit form and kitchen-sink screenshots). Row 6.4 (aggregate comparison) was done in `soft-modern-visual-alignment` (2149b00).
