@@ -392,8 +392,8 @@ None: no schema, data or API change.
 #### Manual
 
 - [x] 1.4 One content width and header width, reasonable margins on very large screens (G-01…G-04)
-- [ ] 1.5 Typography on desktop and phone, light and dark, no mobile heading enlarged (G-05…G-08)
-- [ ] 1.6 Navbar: toggle and "Wyloguj" equal height and rounding; phone "+" and account button unchanged (G-09…G-12)
+- [x] 1.5 Typography on desktop and phone, light and dark, no mobile heading enlarged (G-05…G-08)
+- [x] 1.6 Navbar: toggle and "Wyloguj" equal height and rounding; phone "+" and account button unchanged (G-09…G-12)
 
 ### Phase 2: List and tiles
 
@@ -425,7 +425,7 @@ None: no schema, data or API change.
 
 #### Manual
 
-- [ ] 4.2 Desktop against D03: top card, left-aligned macro, 1/3 and 2/3 split
+- [x] 4.2 Desktop against D03: top card, left-aligned macro, 1/3 and 2/3 split
 - [x] 4.3 Phone against M11/M18 including the lower part — 0d1f374
 
 ### Phase 5: Form and success screen
@@ -438,27 +438,27 @@ None: no schema, data or API change.
 #### Manual
 
 - [ ] 5.3 Desktop form against D04 in both themes, with a failed save and a long label
-- [ ] 5.4 Phone form against M13/M14/M22 B including substitute error, invalid step and lower sections
-- [ ] 5.5 "Przepis dodany" against M16 in both themes
+- [x] 5.4 Phone form against M13/M14/M22 B including substitute error, invalid step and lower sections
+- [x] 5.5 "Przepis dodany" against M16 in both themes
 
 ### Phase 6: Auth, messages and overlays
 
 #### Automated
 
-- [x] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` — PH6
+- [x] 6.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build` — 4db569b
 
 #### Manual
 
 - [ ] 6.2 Desktop D01 and phone M01–M04 in both themes, including empty password, mismatched repeat and wrong credentials
-- [ ] 6.3 M12b, M20 and M21 in both themes
+- [x] 6.3 M12b, M20 and M21 in both themes
 
 ### Phase 7: Final comparison
 
 #### Automated
 
-- [ ] 7.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build`
+- [x] 7.1 `npm run lint`, `npm run check:ui`, `npx astro check`, `npm test`, `npm run build`
 
 #### Manual
 
-- [ ] 7.2 The author's final look at the screens of phases 1–6, desktop and phone, both themes
-- [ ] 7.3 Every finding has a final status; M-2 closed only if no `do poprawy` or unresolved `jeszcze nieporównane` point remains
+- [x] 7.2 The author's final look at the screens of phases 1–6, desktop and phone, both themes
+- [x] 7.3 Every finding has a final status; M-2 closed only if no `do poprawy` or unresolved `jeszcze nieporównane` point remains

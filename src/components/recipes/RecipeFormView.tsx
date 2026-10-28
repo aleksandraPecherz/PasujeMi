@@ -144,7 +144,7 @@ export function RecipeFormView({
         )}
 
         <section aria-labelledby="recipe-name-heading" className={CARD}>
-          <h2 id="recipe-name-heading" className="text-lg font-semibold">
+          <h2 id="recipe-name-heading" className="text-lg font-bold">
             Nazwa przepisu
           </h2>
           <div className="flex min-w-0 flex-col gap-1.5">
@@ -175,7 +175,7 @@ export function RecipeFormView({
 
         <section aria-labelledby="recipe-ingredients-heading" className={CARD}>
           <div>
-            <h2 id="recipe-ingredients-heading" className="text-lg font-semibold">
+            <h2 id="recipe-ingredients-heading" className="text-lg font-bold">
               Składniki <span aria-hidden="true">*</span>
             </h2>
             <p className="text-muted-foreground text-sm">
@@ -222,7 +222,7 @@ export function RecipeFormView({
         </section>
 
         <section aria-labelledby="recipe-steps-heading" className={CARD}>
-          <h2 id="recipe-steps-heading" className="text-lg font-semibold">
+          <h2 id="recipe-steps-heading" className="text-lg font-bold">
             Kroki <span aria-hidden="true">*</span>
           </h2>
           <FieldError id={fieldId("steps")} message={fieldErrors.steps} />
@@ -276,7 +276,7 @@ export function RecipeFormView({
         </section>
 
         <section aria-labelledby="recipe-extra-heading" className={cn(CARD, "md:rounded-b-none md:pb-4")}>
-          <h2 id="recipe-extra-heading" className="text-lg font-semibold">
+          <h2 id="recipe-extra-heading" className="text-lg font-bold">
             Dodatkowe informacje
           </h2>
           <fieldset className="flex flex-col gap-2">
@@ -346,7 +346,7 @@ export function RecipeFormView({
             onClick={disclosureActions.toggleNutrition}
           >
             <span className="flex flex-col">
-              <span className="text-lg font-semibold">Wartości odżywcze</span>
+              <span className="text-lg font-bold">Wartości odżywcze</span>
               <span className="text-muted-foreground flex items-center gap-1 text-sm font-normal">
                 Na 1 porcję · opcjonalne{!disclosure.nutritionOpen && " · zwinięte"}
                 {!disclosure.nutritionOpen && nutritionHasError && (

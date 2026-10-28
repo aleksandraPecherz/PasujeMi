@@ -622,10 +622,11 @@ export default function KitchenSink() {
 
       <StateSection
         title="Spiżarka: brak wyników, błąd i ładowanie"
-        note="Brak wyników z listą wykluczeń i przyciskiem „Zmień wykluczenia”, błąd z „Spróbuj ponownie” oraz linia ładowania (pod nią szkielet kafelków, patrz „Kafelek przepisu”)."
+        note="Brak wyników z listą wykluczeń i przyciskiem „Zmień wykluczenia”, błąd z „Spróbuj ponownie” (pierwszy nieudany start oraz baner nad poprzednimi, przygaszonymi wynikami po nieudanym odświeżeniu) oraz linia ładowania (pod nią szkielet kafelków, patrz „Kafelek przepisu”)."
       >
         <NoResults excluded={["jajka", "mleko", "chleb", "masło"]} onEdit={NOOP} />
         <LoadError message="Nie udało się pobrać przepisów. Spróbuj ponownie." onRetry={NOOP} busy={false} />
+        <LoadError message="Brak połączenia z serwerem. Spróbuj ponownie." onRetry={NOOP} busy={false} outdated />
         <LoadingLine />
       </StateSection>
 

@@ -5,7 +5,8 @@ import Logo from "@/components/Logo.astro";
 import ThemeLink from "@/components/ThemeLink";
 import { buttonVariants } from "@/components/ui/button";
 
-const isAutoConfirmed = import.meta.env.DEV;
+// In development the account is confirmed at once; `?variant=mail` previews the "check your mail" screen. Ignored in production.
+const isAutoConfirmed = import.meta.env.DEV && Astro.url.searchParams.get("variant") !== "mail";
 
 const content = isAutoConfirmed
   ? {
@@ -19,6 +20,8 @@ const content = isAutoConfirmed
       linkText: "Wróć do logowania",
     };
 const Icon = isAutoConfirmed ? Check : Mail;
+// "e-mail" never breaks at its hyphen.
+const descriptionParts = content.description.split("e-mail");
 ---
 
 <Layout title={`${content.heading} · PasujeMi`}>
@@ -28,8 +31,15 @@ const Icon = isAutoConfirmed ? Check : Mail;
       <div class="bg-hero text-hero-foreground mb-6 grid size-24 place-items-center rounded-full">
         <Icon className="size-10" aria-hidden="true" />
       </div>
-      <h1 class="mb-3 text-3xl font-extrabold">{content.heading}</h1>
-      <p class="text-muted-foreground mb-8">{content.description}</p>
+      <h1 class="mb-3 text-2xl font-extrabold sm:text-3xl">{content.heading}</h1>
+      <p class="text-muted-foreground mb-8">
+        {descriptionParts.map((part, i) => (
+          <>
+            {i > 0 && <span class="whitespace-nowrap">e-mail</span>}
+            {part}
+          </>
+        ))}
+      </p>
       <a href="/auth/signin" class:list={[buttonVariants({ variant: "secondary", size: "lg" }), "font-bold"]}>
         {content.linkText}
       </a>
