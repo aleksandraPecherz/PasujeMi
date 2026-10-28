@@ -1,9 +1,27 @@
 ---
 import { Leaf } from "lucide-react";
+
+interface Props {
+  /** Auth screens: a larger mark and name from `md` (D01). */
+  large?: boolean;
+}
+
+const { large = false } = Astro.props;
 ---
 
-<a href="/" class="text-foreground flex items-center gap-2 text-xl font-extrabold">
-  <span class="bg-primary text-primary-foreground grid size-8 place-items-center rounded-lg">
+<a
+  href="/"
+  class:list={[
+    "text-foreground flex shrink-0 items-center gap-2 text-xl font-extrabold",
+    large && "md:gap-3 md:text-2xl",
+  ]}
+>
+  <span
+    class:list={[
+      "bg-primary text-primary-foreground grid size-8 place-items-center rounded-lg",
+      large && "md:size-10 md:rounded-xl",
+    ]}
+  >
     <Leaf className="size-5" aria-hidden="true" />
   </span>
   PasujeMi

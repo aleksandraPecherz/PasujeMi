@@ -138,8 +138,8 @@ export default function PantryMatch({ userId, saved }: PantryMatchProps) {
         : `${recipeCountLabel(total)} · procent dopasowania pojawi się po dodaniu produktów`;
 
   return (
-    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-8">
-      <div className="flex flex-col gap-4 lg:col-span-1">
+    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-8 xl:grid-cols-7">
+      <div className="flex flex-col gap-4 lg:col-span-1 xl:col-span-2">
         <PantrySummary
           lists={lists}
           stale={stale}
@@ -171,10 +171,10 @@ export default function PantryMatch({ userId, saved }: PantryMatchProps) {
         aria-labelledby="recipes-heading"
         aria-busy={loading}
         data-pantry-results
-        className="flex flex-col gap-4 lg:col-span-2"
+        className="flex flex-col gap-4 lg:col-span-2 xl:col-span-5"
       >
         <div className="flex flex-col gap-1">
-          <h1 id="recipes-heading" className="text-3xl font-extrabold lg:text-4xl">
+          <h1 id="recipes-heading" className="text-2xl font-extrabold lg:text-4xl">
             {filtered ? "Pasujące przepisy" : "Przepisy z bazy"}
           </h1>
           {reloading ? (
@@ -194,7 +194,7 @@ export default function PantryMatch({ userId, saved }: PantryMatchProps) {
           </p>
         )}
 
-        {error !== null && <LoadError message={error} onRetry={apply} busy={loading} />}
+        {error !== null && <LoadError message={error} onRetry={apply} busy={loading} outdated={hasRecipes} />}
 
         {showEmptyFiltered && (
           <NoResults
@@ -211,7 +211,7 @@ export default function PantryMatch({ userId, saved }: PantryMatchProps) {
         {loading && recipes.length === 0 && <RecipeListSkeleton count={4} />}
 
         {hasRecipes && (
-          <ul className={cn("grid gap-4 lg:grid-cols-2", loading && "opacity-60")}>
+          <ul className={cn("grid gap-4 lg:grid-cols-2", (loading || error !== null) && "opacity-60")}>
             {recipes.map(({ recipe, match }) => (
               <li key={recipe.id} className="min-w-0">
                 <RecipeTile recipe={recipe} match={match} />

@@ -2,7 +2,8 @@ import { Utensils } from "lucide-react";
 import { resolveIllustration, type IllustrationTone } from "@/lib/recipes/illustrations";
 import { cn } from "@/lib/utils";
 
-const TONE_CLASS: Record<IllustrationTone, string> = {
+/** Background class of each tone; the details page uses it for its phone strip. */
+export const TONE_CLASS: Record<IllustrationTone, string> = {
   green: "bg-illus-green",
   yellow: "bg-illus-yellow",
   pink: "bg-illus-pink",

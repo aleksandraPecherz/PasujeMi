@@ -1,4 +1,5 @@
 ---
+import { Utensils } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
 interface Props {
@@ -10,10 +11,16 @@ const { message = "Nie znaleziono strony", description = "Adres mógł się zmie
   Astro.props;
 ---
 
-<section class="border-border bg-card flex flex-col items-start gap-4 rounded-2xl border p-4 sm:p-6">
-  <h1 class="text-card-foreground text-xl font-semibold sm:text-2xl">{message}</h1>
+<section class="mx-auto flex max-w-md flex-col items-center gap-4 pt-24 pb-16 text-center sm:pt-32">
+  <div
+    aria-hidden="true"
+    class="bg-secondary text-muted-foreground/60 mb-2 grid size-40 place-items-center rounded-full"
+  >
+    <Utensils className="size-20" />
+  </div>
+  <h1 class="text-foreground text-2xl font-extrabold sm:text-3xl">{message}</h1>
   <p class="text-muted-foreground">{description}</p>
-  <a href="/" class:list={[buttonVariants({ variant: "outline" })]}>
+  <a href="/" class:list={[buttonVariants({ size: "lg" }), "mt-2 font-bold"]}>
     Wróć do listy przepisów
   </a>
 </section>

@@ -18,7 +18,7 @@ interface PantrySummaryProps {
 
 function PantryCounts({ lists }: { lists: PantryLists }) {
   return (
-    <ul className="flex flex-wrap gap-x-3 gap-y-1">
+    <ul className="flex flex-wrap gap-x-3 gap-y-1 font-medium">
       {PANTRY_SECTIONS.map(({ section, summaryLabel }) => (
         <li key={section} className="flex items-center gap-1.5">
           <SectionDot section={section} />
@@ -35,13 +35,13 @@ export function PantrySummary({ lists, stale, loading, onEdit, onApply, onStart 
 
   if (empty) {
     return (
-      <section data-pantry-bar className="bg-hero text-hero-foreground flex flex-col gap-4 rounded-2xl p-5 lg:hidden">
-        <h2 className="text-foreground text-3xl leading-tight font-extrabold">Co masz dziś w domu?</h2>
+      <section data-pantry-bar className="bg-hero text-hero-foreground flex flex-col gap-3 rounded-2xl p-5 lg:hidden">
+        <h2 className="text-foreground text-2xl leading-tight font-extrabold">Co masz dziś w domu?</h2>
         <p>Wpisz kilka produktów, a pokażemy przepisy, które z nich ugotujesz.</p>
         <button
           type="button"
           onClick={onStart}
-          className="bg-card text-muted-foreground focus-visible:outline-ring flex h-12 items-center gap-3 rounded-lg px-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="bg-card text-muted-foreground focus-visible:outline-ring flex min-h-12 items-center gap-2 rounded-lg px-4 py-2 text-left tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <Plus className="size-5 shrink-0" aria-hidden="true" />
           Dodaj produkty, np. jajka, pomidor
@@ -55,10 +55,7 @@ export function PantrySummary({ lists, stale, loading, onEdit, onApply, onStart 
     return (
       <section
         data-pantry-bar
-        className={cn(
-          cardVariants(),
-          "bg-warning-surface border-warning/40 flex flex-col gap-3 border-2 p-4 lg:hidden",
-        )}
+        className={cn(cardVariants(), "border-warning-border flex flex-col gap-3 rounded-2xl border-2 p-4 lg:hidden")}
       >
         <p className="text-warning flex items-start gap-2 font-bold">
           <CircleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />

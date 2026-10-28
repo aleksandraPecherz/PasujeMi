@@ -1,4 +1,14 @@
 import { useRef, useState } from "react";
+import {
+  afterIngredientRemoved,
+  initialDisclosure,
+  openNewIngredient,
+  orderedErrorPaths,
+  revealErrors,
+  toggleIngredient,
+  toggleNutrition,
+  toggleSubstitutes,
+} from "@/components/hooks/recipeFormDisclosure";
 import { MAX_INGREDIENTS, MAX_STEPS, MAX_SUBSTITUTES } from "@/lib/recipes/limits";
 import { defaultProduct, parseRecipeInput, type RecipeIssue } from "@/lib/recipes/validate";
 import type { IngredientOption, Recipe, RecipeKind } from "@/types";
@@ -49,6 +59,14 @@ export interface RecipeFormActions {
   addStep: () => void;
   removeStep: (index: number) => void;
   setStep: (index: number, text: string) => void;
+}
+
+export interface RecipeFormDisclosureActions {
+  toggleIngredient: (key: string) => void;
+  toggleSubstitutes: (key: string) => void;
+  toggleNutrition: () => void;
+  /** Opens the section that holds the field of a validator path and asks for the focus on it. */
+  reveal: (path: string) => void;
 }
 
 const SESSION_EXPIRED = "Sesja wygasła. Zaloguj się ponownie.";
@@ -223,8 +241,10 @@ export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [saved, setSaved] = useState<Recipe | null>(null);
-  // Bumped after each failed validation, so the view can move the focus to the first invalid field.
-  const [focusToken, setFocusToken] = useState(0);
+  const [disclosure, setDisclosure] = useState(() => initialDisclosure(form, recipe !== undefined));
+  // Asked for after a failed save (first invalid field) or an error-banner link; `token` makes a repeat request count.
+  // The view moves the focus after render, so what the error needs is already open by then.
+  const [focus, setFocus] = useState<{ path: string | null; token: number }>({ path: null, token: 0 });
 
   /** Applies an edit and drops the error of the field it touched. */
   function edit(path: string | null, update: (prev: RecipeFormState) => RecipeFormState) {
@@ -252,15 +272,18 @@ export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
       }));
     },
     addIngredient: () => {
+      if (form.ingredients.length >= MAX_INGREDIENTS) return;
+      const row = emptyIngredient();
       edit(null, (prev) =>
-        prev.ingredients.length >= MAX_INGREDIENTS
-          ? prev
-          : { ...prev, ingredients: [...prev.ingredients, emptyIngredient()] },
+        prev.ingredients.length >= MAX_INGREDIENTS ? prev : { ...prev, ingredients: [...prev.ingredients, row] },
       );
+      setDisclosure((prev) => openNewIngredient(prev, row.key));
     },
     removeIngredient: (index) => {
       // Error paths refer to positions, so the old ones would point at other rows.
       setFieldErrors({});
+      const removed = form.ingredients.length > 1 ? form.ingredients.at(index) : undefined;
+      if (removed) setDisclosure((prev) => afterIngredientRemoved(prev, removed.key));
       edit(null, (prev) =>
         prev.ingredients.length <= 1 ? prev : { ...prev, ingredients: prev.ingredients.filter((_, i) => i !== index) },
       );
@@ -319,12 +342,31 @@ export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
     },
   };
 
+  /** Open what the errors need and ask for the focus in the same batch, so the field is visible when it is focused. */
   function fail(errors: Record<string, string>, message: string | null) {
     setFieldErrors(errors);
     setServerError(message);
     setStatus("error");
-    setFocusToken((token) => token + 1);
+    setDisclosure((prev) => revealErrors(prev, form, errors));
+    setFocus((prev) => ({ path: orderedErrorPaths(errors)[0] ?? null, token: prev.token + 1 }));
   }
+
+  const disclosureActions: RecipeFormDisclosureActions = {
+    toggleIngredient: (key: string) => {
+      setDisclosure((prev) => toggleIngredient(prev, key));
+    },
+    toggleSubstitutes: (key: string) => {
+      setDisclosure((prev) => toggleSubstitutes(prev, key));
+    },
+    toggleNutrition: () => {
+      setDisclosure((prev) => toggleNutrition(prev));
+    },
+    /** For the error banner: opens the section that holds `path`, then asks for the focus on it. */
+    reveal: (path: string) => {
+      setDisclosure((prev) => revealErrors(prev, form, { [path]: "" }));
+      setFocus((prev) => ({ path, token: prev.token + 1 }));
+    },
+  };
 
   async function submit() {
     // A ref, not `status`: two events before the next render would both see the old status.
@@ -358,12 +400,26 @@ export function useRecipeForm({ recipe }: { recipe?: Recipe } = {}) {
   }
 
   function reset() {
-    setForm(emptyRecipeForm());
+    const empty = emptyRecipeForm();
+    setForm(empty);
+    setDisclosure(initialDisclosure(empty, false));
     setFieldErrors({});
     setServerError(null);
     setSaved(null);
     setStatus("idle");
   }
 
-  return { form, actions, status, fieldErrors, serverError, saved, focusToken, submit, reset };
+  return {
+    form,
+    actions,
+    disclosure,
+    disclosureActions,
+    status,
+    fieldErrors,
+    serverError,
+    saved,
+    focus,
+    submit,
+    reset,
+  };
 }

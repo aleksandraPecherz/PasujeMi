@@ -34,15 +34,26 @@ export function formatServings(servings: Recipe["servings"]): string | null {
 
 export interface NutritionItem {
   label: string;
+  /** Lower-case label short enough for a narrow tile ("węglow."). */
+  shortLabel: string;
+  /** Number as written in Polish ("12,5"), without the unit. */
+  amount: string;
+  unit: "kcal" | "g";
+  /** Number with its unit ("12,5 g"). */
   value: string;
+}
+
+function nutritionItem(label: string, shortLabel: string, number: number, unit: NutritionItem["unit"]): NutritionItem {
+  const amount = formatNumber(number);
+  return { label, shortLabel, amount, unit, value: `${amount} ${unit}` };
 }
 
 /** Nutrition per single serving; values the recipe does not have are left out. */
 export function formatNutrition(recipe: Pick<Recipe, "kcal" | "proteinG" | "carbsG" | "fatG">): NutritionItem[] {
   const items: NutritionItem[] = [];
-  if (recipe.kcal !== null) items.push({ label: "Kalorie", value: `${formatNumber(recipe.kcal)} kcal` });
-  if (recipe.proteinG !== null) items.push({ label: "Białko", value: `${formatNumber(recipe.proteinG)} g` });
-  if (recipe.carbsG !== null) items.push({ label: "Węglowodany", value: `${formatNumber(recipe.carbsG)} g` });
-  if (recipe.fatG !== null) items.push({ label: "Tłuszcz", value: `${formatNumber(recipe.fatG)} g` });
+  if (recipe.kcal !== null) items.push(nutritionItem("Kalorie", "kcal", recipe.kcal, "kcal"));
+  if (recipe.proteinG !== null) items.push(nutritionItem("Białko", "białko", recipe.proteinG, "g"));
+  if (recipe.carbsG !== null) items.push(nutritionItem("Węglowodany", "węglow.", recipe.carbsG, "g"));
+  if (recipe.fatG !== null) items.push(nutritionItem("Tłuszcz", "tłuszcze", recipe.fatG, "g"));
   return items;
 }

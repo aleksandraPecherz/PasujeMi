@@ -15,11 +15,24 @@ import {
 } from "@/components/pantry/PantryStates";
 import { PantrySummary } from "@/components/pantry/PantrySummary";
 import { TagInput, type TagVariant } from "@/components/pantry/TagInput";
-import { emptyRecipeForm, type RecipeFormActions, type RecipeFormState } from "@/components/hooks/useRecipeForm";
+import {
+  initialDisclosure,
+  revealErrors,
+  toggleIngredient,
+  toggleNutrition,
+  toggleSubstitutes,
+} from "@/components/hooks/recipeFormDisclosure";
+import {
+  emptyRecipeForm,
+  type RecipeFormActions,
+  type RecipeFormDisclosureActions,
+  type RecipeFormState,
+} from "@/components/hooks/useRecipeForm";
 import { RecipeAuthorActionsView } from "@/components/recipes/RecipeAuthorActions";
 import { RecipeFormView } from "@/components/recipes/RecipeFormView";
 import { RecipeDetails } from "@/components/recipes/RecipeDetails";
 import { RecipeIllustration } from "@/components/recipes/RecipeIllustration";
+import { RecipeIllustrationPreview } from "@/components/recipes/RecipeIllustrationPreview";
 import { RecipeSaved } from "@/components/recipes/RecipeSaved";
 import { RecipeTile } from "@/components/recipes/RecipeTile";
 import ThemeLink from "@/components/ThemeLink";
@@ -64,6 +77,14 @@ const RECIPE: Recipe = {
   proteinG: 9,
   carbsG: 52,
   fatG: 7,
+};
+
+// A long name and no illustration: the title must wrap in full and the phone strip falls back to the placeholder.
+const LONG_NAME_RECIPE: Recipe = {
+  ...RECIPE,
+  id: "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
+  name: "Pieczone pomidory koktajlowe z kremowym serkiem, świeżą bazylią i chrupiącą grzanką czosnkową",
+  illustration: null,
 };
 
 // A recipe with missing data: no time, servings, kinds or nutrition.
@@ -170,7 +191,7 @@ const NOOP_ACTIONS: RecipeFormActions = {
   setStep: NOOP,
 };
 
-// A form with an ingredient that has a substitute, one step, a kind and the amount without a unit (the field errors below).
+// A form with three ingredients (the first has a substitute, the last is empty), one step, a kind and the amount without a unit (the field errors below).
 function filledForm(): RecipeFormState {
   const form = emptyRecipeForm();
   return {
@@ -194,6 +215,16 @@ function filledForm(): RecipeFormState {
           },
         ],
       },
+      {
+        key: "ks-ing-2",
+        name: "Płatki owsiane",
+        product: "płatki owsiane",
+        productEdited: false,
+        amount: "80",
+        unit: "g",
+        substitutes: [],
+      },
+      { key: "ks-ing-3", name: "", product: "", productEdited: false, amount: "", unit: "", substitutes: [] },
     ],
     steps: [{ ...form.steps[0], text: "Podgrzej mleko i dodaj płatki." }],
     kinds: ["na słodko"],
@@ -206,15 +237,53 @@ const FORM_ERRORS: Record<string, string> = {
   kcal: "Kcal: wartość od 0 do 10000.",
 };
 
-function SampleRecipeForm(props: Partial<Parameters<typeof RecipeFormView>[0]>) {
+// `open` starts the sample with sections open (ingredient and substitutes by position); without it a new form opens
+// the first ingredient and an edit starts collapsed, as the real form does.
+function SampleRecipeForm({
+  editing = false,
+  open,
+  ...props
+}: Partial<Parameters<typeof RecipeFormView>[0]> & {
+  editing?: boolean;
+  open?: { ingredient: number | null; substitutes: number[]; nutrition: boolean };
+}) {
+  const [form] = useState(() => props.form ?? filledForm());
+  const [disclosure, setDisclosure] = useState(() =>
+    open
+      ? {
+          openIngredient: open.ingredient === null ? null : (form.ingredients[open.ingredient]?.key ?? null),
+          openSubstitutes: open.substitutes.flatMap((index) => form.ingredients[index]?.key ?? []),
+          nutritionOpen: open.nutrition,
+        }
+      : initialDisclosure(form, editing),
+  );
+  // Toggles work here so the collapsed and expanded states can be tried; the form data stays fixed.
+  const disclosureActions: RecipeFormDisclosureActions = {
+    toggleIngredient: (key) => {
+      setDisclosure((prev) => toggleIngredient(prev, key));
+    },
+    toggleSubstitutes: (key) => {
+      setDisclosure((prev) => toggleSubstitutes(prev, key));
+    },
+    toggleNutrition: () => {
+      setDisclosure((prev) => toggleNutrition(prev));
+    },
+    reveal: (path) => {
+      setDisclosure((prev) => revealErrors(prev, form, { [path]: "" }));
+    },
+  };
   return (
     <RecipeFormView
-      form={filledForm()}
+      form={form}
+      disclosure={disclosure}
+      disclosureActions={disclosureActions}
       fieldErrors={{}}
       status="idle"
       serverError={null}
       actions={NOOP_ACTIONS}
       onSubmit={NOOP}
+      cancelHref={editing ? `/recipes/${RECIPE.id}` : "/"}
+      {...(editing && { title: "Edytuj przepis", submitLabel: "Zapisz zmiany" })}
       {...props}
     />
   );
@@ -436,14 +505,7 @@ export default function KitchenSink() {
             Dodaj przepis
           </Button>
         </div>
-        <RecipeFormView
-          form={emptyRecipeForm()}
-          fieldErrors={{}}
-          status="idle"
-          serverError={null}
-          actions={NOOP_ACTIONS}
-          onSubmit={NOOP}
-        />
+        <SampleRecipeForm form={emptyRecipeForm()} />
       </StateSection>
 
       <StateSection
@@ -457,7 +519,50 @@ export default function KitchenSink() {
         title="Formularz przepisu: edycja"
         note="Tryb edycji (/recipes/[id]/edit): tytuł „Edytuj przepis”, przycisk „Zapisz zmiany” i link „Anuluj” do szczegółów."
       >
-        <SampleRecipeForm title="Edytuj przepis" submitLabel="Zapisz zmiany" cancelHref={`/recipes/${RECIPE.id}`} />
+        <SampleRecipeForm editing savedIllustration="talerz" />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: rozwinięcia"
+        note="Telefon: składnik 1 rozwinięty z sekcją „Zamienniki · 1” i wartości odżywcze otwarte (strzałki przełączają). Od md wszystko jest widoczne bez przełączania."
+      >
+        <SampleRecipeForm open={{ ingredient: 0, substitutes: [0], nutrition: true }} />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: błąd w zwiniętym składniku"
+        note="Edycja, wszystkie składniki zwinięte: baner „Popraw 2 pola” z linkami, obramowanie błędu na zwiniętym składniku 3 i ikona błędu przy zwiniętych wartościach odżywczych. Linki w banerze otwierają sekcję."
+      >
+        <SampleRecipeForm
+          editing
+          fieldErrors={{ "ingredients.2.name": "Nazwa: pole jest wymagane.", kcal: FORM_ERRORS.kcal }}
+          status="error"
+        />
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: podgląd ilustracji"
+        note="Tylko do odczytu, bez wybieraka. Od lewej: dobrana po nazwie, brak dopasowania, pusta nazwa, zapisana ilustracja zostaje mimo nazwy. Telefon: kafelek i opis w rzędzie; kolumna desktopu: kafelek nad opisem."
+      >
+        <div className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <RecipeIllustrationPreview name="Owsianka z jabłkiem" layout="row" />
+            <RecipeIllustrationPreview name="Zakwas" layout="row" />
+            <RecipeIllustrationPreview name="" layout="row" />
+            <RecipeIllustrationPreview name="Zupa dyniowa" savedIllustration="talerz" layout="row" />
+          </div>
+          <div className="grid max-w-md grid-cols-2 gap-4">
+            <RecipeIllustrationPreview name="Sałatka z pesto" layout="column" />
+            <RecipeIllustrationPreview name="Zakwas" layout="column" />
+          </div>
+        </div>
+      </StateSection>
+
+      <StateSection
+        title="Formularz przepisu: macierz stanów"
+        note="default: pusty, wypełniony i edycja powyżej. hover i focus-visible: tokeny przycisków i pól, do sprawdzenia myszą i klawiszem Tab na formularzach powyżej (chip rodzaju ma własny pierścień). disabled i loading: „wysyłka” (przycisk wyłączony, aria-busy, „Zapisywanie…”). error: błędy pól, zwinięty składnik, błąd serwera. empty: formularz pusty. Przycisk „Dodaj składnik” wyłączony przy limicie składników jest N/A: osiąga się go dopiero przy 40 składnikach."
+      >
+        <p className="text-muted-foreground text-sm">Stany jak w opisie: każdy ma swoją sekcję na tej stronie.</p>
       </StateSection>
 
       <StateSection title="Formularz przepisu: wysyłka" note="Przycisk wyłączony z aria-busy.">
@@ -517,10 +622,11 @@ export default function KitchenSink() {
 
       <StateSection
         title="Spiżarka: brak wyników, błąd i ładowanie"
-        note="Brak wyników z listą wykluczeń i przyciskiem „Zmień wykluczenia”, błąd z „Spróbuj ponownie” oraz linia ładowania (pod nią szkielet kafelków, patrz „Kafelek przepisu”)."
+        note="Brak wyników z listą wykluczeń i przyciskiem „Zmień wykluczenia”, błąd z „Spróbuj ponownie” (pierwszy nieudany start oraz baner nad poprzednimi, przygaszonymi wynikami po nieudanym odświeżeniu) oraz linia ładowania (pod nią szkielet kafelków, patrz „Kafelek przepisu”)."
       >
         <NoResults excluded={["jajka", "mleko", "chleb", "masło"]} onEdit={NOOP} />
         <LoadError message="Nie udało się pobrać przepisów. Spróbuj ponownie." onRetry={NOOP} busy={false} />
+        <LoadError message="Brak połączenia z serwerem. Spróbuj ponownie." onRetry={NOOP} busy={false} outdated />
         <LoadingLine />
       </StateSection>
 
@@ -547,14 +653,14 @@ export default function KitchenSink() {
 
       <StateSection
         title="Szczegóły przepisu"
-        note="Pełny przepis: czas, porcje, rodzaje, wartości odżywcze, składniki z zamiennikami i kroki. Linki nie prowadzą do istniejących przepisów."
+        note="Pełny przepis: czas, porcje, rodzaje, wartości odżywcze (liczba i jednostka), składniki z zamiennikami i numerowane kroki. Na telefonie pas w kolorze ilustracji z przyciskiem wstecz, od sm karta z ilustracją 192 px. Linki nie prowadzą do istniejących przepisów."
       >
         <RecipeDetails recipe={RECIPE} />
       </StateSection>
 
       <StateSection
         title="Szczegóły przepisu: akcje autora"
-        note="Autor widzi „Edytuj” i „Usuń” obok „Wróć do listy” (zawijanie na telefonie)."
+        note="Autor lub administrator widzi „Edytuj” i „Usuń” w wierszu z linkiem wstecz; na telefonie okrągły przycisk „⋯” w prawym rogu pasa otwiera natywny popover (Esc i kliknięcie poza nim zamykają go)."
       >
         <RecipeDetails recipe={RECIPE} actions={<AuthorActions />} />
       </StateSection>
@@ -564,6 +670,13 @@ export default function KitchenSink() {
         note="Okno jest modalne, więc przyciski otwierają po jednym stanie: bezczynny, w trakcie usuwania (oba przyciski wyłączone, okno nie zamyka się — odśwież stronę) i błąd (komunikat w oknie)."
       >
         <DeleteDialogStates />
+      </StateSection>
+
+      <StateSection
+        title="Szczegóły przepisu: długa nazwa, bez ilustracji"
+        note="Pełna nazwa bez obcinania; brak klucza ilustracji pokazuje zastępczy kafelek (pas na telefonie w kolorze secondary)."
+      >
+        <RecipeDetails recipe={LONG_NAME_RECIPE} actions={<AuthorActions />} />
       </StateSection>
 
       <StateSection

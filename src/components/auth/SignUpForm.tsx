@@ -6,13 +6,6 @@ import { ServerError } from "@/components/auth/ServerError";
 
 const MIN_PASSWORD_LENGTH = 6;
 
-// Polish plural for "znak": 1 znak, 2–4 znaki, 5+ znaków (missing count never exceeds 5 here).
-function polishCharsWord(count: number) {
-  if (count === 1) return "znak";
-  if (count >= 2 && count <= 4) return "znaki";
-  return "znaków";
-}
-
 interface Props {
   serverError?: string | null;
   initialEmail?: string;
@@ -65,14 +58,6 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
     }
   }
 
-  const missingChars = MIN_PASSWORD_LENGTH - password.length;
-  const passwordHint =
-    !errors.password && password.length > 0 && missingChars > 0 ? (
-      <p className="text-muted-foreground mt-1 text-xs">
-        Brakuje jeszcze {missingChars} {polishCharsWord(missingChars)}
-      </p>
-    ) : undefined;
-
   return (
     <form method="POST" action="/api/auth/signup" className="space-y-5" onSubmit={handleSubmit} noValidate>
       <ServerError message={serverError} />
@@ -104,7 +89,7 @@ export default function SignUpForm({ serverError, initialEmail = "", autoFocusPa
         }}
         placeholder="Min. 6 znaków"
         error={errors.password}
-        hint={passwordHint}
+        hint={`Min. ${MIN_PASSWORD_LENGTH} znaków`}
         endContent={
           <PasswordToggle
             visible={showPassword}
