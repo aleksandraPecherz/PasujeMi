@@ -127,6 +127,16 @@ const steps = [
     { status: 302, location: "/auth/confirm-email" },
   ],
   [
+    // With e-mail confirmation off, signup signs the user in, so the screen says the account is ready.
+    "signup screen says the account is ready",
+    () => request("/auth/confirm-email"),
+    {
+      status: 200,
+      check: (body) =>
+        typeof body === "string" && body.includes("Konto założone") && !body.includes("Sprawdź skrzynkę"),
+    },
+  ],
+  [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
     {
