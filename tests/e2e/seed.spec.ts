@@ -29,7 +29,7 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await page.getByRole("button", { name: "Zastosuj filtry" }).click();
 
   // Assertion: the list is now the matched one and every tile carries a match, best match first.
-  await expect(page.getByRole("heading", { name: "Przepisy dopasowane do spiżarki" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pasujące przepisy" })).toBeVisible();
   const matches = page.getByLabel(/^Dopasowanie \d+%$/);
   await expect(matches.first()).toBeVisible();
   const percents = (await matches.allTextContents()).map((text) => Number.parseInt(text, 10));
@@ -62,7 +62,7 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await page.waitForURL((url) => url.pathname === "/");
   await expect(page.getByRole("button", { name: "Usuń pomidor" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Usuń cebula" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Przepisy dopasowane do spiżarki" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pasujące przepisy" })).toBeVisible();
   await expect(titles).toHaveText(names);
   await expect(matches).toHaveText(percentTexts);
 });
