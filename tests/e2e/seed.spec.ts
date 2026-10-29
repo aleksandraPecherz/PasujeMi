@@ -46,7 +46,8 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await expect(matches.last()).toHaveText("0%");
 
   // Remember the whole ranked list (names and percents) to compare after the round trip.
-  const titles = page.getByRole("heading", { level: 3 });
+  // Scoped to the results: the pantry panel has level-3 headings of its own ("Mam w domu", …) on wide screens.
+  const titles = page.getByRole("region", { name: "Pasujące przepisy" }).getByRole("heading", { level: 3 });
   const names = await titles.allTextContents();
   const percentTexts = await matches.allTextContents();
 
