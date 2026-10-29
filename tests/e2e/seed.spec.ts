@@ -58,8 +58,12 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await expect(page.getByRole("heading", { name: bestName, level: 1 })).toBeVisible();
 
   // Assertion: back on the list, the tags and the same ranked list (every name and percent, in order) are there.
-  // The details page has the link at the top and at the bottom; either one returns to the list.
-  await page.getByRole("link", { name: "Wróć do listy" }).first().click();
+  // The details page has an icon link on the phone and a "Przepisy" link on desktop; only one is visible.
+  await page
+    .getByRole("link", { name: /^(Wróć do listy przepisów|Przepisy)$/ })
+    .filter({ visible: true })
+    .first()
+    .click();
   await page.waitForURL((url) => url.pathname === "/");
   await expect(page.getByRole("button", { name: "Usuń pomidor" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Usuń cebula" })).toBeVisible();
