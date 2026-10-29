@@ -29,7 +29,7 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await page.getByRole("button", { name: "Zastosuj filtry" }).click();
 
   // Assertion: the list is now the matched one and every tile carries a match, best match first.
-  await expect(page.getByRole("heading", { name: "Przepisy dopasowane do spiżarki" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pasujące przepisy" })).toBeVisible();
   const matches = page.getByLabel(/^Dopasowanie \d+%$/);
   await expect(matches.first()).toBeVisible();
   const percents = (await matches.allTextContents()).map((text) => Number.parseInt(text, 10));
@@ -46,7 +46,8 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await expect(matches.last()).toHaveText("0%");
 
   // Remember the whole ranked list (names and percents) to compare after the round trip.
-  const titles = page.getByRole("heading", { level: 3 });
+  // Scoped to the results: the pantry panel has level-3 headings of its own ("Mam w domu", …) on wide screens.
+  const titles = page.getByRole("region", { name: "Pasujące przepisy" }).getByRole("heading", { level: 3 });
   const names = await titles.allTextContents();
   const percentTexts = await matches.allTextContents();
 
@@ -57,12 +58,16 @@ test("risk #7 — pantry tags rank recipe tiles by match and the list survives a
   await expect(page.getByRole("heading", { name: bestName, level: 1 })).toBeVisible();
 
   // Assertion: back on the list, the tags and the same ranked list (every name and percent, in order) are there.
-  // The details page has the link at the top and at the bottom; either one returns to the list.
-  await page.getByRole("link", { name: "Wróć do listy" }).first().click();
+  // The details page has an icon link on the phone and a "Przepisy" link on desktop; only one is visible.
+  await page
+    .getByRole("link", { name: /^(Wróć do listy przepisów|Przepisy)$/ })
+    .filter({ visible: true })
+    .first()
+    .click();
   await page.waitForURL((url) => url.pathname === "/");
   await expect(page.getByRole("button", { name: "Usuń pomidor" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Usuń cebula" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Przepisy dopasowane do spiżarki" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pasujące przepisy" })).toBeVisible();
   await expect(titles).toHaveText(names);
   await expect(matches).toHaveText(percentTexts);
 });

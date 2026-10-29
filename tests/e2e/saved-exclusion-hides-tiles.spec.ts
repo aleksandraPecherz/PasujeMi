@@ -60,7 +60,7 @@ test.describe("risk #7 — saved exclusions keep excluded recipes off the tiles"
     await page.getByRole("button", { name: "Zastosuj filtry" }).click();
 
     // Assertion: the yoghurt recipe is gone while the others are still listed.
-    await expect(page.getByRole("heading", { name: "Przepisy dopasowane do spiżarki" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pasujące przepisy" })).toBeVisible();
     await expect(page.getByRole("link", { name: KEPT_RECIPE })).toBeVisible();
     await expect(page.getByRole("link", { name: EXCLUDED_RECIPE })).toHaveCount(0);
 
